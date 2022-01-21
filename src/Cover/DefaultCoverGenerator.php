@@ -152,8 +152,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function getCachedFilename($file)
     {
-        // TODO: need to check for empty file path / parent ID values?
-        $filePath = $file->getPath();
+        // TODO: need to check for empty file name / parent ID values?
+        $filePath = $file->getPathName();
         $docId = $file->getParentId();
 
         $cachedFilename = $docId . '-' . $filePath;
