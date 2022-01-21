@@ -42,8 +42,10 @@ interface CoverGeneratorInterface
      *
      * @param Document $document
      * @param File     $file
+     * @param string   $filecacheDir Path to a workspace subdirectory that stores cached document files.
+     * @param string   $tmpDir Path to a workspace subdirectory that stores temporary files.
      *
      * @return string file path
      */
-    public function processFile($document, $file);
+    public function processFile($document, $file, $filecacheDir, $tmpDir);
 }

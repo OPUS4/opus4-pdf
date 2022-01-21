@@ -34,9 +34,9 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
     /**
-     * Creates a PDF cover based on the configuration settings.
+     * Creates a PDF cover based on this class's configuration.
      *
-     * @return string|null
+     * @return string|null Generated PDF data.
      */
     public function generate()
     {

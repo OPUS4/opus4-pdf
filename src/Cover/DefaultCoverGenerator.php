@@ -31,8 +31,11 @@
 
 namespace Opus\Pdf\Cover;
 
+use Exception;
+use iio\libmergepdf\Merger;
 use Opus\Document;
 use Opus\File;
+use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
 class DefaultCoverGenerator implements CoverGeneratorInterface
@@ -43,34 +46,119 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param Document $document
      * @param File     $file
+     * @param string   $filecacheDir Path to a workspace subdirectory that stores cached document files.
+     * @param string   $tmpDir Path to a workspace subdirectory that stores temporary files.
      *
      * @return string file path
      */
-    public function processFile($document, $file)
+    public function processFile($document, $file, $filecacheDir, $tmpDir)
     {
-        // TODO: if there's an up-to-date merged PDF for this file in workspace/filecache, return its path
-        // TODO: use getPdfGenerator() to get an appropriate PdfGenerator instance
-        // TODO: use the PdfGenerator instance to create a PDF cover (e.g. from a cover template)
-        // TODO: use saveCover() to save the generated PDF cover to workspace/tmp
-        // TODO: use mergeFileWithCover() to merge the PDF file with the PDF cover
-        $filePath = "";
+        $filePath = $file->getPath();
+        $cachedFilePath = $this->getCachedFilePath($file, $filecacheDir);
 
-        return $filePath;
+        if ($this->cachedFileExists($document, $file, $cachedFilePath)) {
+            return $cachedFilePath;
+        }
+
+        $pdfGenerator = $this->getPdfGenerator($document, $file);
+        if ($pdfGenerator === null) {
+            return $filePath;
+        }
+
+        // DEBUG
+        $coverPdfData = file_get_contents($filecacheDir . 'testcover.pdf'); // DEBUG
+
+        // TODO: use the PdfGenerator instance to create a PDF cover (e.g. from a cover template)
+        // $coverPdfData = $pdfGenerator->generate();
+        if (empty($coverPdfData)) {
+            return $filePath;
+        }
+
+        $coverPath = $this->getTmpFilePath($file, $tmpDir);
+        $savedSuccessfully = $this->saveFileData($coverPdfData, $coverPath);
+        if (! $savedSuccessfully) {
+            return $filePath;
+        }
+
+        $mergedPdfData = $this->mergePdfFiles($coverPath, $filePath);
+
+        $savedSuccessfully = $this->saveFileData($mergedPdfData, $cachedFilePath);
+        if (! $savedSuccessfully) {
+            return $filePath;
+        }
+
+        return $cachedFilePath;
     }
 
     /**
-     * Returns true if there's an up-to-date file with a merged cover for the given file in workspace/filecache,
+     * Returns true if there's an up-to-date file with a merged cover for the given file in the filecache directory,
      * otherwise returns false.
      *
-     * @param File $file
+     * @param Document $document
+     * @param File     $file
+     * @param string   $cachedFilePath Path to a cached file representing the given file in the filecache directory.
      *
      * @return bool
      */
-    protected function fileWithCoverExists($file)
+    protected function cachedFileExists($document, $file, $cachedFilePath)
     {
-        // TODO: check if there's already an up-to-date merged PDF for this file in workspace/filecache
+        // TODO: check if the cached file is up-to-date by comparing its creation date with Document.ServerDateModified
+
+        if (file_exists($cachedFilePath)) {
+            return true;
+        }
 
         return false;
+    }
+
+    /**
+     * Returns the path of the cached file representing the given file in the filecache directory.
+     *
+     * @param File   $file
+     * @param string $filecacheDir Path to a workspace subdirectory that stores cached document files.
+     *
+     * @return string file path
+     */
+    protected function getCachedFilePath($file, $filecacheDir)
+    {
+        $cachedFilename = $this->getCachedFilename($file);
+        $cachedFilePath = $filecacheDir . $cachedFilename;
+
+        return $cachedFilePath;
+    }
+
+    /**
+     * Returns the path of the tmp file representing the given file in the tmp directory.
+     *
+     * @param File   $file
+     * @param string $tmpDir Path to a workspace subdirectory that stores temporary files.
+     *
+     * @return string file path
+     */
+    protected function getTmpFilePath($file, $tmpDir)
+    {
+        $tmpFilename = $this->getCachedFilename($file);
+        $tmpFilePath = $tmpDir . $tmpFilename;
+
+        return $tmpFilePath;
+    }
+
+    /**
+     * Returns the name of the cached file representing the given file in the filecache directory.
+     *
+     * @param File $file
+     *
+     * @return string file name
+     */
+    protected function getCachedFilename($file)
+    {
+        // TODO: need to check for empty file path / parent ID values?
+        $filePath = $file->getPath();
+        $docId = $file->getParentId();
+
+        $cachedFilename = $docId . '-' . $filePath;
+
+        return $cachedFilename;
     }
 
     /**
@@ -85,42 +173,52 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     {
         // TODO: get a PdfGenerator instance that's appropriate for this document/file
 
-        return null;
+        $generator = PdfGeneratorFactory::create();
+
+        if ($generator === null) {
+            return null;
+        }
+
+        return $generator;
     }
 
     /**
-     * Saves the generated cover to workspace/tmp.
+     * Saves the given file at the given path. Returns true if storage was successful,
+     * otherwise returns false.
      *
-     * @param string $coverData
+     * @param string $fileData File data to be stored at the given path.
+     * @param string $filePath Path at which the given file data shall be stored.
+     *
+     * @return bool
      */
-    protected function saveCover($coverData)
+    protected function saveFileData($fileData, $filePath)
     {
-        // TODO: save the passed PDF cover data to workspace/tmp
+         $result = file_put_contents($filePath, $fileData);
+
+         return !($result === false);
     }
 
     /**
-     * Returns the original file data merged with the cover at the given path.
+     * Merges the PDFs at the given file paths and returns the merged PDF data, or null in case of failure.
      *
-     * @param File   $file
-     * @param string $coverPath Path to saved PDF cover file.
+     * @param string $firstFilePath  Path to PDF file that shall be included first in the merged PDF.
+     * @param string $secondFilePath Path to PDF file that shall be appended to the PDF file at $firstFilePath.
      *
-     * @return string file data
+     * @return string|null Merged PDF data.
      */
-    protected function mergeFileWithCover($file, $coverPath)
+    protected function mergePdfFiles($firstFilePath, $secondFilePath)
     {
-        // TODO: merge the given PDF file with the PDF cover at the given path
-        $fileData = "";
+        // TODO: check whether another (better maintained, more compatible?) library could be used for PDF merging
 
-        return $fileData;
-    }
+        try {
+            $merger = new Merger;
+            $merger->addFile($firstFilePath);
+            $merger->addFile($secondFilePath);
+            $pdfData = $merger->merge();
+        } catch (Exception $e) {
+            return null;
+        }
 
-    /**
-     * Saves the file with merged cover to workspace/filecache.
-     *
-     * @param string $fileData
-     */
-    protected function saveFileWithCover($fileData)
-    {
-        // TODO: save the passed PDF data to workspace/filecache
+        return $pdfData;
     }
 }
