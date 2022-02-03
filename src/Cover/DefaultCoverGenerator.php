@@ -195,7 +195,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     {
          $result = file_put_contents($filePath, $fileData);
 
-         return !($result === false);
+         return ! ($result === false);
     }
 
     /**
