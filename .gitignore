@@ -1,0 +1,18 @@
+# ignore any third-party libraries
+vendor
+.vagrant
+
+# ignore composer runtime
+composer.phar
+composer.lock
+
+# IDE files
+.idea
+*.iml
+nbproject
+
+# Build files
+build
+
+# Other
+**/.DS_Store
