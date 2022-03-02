@@ -31,16 +31,29 @@
 
 namespace Opus\Pdf\Cover\PdfGenerator;
 
+use Opus\Document;
+
+/**
+ * Generates a PDF for a document based on a template.
+ *
+ * This default implementation uses pandoc and LaTeX to generate the PDF based on a Markdown template.
+ *
+ * For an existing instance of this class, the used template can be changed later on in order to achieve
+ * a different PDF style.
+ */
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
     /**
-     * Creates a PDF cover based on this class's configuration.
+     * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
+     * Returns null in case of failure.
+     *
+     * @param Document $document The document for which a PDF shall be generated.
      *
      * @return string|null Generated PDF data.
      */
-    public function generate()
+    public function generate($document)
     {
-        // TODO: generate PDF cover from cover template
+        // TODO: generate PDF from template
 
         return null;
     }

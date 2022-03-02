@@ -31,12 +31,22 @@
 
 namespace Opus\Pdf\Cover\PdfGenerator;
 
+use Opus\Document;
+
+/**
+ * Interface for generating a PDF for a document based on a template.
+ *
+ * Different implementations of this interface may use different tool chains to generate the PDF.
+ */
 interface PdfGeneratorInterface
 {
     /**
-     * Creates a PDF file and returns the generated PDF data. Returns null in case of failure.
+     * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
+     * Returns null in case of failure.
+     *
+     * @param Document $document The document for which a PDF shall be generated.
      *
      * @return string|null Generated PDF data.
      */
-    public function generate();
+    public function generate($document);
 }

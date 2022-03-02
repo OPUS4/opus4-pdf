@@ -38,6 +38,12 @@ use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
+/**
+ * Generates a PDF file copy which includes an appropriate PDF cover.
+ *
+ * The generated file copy containing the PDF cover will be cached in a workspace subdirectory and served
+ * from this file cache unless a change of document metadata requires generating a new cover for the file.
+ */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
     /**
@@ -172,6 +178,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     protected function getPdfGenerator($document, $file)
     {
         // TODO: get a PdfGenerator instance that's appropriate for this document/file
+        // TODO: configure PDF generator instance (e.g. with a template path) & return fully configured generator instance
 
         $generator = PdfGeneratorFactory::create();
 

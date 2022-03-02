@@ -34,14 +34,19 @@ namespace Opus\Pdf\Cover;
 use Opus\Document;
 use Opus\File;
 
+/**
+ * Interface for generating a PDF file copy which includes an appropriate PDF cover.
+ *
+ * The PDF cover should be generated via a PDF generator class that implements PdfGeneratorInterface.
+ */
 interface CoverGeneratorInterface
 {
     /**
      * Returns the file path to a file copy that includes an appropriate cover page.
-     * Returns the file's original path if cover generation fails.
+     * Returns the file's original path if no cover needs to be generated or if cover generation fails.
      *
-     * @param Document $document
-     * @param File     $file
+     * @param Document $document The document for which a PDF cover shall be generated.
+     * @param File     $file The document's file for which a PDF cover shall be generated.
      * @param string   $filecacheDir Path to a workspace subdirectory that stores cached document files.
      * @param string   $tmpDir Path to a workspace subdirectory that stores temporary files.
      *

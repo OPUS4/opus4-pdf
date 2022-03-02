@@ -34,6 +34,9 @@ namespace Opus\Pdf\Cover;
 use Opus\Config;
 use Opus\Util\ClassLoaderHelper;
 
+/**
+ * Factory to create a PDF cover generator instance.
+ */
 class CoverGeneratorFactory
 {
     /**

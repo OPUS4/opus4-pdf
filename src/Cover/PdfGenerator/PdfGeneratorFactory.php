@@ -31,6 +31,9 @@
 
 namespace Opus\Pdf\Cover\PdfGenerator;
 
+/**
+ * Factory to create a PDF generator instance.
+ */
 class PdfGeneratorFactory
 {
     /**
@@ -39,10 +42,8 @@ class PdfGeneratorFactory
     public static function create()
     {
         // TODO: allow to use diff. PDF generator classes with diff. templates depending on the doc's collection
-        //       possible config setting to get the template for a collection: pdf.covers.<COLLECTIONID> = <TEMPLATENAME>
+        //       possible config setting to get the template for a collection: collection.<COLLECTIONID>.cover = <TEMPLATENAME>
         // $config = Config::get();
-
-        // TODO: configure PDF generator instance (e.g. with a template path) & return fully configured generator instance
 
         return new DefaultPdfGenerator();
     }
