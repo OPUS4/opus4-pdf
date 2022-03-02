@@ -46,21 +46,66 @@ use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
  */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
+    private $filecacheDir = "";
+    private $tempDir = "";
+
+    /**
+     * Returns the path to a workspace subdirectory that stores cached document files.
+     *
+     * @return string
+     */
+    public function getFilecacheDir()
+    {
+        // TODO: if $this->filecacheDir is empty, get the path to the filecache directory via Config::getInstance
+
+        return $this->filecacheDir;
+    }
+
+    /**
+     * Sets the path to a workspace subdirectory that stores cached document files.
+     *
+     * @param string $filecacheDir
+     */
+    public function setFilecacheDir($filecacheDir)
+    {
+        $this->filecacheDir = $filecacheDir;
+    }
+
+    /**
+     * Returns the path to a workspace subdirectory that stores temporary files.
+     *
+     * @return string
+     */
+    public function getTempDir()
+    {
+        // TODO: if $this->tempDir is empty, get the path to the temp directory via Config::getInstance
+
+        return $this->tempDir;
+    }
+
+    /**
+     * Sets the path to a workspace subdirectory that stores temporary files.
+     *
+     * @param string $tempDir
+     */
+    public function setTempDir($tempDir)
+    {
+        $this->tempDir = $tempDir;
+    }
+
     /**
      * Returns the file path to a file copy that includes an appropriate cover page.
      * Returns the file's original path if cover generation fails.
      *
      * @param Document $document
      * @param File     $file
-     * @param string   $filecacheDir Path to a workspace subdirectory that stores cached document files.
-     * @param string   $tmpDir Path to a workspace subdirectory that stores temporary files.
      *
      * @return string file path
      */
-    public function processFile($document, $file, $filecacheDir, $tmpDir)
+    public function processFile($document, $file)
     {
         $filePath = $file->getPath();
-        $cachedFilePath = $this->getCachedFilePath($file, $filecacheDir);
+        $cachedFilePath = $this->getCachedFilePath($file);
 
         if ($this->cachedFileExists($document, $file, $cachedFilePath)) {
             return $cachedFilePath;
@@ -72,7 +117,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         }
 
         // DEBUG
-        $coverPdfData = file_get_contents($filecacheDir . 'testcover.pdf'); // DEBUG
+        $coverPdfData = file_get_contents($this->getFilecacheDir() . 'testcover.pdf'); // DEBUG
 
         // TODO: use the PdfGenerator instance to create a PDF cover (e.g. from a cover template)
         // $coverPdfData = $pdfGenerator->generate();
@@ -80,7 +125,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return $filePath;
         }
 
-        $coverPath = $this->getTmpFilePath($file, $tmpDir);
+        $coverPath = $this->getTempFilePath($file);
         $savedSuccessfully = $this->saveFileData($coverPdfData, $coverPath);
         if (! $savedSuccessfully) {
             return $filePath;
@@ -120,31 +165,29 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /**
      * Returns the path of the cached file representing the given file in the filecache directory.
      *
-     * @param File   $file
-     * @param string $filecacheDir Path to a workspace subdirectory that stores cached document files.
+     * @param File $file
      *
      * @return string file path
      */
-    protected function getCachedFilePath($file, $filecacheDir)
+    protected function getCachedFilePath($file)
     {
         $cachedFilename = $this->getCachedFilename($file);
-        $cachedFilePath = $filecacheDir . $cachedFilename;
+        $cachedFilePath = $this->getFilecacheDir() . $cachedFilename;
 
         return $cachedFilePath;
     }
 
     /**
-     * Returns the path of the tmp file representing the given file in the tmp directory.
+     * Returns the path of the temp file representing the given file in the temp directory.
      *
-     * @param File   $file
-     * @param string $tmpDir Path to a workspace subdirectory that stores temporary files.
+     * @param File $file
      *
      * @return string file path
      */
-    protected function getTmpFilePath($file, $tmpDir)
+    protected function getTempFilePath($file)
     {
         $tmpFilename = $this->getCachedFilename($file);
-        $tmpFilePath = $tmpDir . $tmpFilename;
+        $tmpFilePath = $this->getTempDir() . $tmpFilename;
 
         return $tmpFilePath;
     }

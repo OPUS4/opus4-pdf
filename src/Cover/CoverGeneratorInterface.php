@@ -42,15 +42,41 @@ use Opus\File;
 interface CoverGeneratorInterface
 {
     /**
+     * Returns the path to a workspace subdirectory that stores cached document files.
+     *
+     * @return string
+     */
+    public function getFilecacheDir();
+
+    /**
+     * Sets the path to a workspace subdirectory that stores cached document files.
+     *
+     * @param string $filecacheDir
+     */
+    public function setFilecacheDir($filecacheDir);
+
+    /**
+     * Returns the path to a workspace subdirectory that stores temporary files.
+     *
+     * @return string
+     */
+    public function getTempDir();
+
+    /**
+     * Sets the path to a workspace subdirectory that stores temporary files.
+     *
+     * @param string $tempDir
+     */
+    public function setTempDir($tempDir);
+
+    /**
      * Returns the file path to a file copy that includes an appropriate cover page.
      * Returns the file's original path if no cover needs to be generated or if cover generation fails.
      *
      * @param Document $document The document for which a PDF cover shall be generated.
      * @param File     $file The document's file for which a PDF cover shall be generated.
-     * @param string   $filecacheDir Path to a workspace subdirectory that stores cached document files.
-     * @param string   $tmpDir Path to a workspace subdirectory that stores temporary files.
      *
      * @return string file path
      */
-    public function processFile($document, $file, $filecacheDir, $tmpDir);
+    public function processFile($document, $file);
 }
