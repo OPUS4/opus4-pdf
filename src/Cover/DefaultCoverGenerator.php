@@ -47,7 +47,8 @@ use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
     private $filecacheDir = "";
-    private $tempDir = "";
+    private $tempDir      = "";
+    private $templateDir  = "";
 
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
@@ -91,6 +92,28 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     public function setTempDir($tempDir)
     {
         $this->tempDir = $tempDir;
+    }
+
+    /**
+     * Returns the path to a workspace subdirectory that stores template files.
+     *
+     * @return string
+     */
+    public function getTemplateDir()
+    {
+        // TODO: if $this->templateDir is empty, get the path to the template directory via Config::getInstance
+
+        return $this->templateDir;
+    }
+
+    /**
+     * Sets the path to a workspace subdirectory that stores template files.
+     *
+     * @param string $templateDir
+     */
+    public function setTemplateDir($templateDir)
+    {
+        $this->templateDir = $templateDir;
     }
 
     /**
