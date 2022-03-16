@@ -44,15 +44,6 @@ class CoverGeneratorFactory
      */
     public static function create()
     {
-        $config = Config::get();
-
-        $generatePdfCover = (isset($config->pdf->covers->generate)
-            && filter_var($config->pdf->covers->generate, FILTER_VALIDATE_BOOLEAN));
-
-        if (! $generatePdfCover) {
-            return null;
-        }
-
         $generatorClass = 'Opus\Pdf\Cover\DefaultCoverGenerator'; // default class name
 
         // TODO: allow to override the default cover generator class
