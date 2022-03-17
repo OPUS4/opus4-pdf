@@ -48,7 +48,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 {
     private $filecacheDir = "";
     private $tempDir      = "";
-    private $templateDir  = "";
+    private $templatesDir = "";
 
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
@@ -95,25 +95,26 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns the path to a workspace subdirectory that stores template files.
+     * Returns the path to a configuration directory that stores template files.
      *
      * @return string
      */
-    public function getTemplateDir()
+    public function getTemplatesDir()
     {
-        // TODO: if $this->templateDir is empty, get the path to the template directory via Config::getInstance
+        // TODO: if $this->templatesDir is empty, get the path to the template directory via Config::getInstance
 
-        return $this->templateDir;
+        return $this->templatesDir;
     }
 
     /**
-     * Sets the path to a workspace subdirectory that stores template files.
+     * Sets the path to a configuration directory that stores template files.
      *
-     * @param string $templateDir
+     * @param string $templatesDir
      */
-    public function setTemplateDir($templateDir)
+    public function setTemplatesDir($templatesDir)
     {
-        $this->templateDir = $templateDir;
+        $this->templatesDir = $templatesDir;
+    }
     }
 
     /**

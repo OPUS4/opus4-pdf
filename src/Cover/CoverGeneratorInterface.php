@@ -70,18 +70,18 @@ interface CoverGeneratorInterface
     public function setTempDir($tempDir);
 
     /**
-     * Returns the path to a workspace subdirectory that stores template files.
+     * Returns the path to a configuration directory that stores template files.
      *
      * @return string
      */
-    public function getTemplateDir();
+    public function getTemplatesDir();
 
     /**
-     * Sets the path to a workspace subdirectory that stores template files.
+     * Sets the path to a configuration directory that stores template files.
      *
-     * @param string $templateDir
+     * @param string $templatesDir
      */
-    public function setTemplateDir($templateDir);
+    public function setTemplatesDir($templatesDir);
 
     /**
      * Returns the file path to a file copy that includes an appropriate cover page.
