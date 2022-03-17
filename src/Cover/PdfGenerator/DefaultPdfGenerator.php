@@ -36,13 +36,35 @@ use Opus\Document;
 /**
  * Generates a PDF for a document based on a template.
  *
- * This default implementation uses pandoc and LaTeX to generate the PDF based on a Markdown template.
+ * This default implementation uses pandoc and XeTeX to generate the PDF based on a template file.
  *
  * For an existing instance of this class, the used template can be changed later on in order to achieve
  * a different PDF style.
  */
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
+    private $templatePath = "";
+
+    /**
+     * Returns the path to the template file that's used to generate the PDF.
+     *
+     * @return string
+     */
+    public function getTemplatePath()
+    {
+        return $this->templatePath;
+    }
+
+    /**
+     * Sets the path to the template file that's used to generate the PDF.
+     *
+     * @param string $templatePath
+     */
+    public function setTemplatePath($templatePath)
+    {
+        $this->templatePath = $templatePath;
+    }
+
     /**
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.

@@ -40,6 +40,24 @@ use Opus\Document;
  */
 interface PdfGeneratorInterface
 {
+    // TODO: add constants for other supported template formats & PDF engines
+    const TEMPLATE_FORMAT_MARKDOWN = 'markdown';
+    const PDF_ENGINE_XELATEX       = 'xelatex';
+
+    /**
+     * Returns the path to the template file that's used to generate the PDF.
+     *
+     * @return string
+     */
+    public function getTemplatePath();
+
+    /**
+     * Sets the path to the template file that's used to generate the PDF.
+     *
+     * @param string $templatePath
+     */
+    public function setTemplatePath($templatePath);
+
     /**
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.

@@ -31,20 +31,41 @@
 
 namespace Opus\Pdf\Cover\PdfGenerator;
 
+use Opus\Util\ClassLoaderHelper;
+
 /**
  * Factory to create a PDF generator instance.
  */
 class PdfGeneratorFactory
 {
     /**
+     * @param string $templateFormat The template format to be used with the returned PDF generator.
+     * @param string $pdfEngine The PDF engine to be used by the returned PDF generator.
+     *
      * @return PdfGeneratorInterface|null
      */
-    public static function create()
+    public static function create($templateFormat, $pdfEngine)
     {
-        // TODO: allow to use diff. PDF generator classes with diff. templates depending on the doc's collection
-        //       possible config setting to get the template for a collection: collection.<COLLECTIONID>.cover = <TEMPLATENAME>
-        // $config = Config::get();
+        // TODO: support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
-        return new DefaultPdfGenerator();
+        $generatorClass = null;
+
+        if ($templateFormat === PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN &&
+            $pdfEngine === PdfGeneratorInterface::PDF_ENGINE_XELATEX) {
+            $generatorClass = 'Opus\Pdf\Cover\PdfGenerator\DefaultPdfGenerator';
+        }
+
+        if (empty($generatorClass)) {
+            return null;
+        }
+
+        $classExists = ClassLoaderHelper::classExists($generatorClass);
+
+        if (! $classExists) {
+            return null;
+        }
+
+        return new $generatorClass();
+
     }
 }

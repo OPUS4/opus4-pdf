@@ -38,6 +38,8 @@ use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
+use const DIRECTORY_SEPARATOR;
+
 /**
  * Generates a PDF file copy which includes an appropriate PDF cover.
  *
@@ -119,7 +121,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     {
         $this->templatesDir = $templatesDir;
     }
-    }
 
     /**
      * Returns the file path to a file copy that includes an appropriate cover page.
@@ -148,7 +149,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $coverPdfData = file_get_contents($this->getFilecacheDir() . 'testcover.pdf'); // DEBUG
 
         // TODO: use the PdfGenerator instance to create a PDF cover (e.g. from a cover template)
-        // $coverPdfData = $pdfGenerator->generate();
+        // $coverPdfData = $pdfGenerator->generate($document);
         if (empty($coverPdfData)) {
             return $filePath;
         }
@@ -239,6 +240,56 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
+     * Returns the template name (or path relative to the template directory) that's appropriate
+     * for the given document.
+     *
+     * @param Document $document
+     *
+     * @return string|null template name or path relative to template directory
+     */
+    protected function getTemplateName($document)
+    {
+        // TODO: query Config for any `collection.<COLLECTIONID>.cover = <TEMPLATENAME>` setting(s)
+        // TODO: to find the appropriate cover template to be used for a given document / collection ID
+
+        // TODO: walk the collection tree up to its root and use the first template that has a matching config setting
+
+        // TODO: handle document belonging to two collections for which different cover templates have been specified
+
+        // DEBUG
+        return 'ifa/iccra-cover-template.md'; // DEBUG
+    }
+
+    /**
+     * Returns the absolute path to the template file to be used for the given document.
+     *
+     * @param Document $document
+     *
+     * @return string|null absolute path to template file
+     */
+    protected function getTemplatePath($document)
+    {
+        $templatesDir = $this->getTemplatesDir();
+        if (substr($templatesDir, -1) !== DIRECTORY_SEPARATOR) {
+            $templatesDir .= DIRECTORY_SEPARATOR;
+        }
+
+        $templateName = $this->getTemplateName($document);
+
+        if ($templateName === null) {
+            return null;
+        }
+
+        $templatePath = $templatesDir . $templateName;
+
+        if (! file_exists($templatePath)) {
+            return null;
+        }
+
+        return $templatePath;
+    }
+
+    /**
      * Returns a PDF generator instance to create a cover for the given document and file.
      *
      * @param Document $document
@@ -248,14 +299,31 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function getPdfGenerator($document, $file)
     {
-        // TODO: get a PdfGenerator instance that's appropriate for this document/file
-        // TODO: configure PDF generator instance (e.g. with a template path) & return fully configured generator instance
+        // TODO: support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
-        $generator = PdfGeneratorFactory::create();
+        $templatePath = $this->getTemplatePath($document);
+
+        if ($templatePath === null) {
+            return null;
+        }
+
+        // choose an appropriate PDF generator based on the used template
+        $markdownFileExtension = '.md';
+        $templateFormat        = null;
+        $pdfEngine             = null;
+
+        if (substr($templatePath, -3) !== $markdownFileExtension) {
+            $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
+            $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
+        }
+
+        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
 
         if ($generator === null) {
             return null;
         }
+
+        $generator->setTemplatePath($templatePath);
 
         return $generator;
     }
