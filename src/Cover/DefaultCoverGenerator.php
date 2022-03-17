@@ -101,9 +101,13 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getTemplatesDir()
     {
-        // TODO: if $this->templatesDir is empty, get the path to the template directory via Config::getInstance
+        $templatesDir = $this->templatesDir;
 
-        return $this->templatesDir;
+        if (empty($templatesDir)) {
+            $templatesDir = APPLICATION_PATH . '/application/configs/covers';
+        }
+
+        return $templatesDir;
     }
 
     /**
