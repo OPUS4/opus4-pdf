@@ -312,7 +312,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $templateFormat        = null;
         $pdfEngine             = null;
 
-        if (substr($templatePath, -3) !== $markdownFileExtension) {
+        if (substr($templatePath, -3) === $markdownFileExtension) {
             $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
             $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
         }
