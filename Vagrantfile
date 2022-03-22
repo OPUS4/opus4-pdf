@@ -8,11 +8,13 @@ apt-get -yq update
 apt-get -yq install php7.1
 
 # Install required PHP packages
+apt-get -yq install php7.1-curl
 apt-get -yq install php7.1-dom
 
 # Install required tools
 apt-get -yq install pandoc
 apt-get -yq install ant
+apt-get -yq install unzip
 SCRIPT
 
 $composer = <<SCRIPT

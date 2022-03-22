@@ -7,10 +7,6 @@ composer.phar
 composer.lock
 bin/composer
 
-# ignore all workspace files
-workspace/**/*
-tests/workspace/**/*
-
 # IDE files
 .idea
 *.iml
