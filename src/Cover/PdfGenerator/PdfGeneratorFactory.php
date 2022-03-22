@@ -41,7 +41,6 @@ class PdfGeneratorFactory
     /**
      * @param string $templateFormat The template format to be used with the returned PDF generator.
      * @param string $pdfEngine The PDF engine to be used by the returned PDF generator.
-     *
      * @return PdfGeneratorInterface|null
      */
     public static function create($templateFormat, $pdfEngine)
@@ -50,9 +49,11 @@ class PdfGeneratorFactory
 
         $generatorClass = null;
 
-        if ($templateFormat === PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN &&
-            $pdfEngine === PdfGeneratorInterface::PDF_ENGINE_XELATEX) {
-            $generatorClass = 'Opus\Pdf\Cover\PdfGenerator\DefaultPdfGenerator';
+        if (
+            $templateFormat === PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN &&
+            $pdfEngine === PdfGeneratorInterface::PDF_ENGINE_XELATEX
+        ) {
+            $generatorClass = DefaultPdfGenerator::class;
         }
 
         if (empty($generatorClass)) {
@@ -66,6 +67,5 @@ class PdfGeneratorFactory
         }
 
         return new $generatorClass();
-
     }
 }

@@ -29,39 +29,19 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Pdf\Cover;
+namespace OpusTest\Pdf\Cover;
 
-use Opus\Util\ClassLoaderHelper;
+use Opus\Pdf\Cover\CoverGeneratorFactory;
+use Opus\Pdf\Cover\CoverGeneratorInterface;
+use PHPUnit\Framework\TestCase;
 
-/**
- * Factory to create a PDF cover generator instance.
- */
-class CoverGeneratorFactory
+class CoverGeneratorFactoryTest extends TestCase
 {
-    /**
-     * @return CoverGeneratorInterface|null
-     */
-    public static function create()
+    public function testCreate()
     {
-        $generatorClass = DefaultCoverGenerator::class; // default class name
+        $generator = CoverGeneratorFactory::create();
 
-        // TODO: allow to override the default cover generator class
-/*
-        if (isset($config->pdf->covers->generatorClass)) {
-            $generatorClass = $config->pdf->covers->generatorClass;
-        }
-*/
-
-        if (empty($generatorClass)) {
-            return null;
-        }
-
-        $classExists = ClassLoaderHelper::classExists($generatorClass);
-
-        if (! $classExists) {
-            return null;
-        }
-
-        return new $generatorClass();
+        $this->assertNotNull($generator);
+        $this->assertInstanceOf(CoverGeneratorInterface::class, $generator);
     }
 }

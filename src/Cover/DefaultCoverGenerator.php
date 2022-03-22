@@ -38,6 +38,11 @@ use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function substr;
+
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -128,12 +133,11 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param Document $document
      * @param File     $file
-     *
      * @return string file path
      */
     public function processFile($document, $file)
     {
-        $filePath = $file->getPath();
+        $filePath       = $file->getPath();
         $cachedFilePath = $this->getCachedFilePath($file);
 
         if ($this->cachedFileExists($document, $file, $cachedFilePath)) {
@@ -154,7 +158,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return $filePath;
         }
 
-        $coverPath = $this->getTempFilePath($file);
+        $coverPath         = $this->getTempFilePath($file);
         $savedSuccessfully = $this->saveFileData($coverPdfData, $coverPath);
         if (! $savedSuccessfully) {
             return $filePath;
@@ -177,7 +181,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * @param Document $document
      * @param File     $file
      * @param string   $cachedFilePath Path to a cached file representing the given file in the filecache directory.
-     *
      * @return bool
      */
     protected function cachedFileExists($document, $file, $cachedFilePath)
@@ -195,48 +198,39 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the path of the cached file representing the given file in the filecache directory.
      *
      * @param File $file
-     *
      * @return string file path
      */
     protected function getCachedFilePath($file)
     {
         $cachedFilename = $this->getCachedFilename($file);
-        $cachedFilePath = $this->getFilecacheDir() . $cachedFilename;
-
-        return $cachedFilePath;
+        return $this->getFilecacheDir() . $cachedFilename;
     }
 
     /**
      * Returns the path of the temp file representing the given file in the temp directory.
      *
      * @param File $file
-     *
      * @return string file path
      */
     protected function getTempFilePath($file)
     {
         $tmpFilename = $this->getCachedFilename($file);
-        $tmpFilePath = $this->getTempDir() . $tmpFilename;
-
-        return $tmpFilePath;
+        return $this->getTempDir() . $tmpFilename;
     }
 
     /**
      * Returns the name of the cached file representing the given file in the filecache directory.
      *
      * @param File $file
-     *
      * @return string file name
      */
     protected function getCachedFilename($file)
     {
         // TODO: need to check for empty file name / parent ID values?
         $filePath = $file->getPathName();
-        $docId = $file->getParentId();
+        $docId    = $file->getParentId();
 
-        $cachedFilename = $docId . '-' . $filePath;
-
-        return $cachedFilename;
+        return $docId . '-' . $filePath;
     }
 
     /**
@@ -244,7 +238,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * for the given document.
      *
      * @param Document $document
-     *
      * @return string|null template name or path relative to template directory
      */
     protected function getTemplateName($document)
@@ -264,7 +257,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the absolute path to the template file to be used for the given document.
      *
      * @param Document $document
-     *
      * @return string|null absolute path to template file
      */
     protected function getTemplatePath($document)
@@ -294,7 +286,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param Document $document
      * @param File     $file
-     *
      * @return PdfGeneratorInterface|null
      */
     protected function getPdfGenerator($document, $file)
@@ -334,7 +325,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param string $fileData File data to be stored at the given path.
      * @param string $filePath Path at which the given file data shall be stored.
-     *
      * @return bool
      */
     protected function saveFileData($fileData, $filePath)
@@ -349,7 +339,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param string $firstFilePath  Path to PDF file that shall be included first in the merged PDF.
      * @param string $secondFilePath Path to PDF file that shall be appended to the PDF file at $firstFilePath.
-     *
      * @return string|null Merged PDF data.
      */
     protected function mergePdfFiles($firstFilePath, $secondFilePath)
@@ -357,7 +346,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         // TODO: check whether another (better maintained, more compatible?) library could be used for PDF merging
 
         try {
-            $merger = new Merger;
+            $merger = new Merger();
             $merger->addFile($firstFilePath);
             $merger->addFile($secondFilePath);
             $pdfData = $merger->merge();

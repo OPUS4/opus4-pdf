@@ -63,7 +63,6 @@ interface PdfGeneratorInterface
      * Returns null in case of failure.
      *
      * @param Document $document The document for which a PDF shall be generated.
-     *
      * @return string|null Generated PDF data.
      */
     public function generate($document);

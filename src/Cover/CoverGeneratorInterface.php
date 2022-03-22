@@ -89,7 +89,6 @@ interface CoverGeneratorInterface
      *
      * @param Document $document The document for which a PDF cover shall be generated.
      * @param File     $file The document's file for which a PDF cover shall be generated.
-     *
      * @return string file path
      */
     public function processFile($document, $file);
