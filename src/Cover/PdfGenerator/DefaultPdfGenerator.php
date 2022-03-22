@@ -43,6 +43,7 @@ use Opus\Document;
  */
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
+    /** @var string Path to template files */
     private $templatePath = "";
 
     /**

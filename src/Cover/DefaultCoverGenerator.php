@@ -53,8 +53,13 @@ use const DIRECTORY_SEPARATOR;
  */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
+    /** @var string Path to file cache */
     private $filecacheDir = "";
-    private $tempDir      = "";
+
+    /** @var string Path for temp files */
+    private $tempDir = "";
+
+    /** @var string Path to template files */
     private $templatesDir = "";
 
     /**
