@@ -33,6 +33,7 @@ namespace Opus\Pdf\Cover;
 
 use Exception;
 use iio\libmergepdf\Merger;
+use Opus\Config;
 use Opus\Document;
 use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
@@ -53,13 +54,13 @@ use const DIRECTORY_SEPARATOR;
  */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
-    /** @var string Path to file cache */
+    /** @var string Path to a file cache directory */
     private $filecacheDir = "";
 
-    /** @var string Path for temp files */
+    /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
 
-    /** @var string Path to template files */
+    /** @var string Path to a directory that stores template files */
     private $templatesDir = "";
 
     /**
@@ -69,9 +70,17 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getFilecacheDir()
     {
-        // TODO: if $this->filecacheDir is empty, get the path to the filecache directory via Config::getInstance
+        $filecacheDir = $this->filecacheDir;
 
-        return $this->filecacheDir;
+        if (empty($filecacheDir)) {
+            $filecacheDir = Config::getInstance()->getWorkspacePath() . 'filecache';
+        }
+
+        if (substr($filecacheDir, -1) !== DIRECTORY_SEPARATOR) {
+            $filecacheDir .= DIRECTORY_SEPARATOR;
+        }
+
+        return $filecacheDir;
     }
 
     /**
@@ -91,9 +100,17 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getTempDir()
     {
-        // TODO: if $this->tempDir is empty, get the path to the temp directory via Config::getInstance
+        $tempDir = $this->tempDir;
 
-        return $this->tempDir;
+        if (empty($tempDir)) {
+            $tempDir = Config::getInstance()->getTempPath();
+        }
+
+        if (substr($tempDir, -1) !== DIRECTORY_SEPARATOR) {
+            $tempDir .= DIRECTORY_SEPARATOR;
+        }
+
+        return $tempDir;
     }
 
     /**
@@ -117,6 +134,10 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         if (empty($templatesDir)) {
             $templatesDir = APPLICATION_PATH . '/application/configs/covers';
+        }
+
+        if (substr($templatesDir, -1) !== DIRECTORY_SEPARATOR) {
+            $templatesDir .= DIRECTORY_SEPARATOR;
         }
 
         return $templatesDir;
@@ -219,8 +240,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function getTempFilePath($file)
     {
-        $tmpFilename = $this->getCachedFilename($file);
-        return $this->getTempDir() . $tmpFilename;
+        $tempFilename = $this->getCachedFilename($file);
+        return $this->getTempDir() . $tempFilename;
     }
 
     /**
@@ -239,11 +260,11 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns the template name (or path relative to the template directory) that's appropriate
+     * Returns the template name (or path relative to the templates directory) that's appropriate
      * for the given document.
      *
      * @param Document $document
-     * @return string|null template name or path relative to template directory
+     * @return string|null template name or path relative to templates directory
      */
     protected function getTemplateName($document)
     {
@@ -267,10 +288,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     protected function getTemplatePath($document)
     {
         $templatesDir = $this->getTemplatesDir();
-        if (substr($templatesDir, -1) !== DIRECTORY_SEPARATOR) {
-            $templatesDir .= DIRECTORY_SEPARATOR;
-        }
-
         $templateName = $this->getTemplateName($document);
 
         if ($templateName === null) {
