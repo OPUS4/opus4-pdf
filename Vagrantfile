@@ -12,6 +12,7 @@ apt-get -yq install php7.1-curl
 apt-get -yq install php7.1-dom
 
 # Install required tools
+apt-get -yq install texlive-xetex
 apt-get -yq install pandoc
 apt-get -yq install ant
 apt-get -yq install unzip
