@@ -1,0 +1,32 @@
+---
+date-meta: 2003-08-01
+title: "Nutrient status of Baltic Sea ice: Evidence for control by snow-ice formation, ice permeability, and ice algae"
+author-meta: "M. Granskog, H. Kaartokallio, K. Shirasawa"
+abstract: "Samples of land-fast sea ice collected along the Finnish coast of the Baltic Sea, between latitudes 60.2°N and 65.7°N, in January to April 2000 were analyzed for physical, biological, and chemical parameters. Both spatial and temporal variability were investigated. Snow-ice contributed in average a third of the total ice thickness, while the snow fraction (by mass) of the ice was 20% on average. Snow-ice formation increased the nitrogen concentrations substantially, mainly in the upper parts of the ice cover. Phosphorus on the other hand was controlled by biological uptake, with distinct maxima in the bottommost parts of the ice cover. The chlorophyll-a concentrations were dependent on the physical properties of the ice to some extent. In more saline waters the chlorophyll-a concentrations in the ice were variable (1–17 μg l−1). However, in the less saline waters of the Bothnian Bay the concentrations were generally considerably lower (<1 μg l−1) than elsewhere. This is presumably caused by formation of ice of low salinity, due to the low ambient salinity in the area and the under-ice flow of river waters, and formation of ice that has no habitable space for ice algae. Atmospheric nutrients possibly enhance the magnitude of the ice algae bloom, through downward flushing of surface deposited nutrients during periods when the ice was permeable. We surmise that atmospheric supply of nutrients plays an important role in biological productivity within the Baltic Sea ice sheet and potentially also in under-ice waters."
+lang: en-GB
+references:
+- type: article-journal
+  id: Granskog_etal2003NutrientStatus
+  author:
+  - family: Granskog
+    given: Mats Anders
+  - family: Kaartokallio
+    given: Hermanni
+  - family: Shirasawa
+    given: Kunio
+  container-title: Journal of Geophysical Research
+  issued:
+    date-parts:
+    - - 2003
+      - 8
+      - 9
+  title-short: Nutrient status of Baltic Sea ice
+  title: "Nutrient status of Baltic Sea ice: Evidence for control by
+    snow-ice formation, ice permeability, and ice algae"
+  volume: 108
+  issue: C8
+  page: 3253
+  DOI: 10.1029/2002JC001386
+  URL: https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2002JC001386
+  language: en-GB
+---
