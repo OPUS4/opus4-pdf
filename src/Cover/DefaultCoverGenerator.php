@@ -40,11 +40,12 @@ use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
 use function file_exists;
-use function file_get_contents;
 use function file_put_contents;
+use function pathinfo;
 use function substr;
 
 use const DIRECTORY_SEPARATOR;
+use const PATHINFO_FILENAME;
 
 /**
  * Generates a PDF file copy which includes an appropriate PDF cover.
@@ -175,18 +176,11 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return $filePath;
         }
 
-        // DEBUG
-        $coverPdfData = file_get_contents($this->getFilecacheDir() . 'testcover.pdf'); // DEBUG
+        $tempFilename = pathinfo($this->getCachedFilename($file), PATHINFO_FILENAME);
 
-        // TODO: use the PdfGenerator instance to create a PDF cover (e.g. from a cover template)
-        // $coverPdfData = $pdfGenerator->generate($document);
-        if (empty($coverPdfData)) {
-            return $filePath;
-        }
+        $coverPath = $pdfGenerator->generateFile($document, $tempFilename);
 
-        $coverPath         = $this->getTempFilePath($file);
-        $savedSuccessfully = $this->saveFileData($coverPdfData, $coverPath);
-        if (! $savedSuccessfully) {
+        if ($coverPath === null) {
             return $filePath;
         }
 
@@ -276,7 +270,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         // TODO: handle document belonging to two collections for which different cover templates have been specified
 
         // DEBUG
-        return 'ifa/iccra-cover-template.md'; // DEBUG
+        return 'ifa/ifa_iccra-cover_template.md'; // DEBUG
     }
 
     /**
@@ -337,6 +331,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         }
 
         $generator->setTemplatePath($templatePath);
+        $generator->setTempDir($this->getTempDir());
 
         return $generator;
     }
@@ -373,6 +368,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $merger->addFile($secondFilePath);
             $pdfData = $merger->merge();
         } catch (Exception $e) {
+            // TODO: log exception
             return null;
         }
 
