@@ -15,8 +15,8 @@
 # NOTES:
 # - This template can be converted to a cover PDF using Pandoc and XeTeX via two steps:
 #   
-#   - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ > cover.md`
-#   - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/metadata.yaml --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" -o cover.pdf`
+#   - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output cover.md`
+#   - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/metadata.yaml --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output cover.pdf`
 #   
 # - As in the examples above, this template requires two calls to pandoc with the following arguments:
 #   - `--bibliography=` set to the path of the metadata file containing the document's bibliographic metadata
@@ -35,7 +35,7 @@ sansfont: "Open Sans"
 mainfont: "Open Sans"
 # fontsize: 10pt # KOMA-Script default: 11pt
 number-sections: false # specifies whether numbers should be printed in front of headings
-citation-style: styles/apa.csl # specifies the citation style; we use APA here, default is Chicago Manual of Style author-date
+citation-style: styles/apa-ifa.csl # specifies the citation style; we use a slightly modified APA version here, default is Chicago Manual of Style author-date
 # bibliography: metadata.yaml # specifies the external bibliography; supported formats: BibLaTeX (.bib), BibTeX (.bibtex), CSL JSON (.json), CSL YAML (.yaml)
 nocite: |
   @*

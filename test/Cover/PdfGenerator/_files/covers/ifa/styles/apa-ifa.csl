@@ -1253,7 +1253,7 @@
     <group delimiter=", ">
       <!-- Report series [ex. 52] -->
       <choose>
-        <if type="report">
+        <if variable="collection-title">
           <group delimiter=" ">
             <text variable="collection-title" text-case="title"/>
             <text variable="collection-number"/>
