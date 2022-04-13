@@ -1,5 +1,4 @@
 <?php
-
 /**
  * This file is part of OPUS. The software OPUS has been originally developed
  * at the University of Stuttgart with funding from the German Research Net,
@@ -25,60 +24,72 @@
  * along with OPUS; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  *
- * @copyright   Copyright (c) 2008-2020, OPUS 4 development team
+ * @category    Application Tests
+ * @author      Jens Schwidder <schwidder@zib.de>
+ * @copyright   Copyright (c) 2008-2017, OPUS 4 development team
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-// Setup error reporting.
-// TODO leave to Zend and config?
-error_reporting(E_ALL | E_STRICT);
-ini_set('display_errors', 1);
-
 // Define path to application directory
 defined('APPLICATION_PATH')
-        || define('APPLICATION_PATH', realpath(dirname(dirname(__FILE__))));
+|| define('APPLICATION_PATH', realpath(dirname(dirname(dirname(__FILE__)))));
 
-// Define application environment (use 'production' by default)
-define('APPLICATION_ENV', 'testing');
+// Define application environment
+defined('APPLICATION_ENV')
+|| define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
 
 // Configure include path.
-$scriptDir = dirname(__FILE__);
+set_include_path(
+    implode(
+        PATH_SEPARATOR,
+        [
+            '.',
+            dirname(__FILE__),
+            APPLICATION_PATH . '/src',
+            APPLICATION_PATH . '/vendor',
+            get_include_path(),
+        ]
+    )
+);
 
-require_once APPLICATION_PATH . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
+require_once 'autoload.php';
 
-// Do test environment initializiation.
-$application = new Zend_Application(
+// TODO OPUSVIER-4420 remove after switching to Laminas/ZF3
+require_once APPLICATION_PATH . '/vendor/opus4-repo/framework/library/OpusDb/Mysqlutf8.php';
+
+
+// environment initializiation
+$application = new \Zend_Application(
     APPLICATION_ENV,
     [
         "config" => [
-            APPLICATION_PATH . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'config.ini',
-        ],
+            APPLICATION_PATH . '/test/config.ini',
+        ]
     ]
 );
 
-$options                                        = $application->getOptions();
+$options = $application->getOptions();
 $options['opus']['disableDatabaseVersionCheck'] = true;
 $application->setOptions($options);
 
-$application->bootstrap(['Database', 'Temp', 'OpusLocale']);
-
-// make sure necessary directories are available
-ensureDirectory(APPLICATION_PATH . '/test/workspace');
-ensureDirectory(APPLICATION_PATH . '/test/workspace/cache');
-ensureDirectory(APPLICATION_PATH . '/test/workspace/filecache');
-ensureDirectory(APPLICATION_PATH . '/test/workspace/files');
-ensureDirectory(APPLICATION_PATH . '/test/workspace/log');
-ensureDirectory(APPLICATION_PATH . '/test/workspace/tmp');
+// Bootstrapping application
+$application->bootstrap('Backend');
 
 /**
- * Creates the given directory if it doesn't exist.
- *
- * @param string $path The directory path to be created.
+ * Prepare database.
  */
-function ensureDirectory($path)
-{
-    if (! is_dir($path)) {
-        mkdir($path);
-        echo "Created directory '$path'" . PHP_EOL;
-    }
-}
+
+$database = new \Opus\Database();
+
+$dbName = $database->getName();
+
+echo("Dropping database '$dbName' ... ");
+$database->drop();
+echo('done' . PHP_EOL);
+
+echo("Creating database '$dbName' ... ");
+$database->create();
+echo('done' . PHP_EOL);
+
+echo(PHP_EOL . "Importing database schema ... " . PHP_EOL);
+$database->importSchema();
