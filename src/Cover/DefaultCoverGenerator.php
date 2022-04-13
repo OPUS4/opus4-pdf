@@ -41,6 +41,7 @@ use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
 use function file_exists;
 use function file_put_contents;
+use function filemtime;
 use function pathinfo;
 use function substr;
 
@@ -195,8 +196,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns true if there's an up-to-date file with a merged cover for the given file in the filecache directory,
-     * otherwise returns false.
+     * Returns true if there's an up-to-date file with a merged cover for the given document & file in the filecache
+     * directory, otherwise returns false.
      *
      * @param Document $document
      * @param File     $file
@@ -205,13 +206,19 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function cachedFileExists($document, $file, $cachedFilePath)
     {
-        // TODO: check if the cached file is up-to-date by comparing its creation date with Document.ServerDateModified
-
-        if (file_exists($cachedFilePath)) {
-            return true;
+        if (! file_exists($cachedFilePath)) {
+            return false;
         }
 
-        return false;
+        $documentModificationDate   = $document->getServerDateModified()->getUnixTimestamp();
+        $cachedFileModificationDate = filemtime($cachedFilePath);
+
+        // ignore the cached file if it's not up-to-date
+        if ($documentModificationDate > $cachedFileModificationDate) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
