@@ -15,10 +15,16 @@
 # NOTES:
 # - This template can be converted to a cover PDF using Pandoc and XeTeX via two steps:
 #   
-#   - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output cover.md`
-#   - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/metadata.yaml --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output cover.pdf`
+#   - when using a single .yaml file containing both, general and bibliographic metadata:
+#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output=cover.md`
+#     - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/metadata.yaml --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output=cover.pdf`
+#   
+#   - when using separate .json files for general and bibliographic metadata:
+#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md --wrap=preserve --metadata-file=/PATH/TO/meta.json --bibliography=/PATH/TO/csl.json --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output=cover.md`
+#     - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/csl.json --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output=cover.pdf`
 #   
 # - As in the examples above, this template requires two calls to pandoc with the following arguments:
+#   - `--wrap=` set to `preserve` which causes Pandoc to preserve the line wrapping from this template file
 #   - `--bibliography=` set to the path of the metadata file containing the document's bibliographic metadata
 #   - `--template=` set to the path of this template file
 #   - `--variable=` set to `images-basepath:` and followed by the base path of the `images` subdirectory containing images used by this template
