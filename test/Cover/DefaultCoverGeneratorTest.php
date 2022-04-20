@@ -31,14 +31,82 @@
 
 namespace OpusTest\Pdf\Cover;
 
+use Opus\Collection;
+use Opus\CollectionRole;
+use Opus\Document;
+use Opus\Pdf\Cover\CoverGeneratorFactory;
 use PHPUnit\Framework\TestCase;
+
+use function is_object;
 
 class DefaultCoverGeneratorTest extends TestCase
 {
+    /** @var CollectionRole */
+    protected $roleFixture;
+
+    /** @var Collection */
+    protected $collectionFixture;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->roleFixture = new CollectionRole();
+        $this->roleFixture->setName('dummy-role');
+        $this->roleFixture->setOaiName('dummy-oai');
+        $this->roleFixture->store();
+
+        $this->collectionFixture = $this->roleFixture->addRootCollection();
+        $this->collectionFixture->setName('dummy-collection');
+        $this->roleFixture->store();
+    }
+
+    protected function tearDown()
+    {
+        if (is_object($this->roleFixture)) {
+            $this->roleFixture->delete();
+        }
+
+        parent::tearDown();
+    }
+
     public function testGetCachedFilename()
     {
         $this->markTestIncomplete('not implemented yet');
 
         // TODO: create File with pathName and parentId & call DefaultCoverGenerator->getCachedFilename($file)
+    }
+
+    public function testGetTemplateName()
+    {
+        $this->markTestIncomplete('not fully implemented yet');
+
+        // NOTE: This test currently requires a test/config.ini setting like this:
+        //            `collection.16031.cover = 'ifa/ifa-cover_template.md'`
+        //        The collection ID must equal the ID of the last created collection in the database + 2
+        // TODO: alter this test so that it doesn't require a certain collection ID in test/config.ini
+
+        /** @var Collection $subcollection */
+        $subcollection = $this->collectionFixture->addFirstChild();
+        $subcollection->setName('dummy-subcollection');
+        $this->roleFixture->store();
+
+        $doc = new Document();
+        $doc->store();
+
+        $title = $doc->addTitleMain();
+        $title->setValue('Test document belonging to a dummy collection');
+        $title->setLanguage('en');
+
+        $doc->addCollection($subcollection);
+        $doc->store();
+
+        $generator = CoverGeneratorFactory::create();
+
+        $this->assertNotNull($generator);
+
+        $templateName = $generator->getTemplateName($doc);
+
+        $this->assertEquals('ifa/ifa-cover_template.md', $templateName);
     }
 }
