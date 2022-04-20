@@ -33,7 +33,6 @@ namespace OpusTest\Pdf\Cover\PdfGenerator;
 
 use DateTime;
 use Opus\Date;
-use Opus\DnbInstitute;
 use Opus\Document;
 use Opus\Identifier;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
@@ -80,7 +79,6 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $generator->setTempDir(APPLICATION_PATH . '/test/workspace/tmp/');
 
-        // TODO: add dedicated tests that test PDF cover generation with other sample documents (chapter, book, thesis, etc)
         $document = $this->getSampleArticle();
 
         $pdfFilePath = $generator->generateFile($document, 'ifa-cover');
