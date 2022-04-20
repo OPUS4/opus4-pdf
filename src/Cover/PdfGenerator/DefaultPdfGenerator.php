@@ -100,6 +100,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     public function setTempDir($tempDir)
     {
         $this->tempDir = $tempDir;
+
+        // force recreation of the metadata generator using the new temp directory
+        $this->metadataGenerator = null;
     }
 
     /**
@@ -251,7 +254,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         // equivalent shell command:
         //   pandoc {$markdownFilePath} --resource-path={$templateBaseDir} --bibliography={$cslFilePath} \
         //     --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" \
-        //     --output {$pdfFilePath}
+        //     --output={$pdfFilePath}
         $parameters2 = [];
 
         // input file
@@ -374,6 +377,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         }
 
         $generator->setTempDir($this->getTempDir());
+
+        $this->metadataGenerator = $generator;
 
         return $generator;
     }
