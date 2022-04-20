@@ -25,8 +25,10 @@ jobs:
       - name: Install XeTeX
         run: sudo apt-get install texlive-xetex
 
-      - name: Install Pandoc
-        run: sudo apt-get install pandoc
+      - name: Install Pandoc 2.17
+        run: |
+          wget https://github.com/jgm/pandoc/releases/download/2.17.1.1/pandoc-2.17.1.1-1-amd64.deb
+          sudo dpkg -i pandoc-2.17.1.1-1-amd64.deb
 
       - name: Install Composer and Dependencies
         run: curl -s http://getcomposer.org/installer | php && php composer.phar self-update && php composer.phar install
@@ -44,11 +46,10 @@ jobs:
 
       - name: Install Fonts
         run: |
-          mkdir -p /usr/share/fonts/opentype
+          sudo mkdir -p /usr/share/fonts/opentype
           wget https://fonts.google.com/download?family=Open%20Sans -O Open_Sans.zip
-          sudo apt-get install unzip
           unzip -o Open_Sans.zip -d Open_Sans
-          cp -r Open_Sans/static/OpenSans/ /usr/share/fonts/opentype/
+          sudo cp -r Open_Sans/static/OpenSans/ /usr/share/fonts/opentype/
           sudo apt-get install fontconfig
           fc-cache -f -v
 
