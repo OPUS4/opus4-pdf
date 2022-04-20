@@ -33,6 +33,7 @@ namespace Opus\Pdf\Cover;
 
 use Exception;
 use iio\libmergepdf\Merger;
+use Opus\Collection;
 use Opus\Config;
 use Opus\Document;
 use Opus\File;
@@ -161,7 +162,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param Document $document
      * @param File     $file
-     * @return string file path
+     * @return string File path.
      */
     public function processFile($document, $file)
     {
@@ -225,7 +226,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the path of the cached file representing the given file in the filecache directory.
      *
      * @param File $file
-     * @return string file path
+     * @return string File path.
      */
     protected function getCachedFilePath($file)
     {
@@ -237,7 +238,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the path of the temp file representing the given file in the temp directory.
      *
      * @param File $file
-     * @return string file path
+     * @return string File path.
      */
     protected function getTempFilePath($file)
     {
@@ -265,26 +266,89 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * for the given document.
      *
      * @param Document $document
-     * @return string|null template name or path relative to templates directory
+     * @return string|null Template name or path relative to templates directory.
      */
-    protected function getTemplateName($document)
+    public function getTemplateName($document)
     {
-        // TODO: query Config for any `collection.<COLLECTIONID>.cover = <TEMPLATENAME>` setting(s)
-        // TODO: to find the appropriate cover template to be used for a given document / collection ID
+        // TODO: handle documents belonging to two collections for which different cover templates have been specified
 
-        // TODO: walk the collection tree up to its root and use the first template that has a matching config setting
+        $docCollections = $document->getCollection();
 
-        // TODO: handle document belonging to two collections for which different cover templates have been specified
+        foreach ($docCollections as $collection) {
+            $templateName = $this->getTemplateNameForCollection($collection);
+            if ($templateName !== null) {
+                return $templateName;
+            }
+        }
 
-        // DEBUG
-        return 'ifa/ifa_iccra-cover_template.md'; // DEBUG
+        return null;
+    }
+
+    /**
+     * Returns the first matching template name (or path relative to the templates directory) that has been defined
+     * for the given collection or any of its parent collections. Returns null if no matching template was found.
+     *
+     * @param Collection $collection Document collection for which a matching template shall be found.
+     * @return string|null Template name or path relative to templates directory.
+     */
+    protected function getTemplateNameForCollection($collection)
+    {
+        $templateId = $this->getTemplateIdForCollectionId($collection->getId());
+
+        // if there's no template for the given collection, check its parent collection
+        if ($templateId === null) {
+            $parentCollectionId = $collection->getParentNodeId();
+            if ($parentCollectionId !== null) {
+                $parentCollection = new Collection($parentCollectionId);
+                $templateId       = $this->getTemplateNameForCollection($parentCollection);
+            }
+        }
+
+        // NOTE: currently, the template ID is identical to the template name
+        // TODO: in a future implementation, it may be necessary to convert the template ID to a template name
+
+        return $templateId;
+    }
+
+    /**
+     * Returns the ID of a template that has been defined for the given collection, or null if no template was found.
+     *
+     * @param int $collectionId ID of a document collection for which a matching template shall be found.
+     * @return string|null Template ID.
+     */
+    protected function getTemplateIdForCollectionId($collectionId)
+    {
+        // NOTE: The template name/rel.path <-> collection ID mapping is currently defined via a Config setting such as
+        //       `collection.<COLLECTION_ID>.cover = '<TEMPLATE_NAME>'`; however, note that this is a temporary measure.
+        // NOTE: As a result, the returned template ID is currently identical to the template name and is thus a string
+        //       (instead of an int).
+        // TODO: better implementation of the template name/rel.path <-> collection ID mapping
+
+        $config = Config::get();
+
+        $collectionConfig = $config->collection;
+        if ($collectionConfig === null) {
+            return null;
+        }
+
+        $collectionConfigId = $collectionConfig->{$collectionId};
+        if ($collectionConfigId === null) {
+            return null;
+        }
+
+        $templateId = $collectionConfigId->cover;
+        if (empty($templateId)) {
+            return null;
+        }
+
+        return $templateId;
     }
 
     /**
      * Returns the absolute path to the template file to be used for the given document.
      *
      * @param Document $document
-     * @return string|null absolute path to template file
+     * @return string|null Absolute path to template file.
      */
     protected function getTemplatePath($document)
     {
