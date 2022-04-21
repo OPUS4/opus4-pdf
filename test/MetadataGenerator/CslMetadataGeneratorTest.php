@@ -367,8 +367,11 @@ class CslMetadataGeneratorTest extends TestCase
         $doc->setPublisherName('Alfred-Wegener Institut für Meeres- und Polarforschung');
         $doc->setPublisherPlace('Bremerhaven');
 
-        $institute = new DnbInstitute(1);
-        if ($institute === null) {
+        // TODO: better way to only create a certain DnbInstitute if it doesn't exist
+        $institutes = DnbInstitute::getAll();
+        if (! empty($institutes)) {
+            $institute = $institutes[0];
+        } else {
             $institute = new DnbInstitute();
             $institute->setName('Universität Bremen');
             $institute->setCity('Bremen');
