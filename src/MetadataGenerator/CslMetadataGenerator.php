@@ -377,7 +377,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
             'workingpaper'             => 'article', // approximate
         ];
 
-        // NOTE: we use the ternary operator instead of the null coalesce operator for backwards compatibility
+        // phpcs:ignore -- we use the ternary operator instead of the null coalesce operator for backwards compatibility
         return isset($cslTypesByDocType[$type]) ? $cslTypesByDocType[$type] : null;
     }
 
