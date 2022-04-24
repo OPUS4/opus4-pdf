@@ -299,18 +299,23 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      * TODO move this function to a more appropriate place
      *
      * @param  Person[] $persons Array of Person objects for which a formatted string shall be created.
+     * @param  bool     $shortenFirstNames Specifies whether first name(s) shall be reduced to initials.
+     * By default, first names are used without modification.
      * @return string|null Formatted string of person names.
      */
-    public function personsString($persons)
+    public function personsString($persons, $shortenFirstNames = false)
     {
         $personStrings = [];
 
         foreach ($persons as $person) {
-            // reduce first name(s) to initial(s) and append period(s) if necessary
-            $initialsString = preg_replace('/(\w)\w+/', '$1', $person->getFirstName());
-            $initialsString = preg_replace('/(\w)(?!\.)/', '$1.', $initialsString);
+            $firstNamesString = $person->getFirstName();
+            if ($shortenFirstNames === true) {
+                // reduce first name(s) to initial(s) and append period(s) if necessary
+                $firstNamesString = preg_replace('/(\w)\w+/', '$1', $firstNamesString);
+                $firstNamesString = preg_replace('/(\w)(?!\.)/', '$1.', $firstNamesString);
+            }
 
-            $personStrings[] = $initialsString . ' ' . $person->getLastName();
+            $personStrings[] = $firstNamesString . ' ' . $person->getLastName();
         }
 
         return implode(', ', $personStrings);
