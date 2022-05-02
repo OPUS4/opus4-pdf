@@ -45,6 +45,20 @@ interface PdfGeneratorInterface
     const PDF_ENGINE_XELATEX       = 'xelatex';
 
     /**
+     * Returns the path to a directory that stores temporary files.
+     *
+     * @return string
+     */
+    public function getTempDir();
+
+    /**
+     * Sets the path to a directory that stores temporary files.
+     *
+     * @param string $tempDir
+     */
+    public function setTempDir($tempDir);
+
+    /**
      * Returns the path to the template file that's used to generate the PDF.
      *
      * @return string
@@ -63,7 +77,22 @@ interface PdfGeneratorInterface
      * Returns null in case of failure.
      *
      * @param Document $document The document for which a PDF shall be generated.
+     * @param string   $tempFilename The file name (without its file extension) to be used for any
+     * temporary file(s) that may be generated during PDF generation. May be empty in which case
+     * a default name will be used.
      * @return string|null Generated PDF data.
      */
-    public function generate($document);
+    public function generate($document, $tempFilename = '');
+
+    /**
+     * Creates a PDF that's appropriate for the given document and returns the path to the generated
+     * PDF file. Returns null in case of failure.
+     *
+     * @param Document $document The document for which a PDF shall be generated.
+     * @param string   $tempFilename The file name (without its file extension) to be used for any
+     * temporary file(s) that may be generated during PDF generation. May be empty in which case
+     * a default name will be used.
+     * @return string|null Path to generated PDF file.
+     */
+    public function generateFile($document, $tempFilename = '');
 }

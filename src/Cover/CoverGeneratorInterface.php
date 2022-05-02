@@ -84,6 +84,15 @@ interface CoverGeneratorInterface
     public function setTemplatesDir($templatesDir);
 
     /**
+     * Returns the template name (or path relative to the templates directory) that's appropriate
+     * for the given document.
+     *
+     * @param Document $document
+     * @return string|null Template name or path relative to templates directory.
+     */
+    public function getTemplateName($document);
+
+    /**
      * Returns the file path to a file copy that includes an appropriate cover page.
      * Returns the file's original path if no cover needs to be generated or if cover generation fails.
      *

@@ -33,17 +33,21 @@ namespace Opus\Pdf\Cover;
 
 use Exception;
 use iio\libmergepdf\Merger;
+use Opus\Collection;
+use Opus\Config;
 use Opus\Document;
 use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
 use function file_exists;
-use function file_get_contents;
 use function file_put_contents;
+use function filemtime;
+use function pathinfo;
 use function substr;
 
 use const DIRECTORY_SEPARATOR;
+use const PATHINFO_FILENAME;
 
 /**
  * Generates a PDF file copy which includes an appropriate PDF cover.
@@ -53,13 +57,13 @@ use const DIRECTORY_SEPARATOR;
  */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
-    /** @var string Path to file cache */
+    /** @var string Path to a file cache directory */
     private $filecacheDir = "";
 
-    /** @var string Path for temp files */
+    /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
 
-    /** @var string Path to template files */
+    /** @var string Path to a directory that stores template files */
     private $templatesDir = "";
 
     /**
@@ -69,9 +73,17 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getFilecacheDir()
     {
-        // TODO: if $this->filecacheDir is empty, get the path to the filecache directory via Config::getInstance
+        $filecacheDir = $this->filecacheDir;
 
-        return $this->filecacheDir;
+        if (empty($filecacheDir)) {
+            $filecacheDir = Config::getInstance()->getWorkspacePath() . 'filecache';
+        }
+
+        if (substr($filecacheDir, -1) !== DIRECTORY_SEPARATOR) {
+            $filecacheDir .= DIRECTORY_SEPARATOR;
+        }
+
+        return $filecacheDir;
     }
 
     /**
@@ -91,9 +103,17 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getTempDir()
     {
-        // TODO: if $this->tempDir is empty, get the path to the temp directory via Config::getInstance
+        $tempDir = $this->tempDir;
 
-        return $this->tempDir;
+        if (empty($tempDir)) {
+            $tempDir = Config::getInstance()->getTempPath();
+        }
+
+        if (substr($tempDir, -1) !== DIRECTORY_SEPARATOR) {
+            $tempDir .= DIRECTORY_SEPARATOR;
+        }
+
+        return $tempDir;
     }
 
     /**
@@ -119,6 +139,10 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templatesDir = APPLICATION_PATH . '/application/configs/covers';
         }
 
+        if (substr($templatesDir, -1) !== DIRECTORY_SEPARATOR) {
+            $templatesDir .= DIRECTORY_SEPARATOR;
+        }
+
         return $templatesDir;
     }
 
@@ -138,7 +162,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param Document $document
      * @param File     $file
-     * @return string file path
+     * @return string File path.
      */
     public function processFile($document, $file)
     {
@@ -154,18 +178,11 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return $filePath;
         }
 
-        // DEBUG
-        $coverPdfData = file_get_contents($this->getFilecacheDir() . 'testcover.pdf'); // DEBUG
+        $tempFilename = pathinfo($this->getCachedFilename($file), PATHINFO_FILENAME);
 
-        // TODO: use the PdfGenerator instance to create a PDF cover (e.g. from a cover template)
-        // $coverPdfData = $pdfGenerator->generate($document);
-        if (empty($coverPdfData)) {
-            return $filePath;
-        }
+        $coverPath = $pdfGenerator->generateFile($document, $tempFilename);
 
-        $coverPath         = $this->getTempFilePath($file);
-        $savedSuccessfully = $this->saveFileData($coverPdfData, $coverPath);
-        if (! $savedSuccessfully) {
+        if ($coverPath === null) {
             return $filePath;
         }
 
@@ -180,8 +197,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns true if there's an up-to-date file with a merged cover for the given file in the filecache directory,
-     * otherwise returns false.
+     * Returns true if there's an up-to-date file with a merged cover for the given document & file in the filecache
+     * directory, otherwise returns false.
      *
      * @param Document $document
      * @param File     $file
@@ -190,20 +207,26 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function cachedFileExists($document, $file, $cachedFilePath)
     {
-        // TODO: check if the cached file is up-to-date by comparing its creation date with Document.ServerDateModified
-
-        if (file_exists($cachedFilePath)) {
-            return true;
+        if (! file_exists($cachedFilePath)) {
+            return false;
         }
 
-        return false;
+        $documentModificationDate   = $document->getServerDateModified()->getUnixTimestamp();
+        $cachedFileModificationDate = filemtime($cachedFilePath);
+
+        // ignore the cached file if it's not up-to-date
+        if ($documentModificationDate > $cachedFileModificationDate) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Returns the path of the cached file representing the given file in the filecache directory.
      *
      * @param File $file
-     * @return string file path
+     * @return string File path.
      */
     protected function getCachedFilePath($file)
     {
@@ -215,12 +238,12 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the path of the temp file representing the given file in the temp directory.
      *
      * @param File $file
-     * @return string file path
+     * @return string File path.
      */
     protected function getTempFilePath($file)
     {
-        $tmpFilename = $this->getCachedFilename($file);
-        return $this->getTempDir() . $tmpFilename;
+        $tempFilename = $this->getCachedFilename($file);
+        return $this->getTempDir() . $tempFilename;
     }
 
     /**
@@ -239,38 +262,97 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns the template name (or path relative to the template directory) that's appropriate
+     * Returns the template name (or path relative to the templates directory) that's appropriate
      * for the given document.
      *
      * @param Document $document
-     * @return string|null template name or path relative to template directory
+     * @return string|null Template name or path relative to templates directory.
      */
-    protected function getTemplateName($document)
+    public function getTemplateName($document)
     {
-        // TODO: query Config for any `collection.<COLLECTIONID>.cover = <TEMPLATENAME>` setting(s)
-        // TODO: to find the appropriate cover template to be used for a given document / collection ID
+        // TODO: handle documents belonging to two collections for which different cover templates have been specified
 
-        // TODO: walk the collection tree up to its root and use the first template that has a matching config setting
+        $docCollections = $document->getCollection();
 
-        // TODO: handle document belonging to two collections for which different cover templates have been specified
+        foreach ($docCollections as $collection) {
+            $templateName = $this->getTemplateNameForCollection($collection);
+            if ($templateName !== null) {
+                return $templateName;
+            }
+        }
 
-        // DEBUG
-        return 'ifa/iccra-cover-template.md'; // DEBUG
+        return null;
+    }
+
+    /**
+     * Returns the first matching template name (or path relative to the templates directory) that has been defined
+     * for the given collection or any of its parent collections. Returns null if no matching template was found.
+     *
+     * @param Collection $collection Document collection for which a matching template shall be found.
+     * @return string|null Template name or path relative to templates directory.
+     */
+    protected function getTemplateNameForCollection($collection)
+    {
+        $templateId = $this->getTemplateIdForCollectionId($collection->getId());
+
+        // if there's no template for the given collection, check its parent collection
+        if ($templateId === null) {
+            $parentCollectionId = $collection->getParentNodeId();
+            if ($parentCollectionId !== null) {
+                $parentCollection = new Collection($parentCollectionId);
+                $templateId       = $this->getTemplateNameForCollection($parentCollection);
+            }
+        }
+
+        // NOTE: currently, the template ID is identical to the template name
+        // TODO: in a future implementation, it may be necessary to convert the template ID to a template name
+
+        return $templateId;
+    }
+
+    /**
+     * Returns the ID of a template that has been defined for the given collection, or null if no template was found.
+     *
+     * @param int $collectionId ID of a document collection for which a matching template shall be found.
+     * @return string|null Template ID.
+     */
+    protected function getTemplateIdForCollectionId($collectionId)
+    {
+        // NOTE: The template name/rel.path <-> collection ID mapping is currently defined via a Config setting such as
+        //       `collection.<COLLECTION_ID>.cover = '<TEMPLATE_NAME>'`; however, note that this is a temporary measure.
+        // NOTE: As a result, the returned template ID is currently identical to the template name and is thus a string
+        //       (instead of an int).
+        // TODO: better implementation of the template name/rel.path <-> collection ID mapping
+
+        $config = Config::get();
+
+        $collectionConfig = $config->collection;
+        if ($collectionConfig === null) {
+            return null;
+        }
+
+        $collectionConfigId = $collectionConfig->{$collectionId};
+        if ($collectionConfigId === null) {
+            return null;
+        }
+
+        $templateId = $collectionConfigId->cover;
+        if (empty($templateId)) {
+            return null;
+        }
+
+        return $templateId;
     }
 
     /**
      * Returns the absolute path to the template file to be used for the given document.
      *
      * @param Document $document
-     * @return string|null absolute path to template file
+     * @return string|null Absolute path to template file.
      */
     protected function getTemplatePath($document)
     {
         $templatesDir = $this->getTemplatesDir();
-        if (substr($templatesDir, -1) !== DIRECTORY_SEPARATOR) {
-            $templatesDir .= DIRECTORY_SEPARATOR;
-        }
-
         $templateName = $this->getTemplateName($document);
 
         if ($templateName === null) {
@@ -320,6 +402,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         }
 
         $generator->setTemplatePath($templatePath);
+        $generator->setTempDir($this->getTempDir());
 
         return $generator;
     }
@@ -356,6 +439,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $merger->addFile($secondFilePath);
             $pdfData = $merger->merge();
         } catch (Exception $e) {
+            // TODO: log exception
             return null;
         }
 
