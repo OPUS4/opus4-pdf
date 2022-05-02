@@ -31,7 +31,7 @@
 
 namespace Opus\Pdf\MetadataGenerator;
 
-use Opus\Util\ClassLoaderHelper;
+use Opus\Common\Util\ClassLoaderHelper;
 
 /**
  * Factory to create a metadata generator instance.
