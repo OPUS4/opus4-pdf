@@ -1,9 +1,7 @@
 ---
 # 
-# Markdown template for PDF cover generation
-# ------------------------------------------
-# 
-# Created for: Institut für Auslandsbeziehungen e.V. (ifa), https://www.ifa.de
+# Demo Markdown template for PDF cover generation
+# -----------------------------------------------
 # 
 # REQUIREMENTS:
 # - This template requires the packages `pandoc` (>= v2.11) and `texlive-xetex` to be installed.
@@ -41,7 +39,7 @@ sansfont: "Open Sans"
 mainfont: "Open Sans"
 # fontsize: 10pt # KOMA-Script default: 11pt
 number-sections: false # specifies whether numbers should be printed in front of headings
-citation-style: styles/apa-ifa.csl # specifies the citation style; we use a slightly modified APA version here, default is Chicago Manual of Style author-date
+citation-style: styles/apa-opus.csl # specifies the citation style; we use a slightly modified APA version here, default is Chicago Manual of Style author-date
 # bibliography: metadata.yaml # specifies the external bibliography; supported formats: BibLaTeX (.bib), BibTeX (.bibtex), CSL JSON (.json), CSL YAML (.yaml)
 nocite: |
   @*
@@ -53,13 +51,13 @@ header-includes: |
   \special{dvipdfmx:config z 0}
   \usepackage{scrlayer-scrpage}
   \lohead{
-    \subsection{ifa Repository}
+    \subsection{Demo Repository}
   }
   \cohead{}
   \rohead{
-    \subsection{\hfill Open Access Repository}
+    \subsection{\hfill OPUS 4 Repository}
     \begin{minipage}[b]{165pt}
-    \rightline{\small \url{https://opustest.bsz-bw.de/ifa}}
+    \rightline{\small \url{https://www.opus-repository.org}}
     \end{minipage}
   }
   \lofoot{
@@ -88,25 +86,23 @@ header-includes: |
 ---
 
 $--REPOSITORY LOGOS
-\rightline{\small \emph{in partnership with}}
-
 
 \begin{figure}
 \begin{minipage}[c]{0.37\linewidth}
-{\centering 
-\includegraphics[width=50mm]{$images-basepath$images/logo.pdf}
-}
-\end{minipage}%
-%
-\begin{minipage}[c]{0.40\linewidth}
 {\centering 
 ~
 }
 \end{minipage}%
 %
-\begin{minipage}[c]{0.23\linewidth}
+\begin{minipage}[c]{0.35\linewidth}
 {\centering 
-\includegraphics[width=30mm]{$images-basepath$images/partner_logo.png}
+~
+}
+\end{minipage}%
+%
+\begin{minipage}[c]{0.28\linewidth}
+{\centering 
+\includegraphics[width=50mm]{$images-basepath$images/logo.png}
 }
 \end{minipage}%
 \end{figure}
