@@ -136,7 +136,15 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $templatesDir = $this->templatesDir;
 
         if (empty($templatesDir)) {
-            $templatesDir = APPLICATION_PATH . '/application/configs/covers';
+            $config = Config::getInstance();
+
+            if (isset($config->pdf->covers->path)) {
+                $templatesDir = $config->pdf->covers->path;
+            }
+
+            if (empty($templatesDir)) {
+                $templatesDir = APPLICATION_PATH . '/application/configs/covers';
+            }
         }
 
         if (substr($templatesDir, -1) !== DIRECTORY_SEPARATOR) {
