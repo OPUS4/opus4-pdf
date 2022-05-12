@@ -289,7 +289,30 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             }
         }
 
+        $templateName = $this->getDefaultTemplateName();
+        if ($templateName !== null) {
+            return $templateName;
+        }
+
         return null;
+    }
+
+    /**
+     * Returns the default template name (or path relative to the templates directory) that has been defined
+     * via the `pdf.covers.default` configuration setting. Returns null if no default template was defined.
+     *
+     * @return string|null Template name or path relative to templates directory.
+     */
+    protected function getDefaultTemplateName()
+    {
+        $config       = Config::get();
+        $templateName = null;
+
+        if (isset($config->pdf->covers->default)) {
+            $templateName = $config->pdf->covers->default;
+        }
+
+        return ! empty($templateName) ? $templateName : null;
     }
 
     /**
@@ -425,9 +448,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function saveFileData($fileData, $filePath)
     {
-         $result = file_put_contents($filePath, $fileData);
+        $result = file_put_contents($filePath, $fileData);
 
-         return ! ($result === false);
+        return ! ($result === false);
     }
 
     /**
