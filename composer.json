@@ -7,10 +7,12 @@
     "opus4",
     "pdf"
   ],
+  "minimum-stability": "dev",
+  "prefer-stable" : true,
   "homepage": "https://www.opus-repository.org",
   "require": {
-    "opus4-repo/opus4-common": "^4.7.1",
-    "opus4-repo/framework": "^4.7.1",
+    "opus4-repo/opus4-common": "dev-master",
+    "opus4-repo/framework": "dev-issue253",
     "iio/libmergepdf": "^4.0",
     "ueberdosis/pandoc": "^0.7.0",
     "seboettg/citedata": "@dev"
