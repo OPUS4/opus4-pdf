@@ -31,7 +31,7 @@
 
 namespace Opus\Pdf\Cover\PdfGenerator;
 
-use Opus\Util\ClassLoaderHelper;
+use Opus\Common\Util\ClassLoaderHelper;
 
 /**
  * Factory to create a PDF generator instance.
