@@ -71,7 +71,7 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $this->assertNotNull($generator);
 
-        $templatePath = $this->getTemplatePath('ifa' . DIRECTORY_SEPARATOR . 'ifa-cover_template.md');
+        $templatePath = $this->getTemplatePath('demo' . DIRECTORY_SEPARATOR . 'demo-cover_template.md');
 
         $this->assertFileExists($templatePath);
 
@@ -81,7 +81,7 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $document = $this->getSampleArticle();
 
-        $pdfFilePath = $generator->generateFile($document, 'ifa-cover');
+        $pdfFilePath = $generator->generateFile($document, 'demo-cover');
 
         // mark output files for deletion
         $filePathWithoutExtension = substr($pdfFilePath, 0, strlen($pdfFilePath) - 4);
@@ -146,7 +146,7 @@ class DefaultPdfGeneratorTest extends TestCase
         $doc->addPersonAuthor($author);
 
         $author = new Person();
-        $author->setFirstName('K');
+        $author->setFirstName('Kunio');
         $author->setLastName('Shirasawa');
         $doc->addPersonAuthor($author);
 
