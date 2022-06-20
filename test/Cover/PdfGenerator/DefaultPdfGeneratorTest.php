@@ -32,6 +32,7 @@
 namespace OpusTest\Pdf\Cover\PdfGenerator;
 
 use DateTime;
+use Opus\Common\Config;
 use Opus\Date;
 use Opus\Document;
 use Opus\Identifier;
@@ -77,7 +78,7 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $generator->setTemplatePath($templatePath);
 
-        $generator->setTempDir(APPLICATION_PATH . '/test/workspace/tmp/');
+        $generator->setTempDir(Config::getInstance()->getTempPath());
 
         $document = $this->getSampleArticle();
 
