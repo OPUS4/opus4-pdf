@@ -46,7 +46,6 @@ use function strlen;
 use function substr;
 use function unlink;
 
-use const APPLICATION_PATH;
 use const DIRECTORY_SEPARATOR;
 
 class DefaultPdfGeneratorTest extends TestCase
