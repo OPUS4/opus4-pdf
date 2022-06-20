@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="./test/Bootstrap.php"
+         bootstrap="./vendor/opus4-repo/framework/tests/Bootstrap.php"
          colors="true">
 
     <testsuites>
@@ -9,18 +9,5 @@
             <directory>./test/</directory>
         </testsuite>
     </testsuites>
-
-    <!-- Define directories/files filter for code coverage. -->
-    <filter>
-        <!-- Per default, skip all files. -->
-        <blacklist>
-            <directory suffix=".php">.</directory>
-        </blacklist>
-
-        <!-- Define directories to include. -->
-        <whitelist>
-            <directory suffix=".php">./src</directory>
-        </whitelist>
-    </filter>
 
 </phpunit>
