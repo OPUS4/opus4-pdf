@@ -7,6 +7,8 @@
     "opus4",
     "pdf"
   ],
+  "minimum-stability": "dev",
+  "prefer-stable" : true,
   "homepage": "https://www.opus-repository.org",
   "require": {
     "opus4-repo/opus4-common": "dev-master",

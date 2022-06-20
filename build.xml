@@ -12,11 +12,11 @@
     <property name="dbAdminPassword" value="" />
 
     <target name="prepare-workspace">
-        <mkdir dir="${basedir}/test/workspace/cache" />
-        <mkdir dir="${basedir}/test/workspace/filecache" />
-        <mkdir dir="${basedir}/test/workspace/files" />
-        <mkdir dir="${basedir}/test/workspace/log" />
-        <mkdir dir="${basedir}/test/workspace/tmp" />
+        <mkdir dir="${basedir}/build/workspace/cache" />
+        <mkdir dir="${basedir}/build/workspace/filecache" />
+        <mkdir dir="${basedir}/build/workspace/files" />
+        <mkdir dir="${basedir}/build/workspace/log" />
+        <mkdir dir="${basedir}/build/workspace/tmp" />
     </target>
 
     <target name="prepare-config">
