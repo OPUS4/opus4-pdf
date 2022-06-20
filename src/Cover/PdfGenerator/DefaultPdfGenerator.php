@@ -32,7 +32,7 @@
 namespace Opus\Pdf\Cover\PdfGenerator;
 
 use Exception;
-use Opus\Config;
+use Opus\Common\Config;
 use Opus\Document;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;

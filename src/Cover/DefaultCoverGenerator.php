@@ -34,7 +34,7 @@ namespace Opus\Pdf\Cover;
 use Exception;
 use iio\libmergepdf\Merger;
 use Opus\Collection;
-use Opus\Config;
+use Opus\Common\Config;
 use Opus\Document;
 use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
