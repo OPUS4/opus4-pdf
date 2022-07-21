@@ -32,6 +32,7 @@
 namespace OpusTest\Pdf\MetadataGenerator;
 
 use DateTime;
+use Opus\Common\Config;
 use Opus\Date;
 use Opus\DnbInstitute;
 use Opus\Document;
@@ -121,7 +122,7 @@ class CslMetadataGeneratorTest extends TestCase
 
         $this->assertNotNull($generator);
 
-        $generator->setTempDir(APPLICATION_PATH . '/test/workspace/tmp/');
+        $generator->setTempDir(Config::getInstance()->getTempPath());
 
         return $generator;
     }
