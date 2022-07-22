@@ -14,11 +14,11 @@
 # - This template can be converted to a cover PDF using Pandoc and XeTeX via two steps:
 #   
 #   - when using a single .yaml file containing both, general and bibliographic metadata:
-#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output=cover.md`
+#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --variable=licence-logo-basepath:/PATH/TO/LICENCE_LOGO_DIR/ --output=cover.md`
 #     - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/metadata.yaml --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output=cover.pdf`
 #   
 #   - when using separate .json files for general and bibliographic metadata:
-#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md --wrap=preserve --metadata-file=/PATH/TO/meta.json --bibliography=/PATH/TO/csl.json --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output=cover.md`
+#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md --wrap=preserve --metadata-file=/PATH/TO/meta.json --bibliography=/PATH/TO/csl.json --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --variable=licence-logo-basepath:/PATH/TO/LICENCE_LOGO_DIR/ --output=cover.md`
 #     - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/csl.json --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output=cover.pdf`
 #   
 # - As in the examples above, this template requires two calls to pandoc with the following arguments:
@@ -27,6 +27,7 @@
 #   - `--bibliography=` set to the path of the metadata file containing the document's bibliographic metadata
 #   - `--template=` set to the path of this template file
 #   - `--variable=` set to `images-basepath:` and followed by the base path of the `images` subdirectory containing images used by this template
+#   - `--variable=` set to `licence-logo-basepath:` and followed by the path to a directory containing license logos (arranged/named according to <https://licensebuttons.net>)
 #   - `--resource-path=` set to the base path of the `styles` subdirectory containing the citation style used by this template
 #   - `--citeproc` which causes a formatted citation to be generated from the bibliographic metadata
 #   - `--pdf-engine=` set to `xelatex` which specifies that XeTeX will be used to generate the PDF (allowing the template to use Unicode & system fonts)
@@ -72,7 +73,7 @@ header-includes: |
   }
   \cofoot{
     \begin{minipage}[t][27mm][c]{34mm}
-    \rightline{\includegraphics[width=27mm]{$images-basepath$images/by-nc-nd.png}}
+    $if(licence-logo-basepath)$$if(licence-logo-name)$\rightline{\includegraphics[width=27mm]{$licence-logo-basepath$$licence-logo-name$}}$endif$$endif$
     \end{minipage}
   }
   \rofoot{

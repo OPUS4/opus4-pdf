@@ -36,11 +36,13 @@ use Opus\Common\Config;
 use Opus\Date;
 use Opus\Document;
 use Opus\Identifier;
+use Opus\Licence;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 use Opus\Person;
 use PHPUnit\Framework\TestCase;
 
+use function dirname;
 use function file_exists;
 use function strlen;
 use function substr;
@@ -78,6 +80,12 @@ class DefaultPdfGeneratorTest extends TestCase
         $generator->setTemplatePath($templatePath);
 
         $generator->setTempDir(Config::getInstance()->getTempPath());
+
+        $licenceLogosDir = dirname($templatePath) . DIRECTORY_SEPARATOR . 'images/';
+
+        $this->assertDirectoryExists($licenceLogosDir);
+
+        $generator->setLicenceLogosDir($licenceLogosDir);
 
         $document = $this->getSampleArticle();
 
@@ -187,6 +195,19 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $ids = [$doi, $url, $issn];
         $doc->setIdentifier($ids);
+
+        $licence = Licence::fetchByName('CC BY-NC-ND 4.0');
+        if ($licence === null) {
+            $licence = new Licence();
+            $licence->setName('CC BY-NC-ND 4.0');
+            $licence->setNameLong('CC BY-NC-ND (Attribution – NonCommercial – NoDerivatives)');
+            $licence->setLinkLicence('https://creativecommons.org/licenses/by-nc-nd/4.0');
+            $licence->setLinkLogo('https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png');
+            $licence->setLanguage('eng');
+            $licence->store();
+        }
+
+        $doc->setLicence($licence);
 
         $doc->store();
 

@@ -66,6 +66,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /** @var string Path to a directory that stores template files */
     private $templatesDir = "";
 
+    /** @var string Path to a directory that stores licence logo files */
+    private $licenceLogosDir = "";
+
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
      *
@@ -162,6 +165,45 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     public function setTemplatesDir($templatesDir)
     {
         $this->templatesDir = $templatesDir;
+    }
+
+    /**
+     * Returns the path to a directory that stores licence logo files, or null if no such
+     * directory has been defined.
+     *
+     * @return string|null
+     */
+    public function getLicenceLogosDir()
+    {
+        $licenceLogosDir = $this->licenceLogosDir;
+
+        if (empty($licenceLogosDir)) {
+            $config = Config::get();
+
+            if (isset($config->licenses->logos->path)) {
+                $licenceLogosDir = $config->licenses->logos->path;
+            }
+
+            if (empty($licenceLogosDir)) {
+                return null;
+            }
+        }
+
+        if (substr($licenceLogosDir, -1) !== DIRECTORY_SEPARATOR) {
+            $licenceLogosDir .= DIRECTORY_SEPARATOR;
+        }
+
+        return $licenceLogosDir;
+    }
+
+    /**
+     * Sets the path to a directory that stores licence logo files.
+     *
+     * @param string $licenceLogosDir
+     */
+    public function setLicenceLogosDir($licenceLogosDir)
+    {
+        $this->licenceLogosDir = $licenceLogosDir;
     }
 
     /**
@@ -430,6 +472,11 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         if ($generator === null) {
             return null;
+        }
+
+        $licenceLogosDir = $this->getLicenceLogosDir();
+        if ($licenceLogosDir !== null) {
+            $generator->setLicenceLogosDir($licenceLogosDir);
         }
 
         $generator->setTemplatePath($templatePath);

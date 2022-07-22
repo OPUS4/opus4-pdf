@@ -93,6 +93,21 @@ interface CoverGeneratorInterface
     public function getTemplateName($document);
 
     /**
+     * Returns the path to a directory that stores licence logo files, or null if no such
+     * directory has been defined.
+     *
+     * @return string|null
+     */
+    public function getLicenceLogosDir();
+
+    /**
+     * Sets the path to a directory that stores licence logo files.
+     *
+     * @param string $licenceLogosDir
+     */
+    public function setLicenceLogosDir($licenceLogosDir);
+
+    /**
      * Returns the file path to a file copy that includes an appropriate cover page.
      * Returns the file's original path if no cover needs to be generated or if cover generation fails.
      *

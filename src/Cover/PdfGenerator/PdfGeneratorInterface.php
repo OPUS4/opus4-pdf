@@ -73,6 +73,20 @@ interface PdfGeneratorInterface
     public function setTemplatePath($templatePath);
 
     /**
+     * Returns the path to a directory containing licence logo files to be used when generating the PDF.
+     *
+     * @return string
+     */
+    public function getLicenceLogosDir();
+
+    /**
+     * Sets the path to a directory containing licence logo files to be used when generating the PDF.
+     *
+     * @param string $licenceLogosDir
+     */
+    public function setLicenceLogosDir($licenceLogosDir);
+
+    /**
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.
      *

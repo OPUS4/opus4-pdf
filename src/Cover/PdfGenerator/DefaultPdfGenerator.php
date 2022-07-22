@@ -34,6 +34,7 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 use Exception;
 use Opus\Common\Config;
 use Opus\Document;
+use Opus\Licence;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;
@@ -45,10 +46,12 @@ use function file_get_contents;
 use function file_put_contents;
 use function is_writable;
 use function json_encode;
+use function parse_url;
 use function substr;
 use function uniqid;
 
 use const DIRECTORY_SEPARATOR;
+use const PHP_URL_PATH;
 
 /**
  * Generates a PDF for a document based on a template.
@@ -65,6 +68,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
     /** @var string Path to the template file to be used for PDF generation */
     private $templatePath = "";
+
+    /** @var string Path to a directory that stores licence logo files */
+    private $licenceLogosDir = "";
 
     /** @var MetadataGeneratorInterface|null Metadata generator to create CSL JSON metadata */
     private $metadataGenerator;
@@ -143,6 +149,101 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     }
 
     /**
+     * Returns the path to a directory containing licence logo files to be used when generating the PDF.
+     *
+     * @return string
+     */
+    public function getLicenceLogosDir()
+    {
+        return $this->licenceLogosDir;
+    }
+
+    /**
+     * Sets the path to a directory containing licence logo files to be used when generating the PDF.
+     *
+     * @param string $licenceLogosDir
+     */
+    public function setLicenceLogosDir($licenceLogosDir)
+    {
+        $this->licenceLogosDir = $licenceLogosDir;
+    }
+
+    /**
+     * Returns the "main" licence of the given document, or null if the document has no license(s) assigned.
+     * Note that, currently, this method simply treats the document's first licence as its "main" license.
+     *
+     * @param Document $document
+     * @return Licence|null
+     */
+    public function getMainLicence($document)
+    {
+        // TODO: #24 better handling of cases where a document contains multiple licences?
+
+        $docLicences = $document->getLicence();
+
+        if (! empty($docLicences)) {
+            $docLicence = $docLicences[0];
+            return $docLicence->getModel();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the file name (or path relative to the licence logos directory) of a licence logo that
+     * represents the given licence.
+     *
+     * @param Licence $licence
+     * @return string|null Licence logo name or path relative to licence logos directory.
+     */
+    public function getLicenceLogoName($licence)
+    {
+        $licenceLogoUrl = $licence->getLinkLogo();
+        if (empty($licenceLogoUrl)) {
+            return null;
+        }
+
+        $urlPath = parse_url($licenceLogoUrl, PHP_URL_PATH);
+        if (empty($urlPath)) {
+            return null;
+        }
+
+        // remove any preceding path separator
+        if (substr($urlPath, 0, 1) === DIRECTORY_SEPARATOR) {
+            $urlPath = substr($urlPath, 1);
+        }
+
+        return $urlPath;
+    }
+
+    /**
+     * Returns the absolute path to the licence logo file to be used for the given licence.
+     *
+     * @param Licence $licence
+     * @return string|null Absolute path to licence logo file.
+     */
+    protected function getLicenceLogoPath($licence)
+    {
+        $licenceLogosDir = $this->getLicenceLogosDir();
+        if (empty($licenceLogosDir)) {
+            return null;
+        }
+
+        $licenceLogoName = $this->getLicenceLogoName($licence);
+        if (empty($licenceLogoName)) {
+            return null;
+        }
+
+        $licenceLogoPath = $licenceLogosDir . $licenceLogoName;
+
+        if (! file_exists($licenceLogoPath)) {
+            return null;
+        }
+
+        return $licenceLogoPath;
+    }
+
+    /**
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.
      *
@@ -186,6 +287,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         if (! is_writable($tempDir)) {
             return null;
         }
+
+        $licenceLogosDir = $this->getLicenceLogosDir();
 
         if (empty($tempFilename)) {
             $tempFilename = $document->getId() . '-' . uniqid();
@@ -235,6 +338,12 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         // --variable is used to populate the `$images-basepath$` placeholder in the template with the base
         //   path of the `images` directory containing any images/logos
         array_push($parameters, '--variable', 'images-basepath:' . $templateBaseDir);
+
+        // --variable is used to populate the `$licence-logo-basepath$` placeholder in the template with the
+        //   path to a directory containing license logos (arranged/named according to https://licensebuttons.net)
+        if (! empty($licenceLogosDir)) {
+            array_push($parameters, '--variable', 'licence-logo-basepath:' . $licenceLogosDir);
+        }
 
         // --output specifies that generated output will be written to the given file path
         array_push($parameters, '--output', $markdownFilePath);
@@ -345,6 +454,30 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $language = $document->getLanguage();
         if (! empty($language)) {
             $documentMetadata['lang'] = $language;
+        }
+
+        $licence = $this->getMainLicence($document);
+
+        if ($licence !== null) {
+            $licenceTitle = $licence->getName();
+            if (! empty($licenceTitle)) {
+                $documentMetadata['licence-title'] = $licenceTitle;
+            }
+
+            $licenceText = $licence->getNameLong();
+            if (! empty($licenceText)) {
+                $documentMetadata['licence-text'] = $licenceText;
+            }
+
+            $licenceUrl = $licence->getLinkLicence();
+            if (! empty($licenceUrl)) {
+                $documentMetadata['licence-url'] = $licenceUrl;
+            }
+
+            $licenceLogoPath = $this->getLicenceLogoPath($licence);
+            if ($licenceLogoPath !== null) {
+                $documentMetadata['licence-logo-name'] = $this->getLicenceLogoName($licence);
+            }
         }
 
         $jsonString = json_encode($documentMetadata);
