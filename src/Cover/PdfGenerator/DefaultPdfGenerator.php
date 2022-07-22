@@ -222,7 +222,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         // --wrap is used to preserve the line wrapping from the input files
         array_push($parameters, '--wrap', 'preserve');
 
-        // --bibliography specifies an external bibliography file
+        // --metadata-file specifies the path to a JSON file containing the document's general metadata
         array_push($parameters, '--metadata-file', $metadataFilePath);
 
         // --bibliography specifies an external bibliography file

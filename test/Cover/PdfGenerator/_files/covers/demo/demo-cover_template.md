@@ -23,6 +23,7 @@
 #   
 # - As in the examples above, this template requires two calls to pandoc with the following arguments:
 #   - `--wrap=` set to `preserve` which causes Pandoc to preserve the line wrapping from this template file
+#   - `--metadata-file=` set to the path of the metadata file containing the document's general metadata
 #   - `--bibliography=` set to the path of the metadata file containing the document's bibliographic metadata
 #   - `--template=` set to the path of this template file
 #   - `--variable=` set to `images-basepath:` and followed by the base path of the `images` subdirectory containing images used by this template
