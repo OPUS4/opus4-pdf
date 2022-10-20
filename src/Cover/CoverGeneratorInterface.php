@@ -31,8 +31,8 @@
 
 namespace Opus\Pdf\Cover;
 
-use Opus\Document;
-use Opus\File;
+use Opus\Common\DocumentInterface;
+use Opus\Common\FileInterface;
 
 /**
  * Interface for generating a PDF file copy which includes an appropriate PDF cover.
@@ -87,7 +87,7 @@ interface CoverGeneratorInterface
      * Returns the template name (or path relative to the templates directory) that's appropriate
      * for the given document.
      *
-     * @param Document $document
+     * @param DocumentInterface $document
      * @return string|null Template name or path relative to templates directory.
      */
     public function getTemplateName($document);
@@ -96,8 +96,8 @@ interface CoverGeneratorInterface
      * Returns the file path to a file copy that includes an appropriate cover page.
      * Returns the file's original path if no cover needs to be generated or if cover generation fails.
      *
-     * @param Document $document The document for which a PDF cover shall be generated.
-     * @param File     $file The document's file for which a PDF cover shall be generated.
+     * @param DocumentInterface $document The document for which a PDF cover shall be generated.
+     * @param FileInterface     $file The document's file for which a PDF cover shall be generated.
      * @return string file path
      */
     public function processFile($document, $file);

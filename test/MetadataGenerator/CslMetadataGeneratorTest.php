@@ -32,13 +32,14 @@
 namespace OpusTest\Pdf\MetadataGenerator;
 
 use DateTime;
-use Opus\Date;
-use Opus\DnbInstitute;
-use Opus\Document;
-use Opus\Identifier;
+use Opus\Common\Date;
+use Opus\Common\DnbInstitute;
+use Opus\Common\Document;
+use Opus\Common\DocumentInterface;
+use Opus\Common\Identifier;
+use Opus\Common\Person;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
-use Opus\Person;
 use PHPUnit\Framework\TestCase;
 
 use function file_get_contents;
@@ -140,28 +141,28 @@ class CslMetadataGeneratorTest extends TestCase
     /**
      * Returns a sample Document object representing an academic journal article.
      *
-     * @return Document Document object representing an article.
+     * @return DocumentInterface Document object representing an article.
      */
     private function getSampleArticle()
     {
-        $doc = new Document();
+        $doc = Document::new();
         $doc->store();
 
         $doc->setType("article");
         $doc->setLanguage("en");
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Mats Anders');
         $author->setLastName('Granskog');
         $author->setAcademicTitle('Ph.D.');
         $doc->addPersonAuthor($author);
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Hermanni');
         $author->setLastName('Kaartokallio');
         $doc->addPersonAuthor($author);
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('K');
         $author->setLastName('Shirasawa');
         $doc->addPersonAuthor($author);
@@ -189,15 +190,15 @@ class CslMetadataGeneratorTest extends TestCase
         //$doc->setPageLast(3253);
         $doc->setPageNumber(9);
 
-        $doi = new Identifier();
+        $doi = Identifier::new();
         $doi->setType('doi');
         $doi->setValue('10.1029/2002JC001386');
 
-        $url = new Identifier();
+        $url = Identifier::new();
         $url->setType('url');
         $url->setValue('https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2002JC001386');
 
-        $issn = new Identifier();
+        $issn = Identifier::new();
         $issn->setType('issn');
         $issn->setValue('0148-0227');
 
@@ -212,39 +213,39 @@ class CslMetadataGeneratorTest extends TestCase
     /**
      * Returns a sample Document object representing a chapter within a book that's part of a series.
      *
-     * @return Document Document object representing a book chapter.
+     * @return DocumentInterface Document object representing a book chapter.
      */
     private function getSampleChapter()
     {
         // TODO: how to add the series title aka CSL collection-title ("CRREL Monograph") for this book chapter?
 
-        $doc = new Document();
+        $doc = Document::new();
         $doc->store();
 
         $doc->setType("bookpart");
         $doc->setLanguage("en");
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Stephen F.');
         $author->setLastName('Ackley');
         $doc->addPersonAuthor($author);
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('M A');
         $author->setLastName('Lange');
         $doc->addPersonAuthor($author);
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Peter');
         $author->setLastName('Wadhams');
         $doc->addPersonAuthor($author);
 
-        $editor = new Person();
+        $editor = Person::new();
         $editor->setFirstName('Stephen F.');
         $editor->setLastName('Ackley');
         $doc->addPersonEditor($editor);
 
-        $editor = new Person();
+        $editor = Person::new();
         $editor->setFirstName('Wilford F');
         $editor->setLastName('Weeks');
         $doc->addPersonEditor($editor);
@@ -272,7 +273,7 @@ class CslMetadataGeneratorTest extends TestCase
         $doc->setPageLast(21);
         $doc->setPageNumber(6);
 
-        $url = new Identifier();
+        $url = Identifier::new();
         $url->setType('url');
         $url->setValue('https://www.coldregions.org/vufind/Record/120367');
 
@@ -287,22 +288,22 @@ class CslMetadataGeneratorTest extends TestCase
     /**
      * Returns a sample Document object representing an edited book that's part of a series.
      *
-     * @return Document Document object representing an edited book.
+     * @return DocumentInterface Document object representing an edited book.
      */
     private function getSampleEditedBook()
     {
-        $doc = new Document();
+        $doc = Document::new();
         $doc->store();
 
         $doc->setType("book");
         $doc->setLanguage("en");
 
-        $editor = new Person();
+        $editor = Person::new();
         $editor->setFirstName('A. M.');
         $editor->setLastName('D\'yakonov');
         $doc->addPersonEditor($editor);
 
-        $editor = new Person();
+        $editor = Person::new();
         $editor->setFirstName('A A');
         $editor->setLastName('Strelkov');
         $doc->addPersonEditor($editor);
@@ -330,17 +331,17 @@ class CslMetadataGeneratorTest extends TestCase
     /**
      * Returns a sample Document object representing a doctoral thesis.
      *
-     * @return Document Document object representing a doctoral thesis.
+     * @return DocumentInterface Document object representing a doctoral thesis.
      */
     private function getSampleDoctoralThesis()
     {
-        $doc = new Document();
+        $doc = Document::new();
         $doc->store();
 
         $doc->setType("doctoralthesis");
         $doc->setLanguage("de");
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('A.');
         $author->setLastName('Bochert');
         $doc->addPersonAuthor($author);
@@ -372,7 +373,7 @@ class CslMetadataGeneratorTest extends TestCase
         if (! empty($institutes)) {
             $institute = $institutes[0];
         } else {
-            $institute = new DnbInstitute();
+            $institute = DnbInstitute::new();
             $institute->setName('Universität Bremen');
             $institute->setCity('Bremen');
             $institute->setDepartment('Fachbereich 1 – Physik/Elektrotechnik');
@@ -388,15 +389,15 @@ class CslMetadataGeneratorTest extends TestCase
         $doc->setVolume('209');
         $doc->setPageNumber(202);
 
-        $issn = new Identifier();
+        $issn = Identifier::new();
         $issn->setType('issn');
         $issn->setValue('0176-5027');
 
-        $doi = new Identifier();
+        $doi = Identifier::new();
         $doi->setType('doi');
         $doi->setValue('10.2312/BzP_0209_1996');
 
-        $url = new Identifier();
+        $url = Identifier::new();
         $url->setType('url');
         $url->setValue('https://epic.awi.de/id/eprint/26387/');
 

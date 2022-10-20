@@ -33,12 +33,12 @@ namespace OpusTest\Pdf\Cover\PdfGenerator;
 
 use DateTime;
 use Opus\Common\Config;
-use Opus\Date;
-use Opus\Document;
-use Opus\Identifier;
+use Opus\Common\Date;
+use Opus\Common\Document;
+use Opus\Common\Identifier;
+use Opus\Common\Person;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
-use Opus\Person;
 use PHPUnit\Framework\TestCase;
 
 use function file_exists;
@@ -124,28 +124,28 @@ class DefaultPdfGeneratorTest extends TestCase
     /**
      * Returns a sample Document object representing an academic journal article.
      *
-     * @return Document Document object representing an article.
+     * @return DocumentInterface Document object representing an article.
      */
     private function getSampleArticle()
     {
-        $doc = new Document();
+        $doc = Document::new();
         $doc->store();
 
         $doc->setType("article");
         $doc->setLanguage("en");
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Mats Anders');
         $author->setLastName('Granskog');
         $author->setAcademicTitle('Ph.D.');
         $doc->addPersonAuthor($author);
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Hermanni');
         $author->setLastName('Kaartokallio');
         $doc->addPersonAuthor($author);
 
-        $author = new Person();
+        $author = Person::new();
         $author->setFirstName('Kunio');
         $author->setLastName('Shirasawa');
         $doc->addPersonAuthor($author);
@@ -173,15 +173,15 @@ class DefaultPdfGeneratorTest extends TestCase
         //$doc->setPageLast(3253);
         $doc->setPageNumber(9);
 
-        $doi = new Identifier();
+        $doi = Identifier::new();
         $doi->setType('doi');
         $doi->setValue('10.1029/2002JC001386');
 
-        $url = new Identifier();
+        $url = Identifier::new();
         $url->setType('url');
         $url->setValue('https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2002JC001386');
 
-        $issn = new Identifier();
+        $issn = Identifier::new();
         $issn->setType('issn');
         $issn->setValue('0148-0227');
 

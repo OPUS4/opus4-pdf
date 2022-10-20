@@ -31,9 +31,9 @@
 
 namespace Opus\Pdf\MetadataGenerator;
 
-use Opus\Date;
-use Opus\Document;
-use Opus\Person;
+use Opus\Common\Date;
+use Opus\Common\Document;
+use Opus\Common\Person;
 
 /**
  * Interface for generating metadata for a document in a bibliographic metadata format.
@@ -63,7 +63,7 @@ interface MetadataGeneratorInterface
      * Creates metadata that are appropriate for the given document and returns the generated data.
      * Returns null in case of failure.
      *
-     * @param Document $document The document for which metadata shall be generated.
+     * @param DocumentInterface $document The document for which metadata shall be generated.
      * @return string|null Generated metadata.
      */
     public function generate($document);
@@ -72,10 +72,10 @@ interface MetadataGeneratorInterface
      * Creates metadata that are appropriate for the given document and returns the path to the generated
      * metadata file. Returns null in case of failure.
      *
-     * @param Document $document The document for which metadata shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for any
-     * temporary file(s) that may be generated during metadata generation. May be empty in which case
-     * a default name will be used.
+     * @param DocumentInterface $document The document for which metadata shall be generated.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any
+     *          temporary file(s) that may be generated during metadata generation. May be empty in which case
+     *          a default name will be used.
      * @return string|null Path to generated metadata file.
      */
     public function generateFile($document, $tempFilename = '');
@@ -103,7 +103,7 @@ interface MetadataGeneratorInterface
      *
      * TODO move this function to a more appropriate place
      *
-     * @param  Person[] $persons Array of Person objects for which a formatted string shall be created.
+     * @param  PersonInterface[] $persons Array of Person objects for which a formatted string shall be created.
      * @return string|null Formatted string of person names.
      */
     public function personsString($persons);
