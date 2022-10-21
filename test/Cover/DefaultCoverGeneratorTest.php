@@ -31,9 +31,8 @@
 
 namespace OpusTest\Pdf\Cover;
 
-use Opus\Collection;
-use Opus\CollectionRole;
-use Opus\Document;
+use Opus\Common\CollectionRole;
+use Opus\Common\Document;
 use Opus\Pdf\Cover\CoverGeneratorFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -41,17 +40,17 @@ use function is_object;
 
 class DefaultCoverGeneratorTest extends TestCase
 {
-    /** @var CollectionRole */
+    /** @var CollectionRoleInterface */
     protected $roleFixture;
 
-    /** @var Collection */
+    /** @var CollectionInterface */
     protected $collectionFixture;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->roleFixture = new CollectionRole();
+        $this->roleFixture = CollectionRole::new();
         $this->roleFixture->setName('dummy-role');
         $this->roleFixture->setOaiName('dummy-oai');
         $this->roleFixture->store();
@@ -86,12 +85,12 @@ class DefaultCoverGeneratorTest extends TestCase
         //        The collection ID must equal the ID of the last created collection in the database + 2
         // TODO: alter this test so that it doesn't require a certain collection ID in test/config.ini
 
-        /** @var Collection $subcollection */
+        /** @var CollectionInterface $subcollection */
         $subcollection = $this->collectionFixture->addFirstChild();
         $subcollection->setName('dummy-subcollection');
         $this->roleFixture->store();
 
-        $doc = new Document();
+        $doc = Document::new();
         $doc->store();
 
         $title = $doc->addTitleMain();

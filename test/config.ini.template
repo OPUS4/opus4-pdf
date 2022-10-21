@@ -41,4 +41,7 @@ db.params.dbname = @db.name@
 opusdb.params.admin.name = @db.admin.name@
 opusdb.params.admin.password = @db.admin.password@
 
+modelFactory = "Opus\ModelFactory"
+model.fieldDescriptorClass = "Opus\Db\Model\DbFieldDescriptor"
+
 [testing : production]

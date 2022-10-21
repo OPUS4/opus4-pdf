@@ -33,7 +33,7 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 
 use Exception;
 use Opus\Common\Config;
-use Opus\Document;
+use Opus\Common\Document;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;
@@ -146,10 +146,10 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.
      *
-     * @param Document $document The document for which a PDF shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for any
-     * temporary file(s) that may be generated during PDF generation. May be empty in which case
-     * a default name will be used.
+     * @param DocumentInterface $document The document for which a PDF shall be generated.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any
+     *          temporary file(s) that may be generated during PDF generation. May be empty in which case
+     *          a default name will be used.
      * @return string|null Generated PDF data.
      */
     public function generate($document, $tempFilename = '')
@@ -167,10 +167,10 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * Creates a PDF that's appropriate for the given document and returns the path to the generated
      * PDF file. Returns null in case of failure.
      *
-     * @param Document $document The document for which a PDF shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for any
-     * temporary file(s) that may be generated during PDF generation. May be empty in which case
-     * a default name will be used.
+     * @param DocumentInterface $document The document for which a PDF shall be generated.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any
+     *          temporary file(s) that may be generated during PDF generation. May be empty in which case
+     *          a default name will be used.
      * @return string|null Path to generated PDF file.
      */
     public function generateFile($document, $tempFilename = '')
@@ -295,9 +295,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * Creates a JSON file with general metadata for the given document and returns the path to the
      * generated metadata file. Returns null in case of failure.
      *
-     * @param Document $document The document for which metadata shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for the
-     * generated metadata file. May be empty in which case a default name will be used.
+     * @param DocumentInterface $document The document for which metadata shall be generated.
+     * @param string            $tempFilename The file name (without its file extension) to be used for the
+     *          generated metadata file. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
     protected function generalMetadataFile($document, $tempFilename = '')

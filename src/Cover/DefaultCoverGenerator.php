@@ -33,10 +33,10 @@ namespace Opus\Pdf\Cover;
 
 use Exception;
 use iio\libmergepdf\Merger;
-use Opus\Collection;
+use Opus\Common\Collection;
 use Opus\Common\Config;
-use Opus\Document;
-use Opus\File;
+use Opus\Common\DocumentInterface;
+use Opus\Common\FileInterface;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 
@@ -168,8 +168,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the file path to a file copy that includes an appropriate cover page.
      * Returns the file's original path if cover generation fails.
      *
-     * @param Document $document
-     * @param File     $file
+     * @param DocumentInterface $document
+     * @param FileInterface     $file
      * @return string File path.
      */
     public function processFile($document, $file)
@@ -208,9 +208,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns true if there's an up-to-date file with a merged cover for the given document & file in the filecache
      * directory, otherwise returns false.
      *
-     * @param Document $document
-     * @param File     $file
-     * @param string   $cachedFilePath Path to a cached file representing the given file in the filecache directory.
+     * @param DocumentInterface $document
+     * @param FileInterface     $file
+     * @param string            $cachedFilePath Path to a cached file representing the given file in the filecache directory.
      * @return bool
      */
     protected function cachedFileExists($document, $file, $cachedFilePath)
@@ -233,7 +233,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /**
      * Returns the path of the cached file representing the given file in the filecache directory.
      *
-     * @param File $file
+     * @param FileInterface $file
      * @return string File path.
      */
     protected function getCachedFilePath($file)
@@ -245,7 +245,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /**
      * Returns the path of the temp file representing the given file in the temp directory.
      *
-     * @param File $file
+     * @param FileInterface $file
      * @return string File path.
      */
     protected function getTempFilePath($file)
@@ -257,7 +257,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /**
      * Returns the name of the cached file representing the given file in the filecache directory.
      *
-     * @param File $file
+     * @param FileInterface $file
      * @return string file name
      */
     protected function getCachedFilename($file)
@@ -273,7 +273,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the template name (or path relative to the templates directory) that's appropriate
      * for the given document.
      *
-     * @param Document $document
+     * @param DocumentInterface $document
      * @return string|null Template name or path relative to templates directory.
      */
     public function getTemplateName($document)
@@ -319,7 +319,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns the first matching template name (or path relative to the templates directory) that has been defined
      * for the given collection or any of its parent collections. Returns null if no matching template was found.
      *
-     * @param Collection $collection Document collection for which a matching template shall be found.
+     * @param CollectionInterface $collection Document collection for which a matching template shall be found.
      * @return string|null Template name or path relative to templates directory.
      */
     protected function getTemplateNameForCollection($collection)
@@ -330,7 +330,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         if ($templateId === null) {
             $parentCollectionId = $collection->getParentNodeId();
             if ($parentCollectionId !== null) {
-                $parentCollection = new Collection($parentCollectionId);
+                $parentCollection = Collection::get($parentCollectionId);
                 $templateId       = $this->getTemplateNameForCollection($parentCollection);
             }
         }
@@ -378,7 +378,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /**
      * Returns the absolute path to the template file to be used for the given document.
      *
-     * @param Document $document
+     * @param DocumentInterface $document
      * @return string|null Absolute path to template file.
      */
     protected function getTemplatePath($document)
@@ -402,8 +402,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     /**
      * Returns a PDF generator instance to create a cover for the given document and file.
      *
-     * @param Document $document
-     * @param File     $file
+     * @param DocumentInterface $document
+     * @param FileInterface     $file
      * @return PdfGeneratorInterface|null
      */
     protected function getPdfGenerator($document, $file)
