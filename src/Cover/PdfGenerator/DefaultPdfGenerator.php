@@ -33,7 +33,7 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 
 use Exception;
 use Opus\Common\Config;
-use Opus\Common\Document;
+use Opus\Common\DocumentInterface;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;

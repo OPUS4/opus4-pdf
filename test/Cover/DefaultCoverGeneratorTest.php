@@ -31,7 +31,9 @@
 
 namespace OpusTest\Pdf\Cover;
 
+use Opus\Common\CollectionInterface;
 use Opus\Common\CollectionRole;
+use Opus\Common\CollectionRoleInterface;
 use Opus\Common\Document;
 use Opus\Pdf\Cover\CoverGeneratorFactory;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +48,7 @@ class DefaultCoverGeneratorTest extends TestCase
     /** @var CollectionInterface */
     protected $collectionFixture;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +62,7 @@ class DefaultCoverGeneratorTest extends TestCase
         $this->roleFixture->store();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (is_object($this->roleFixture)) {
             $this->roleFixture->delete();

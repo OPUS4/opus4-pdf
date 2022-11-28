@@ -31,7 +31,7 @@
 
 namespace Opus\Pdf\Cover\PdfGenerator;
 
-use Opus\Common\Document;
+use Opus\Common\DocumentInterface;
 
 /**
  * Interface for generating a PDF for a document based on a template.
