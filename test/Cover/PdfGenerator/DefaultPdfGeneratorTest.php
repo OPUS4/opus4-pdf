@@ -50,12 +50,13 @@ use const DIRECTORY_SEPARATOR;
 
 class DefaultPdfGeneratorTest extends TestCase
 {
+    /** @var array */
     private $tempFiles = [];
 
     /**
      * Clean up any files that were registered by tests for deletion.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->deleteTempFiles();
 

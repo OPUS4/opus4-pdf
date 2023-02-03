@@ -32,8 +32,8 @@
 namespace Opus\Pdf\MetadataGenerator;
 
 use Opus\Common\Date;
-use Opus\Common\Document;
-use Opus\Common\Person;
+use Opus\Common\DocumentInterface;
+use Opus\Common\PersonInterface;
 
 /**
  * Interface for generating metadata for a document in a bibliographic metadata format.
