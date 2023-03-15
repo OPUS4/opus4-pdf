@@ -180,8 +180,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         if (empty($licenceLogosDir)) {
             $config = Config::get();
 
-            if (isset($config->licenses->logos->path)) {
-                $licenceLogosDir = $config->licenses->logos->path;
+            if (isset($config->licences->logos->path)) {
+                $licenceLogosDir = $config->licences->logos->path;
             }
 
             if (empty($licenceLogosDir)) {
