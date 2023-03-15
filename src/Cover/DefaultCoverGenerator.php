@@ -304,7 +304,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function getCachedFilename($file)
     {
-        // TODO: need to check for empty file name / parent ID values?
+        // TODO need to check for empty file name / parent ID values?
         $filePath = $file->getPathName();
         $docId    = $file->getParentId();
 
@@ -320,7 +320,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getTemplateName($document)
     {
-        // TODO: handle documents belonging to two collections for which different cover templates have been specified
+        // TODO handle documents belonging to two collections for which different cover templates have been specified
 
         $docCollections = $document->getCollection();
 
@@ -378,7 +378,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         }
 
         // NOTE: currently, the template ID is identical to the template name
-        // TODO: in a future implementation, it may be necessary to convert the template ID to a template name
+        // TODO in a future implementation, it may be necessary to convert the template ID to a template name
 
         return $templateId;
     }
@@ -395,7 +395,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         //       `collection.<COLLECTION_ID>.cover = '<TEMPLATE_NAME>'`; however, note that this is a temporary measure.
         // NOTE: As a result, the returned template ID is currently identical to the template name and is thus a string
         //       (instead of an int).
-        // TODO: better implementation of the template name/rel.path <-> collection ID mapping
+        // TODO better implementation of the template name/rel.path <-> collection ID mapping
 
         $config = Config::get();
 
@@ -450,7 +450,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function getPdfGenerator($document, $file)
     {
-        // TODO: support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
+        // TODO support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
         $templatePath = $this->getTemplatePath($document);
 
@@ -509,7 +509,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function mergePdfFiles($firstFilePath, $secondFilePath)
     {
-        // TODO: check whether another (better maintained, more compatible?) library could be used for PDF merging
+        // TODO check whether another (better maintained, more compatible?) library could be used for PDF merging
 
         try {
             $merger = new Merger();
@@ -517,7 +517,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $merger->addFile($secondFilePath);
             $pdfData = $merger->merge();
         } catch (Exception $e) {
-            // TODO: log exception
+            // TODO log exception
             return null;
         }
 

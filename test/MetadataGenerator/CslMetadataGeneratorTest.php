@@ -217,7 +217,7 @@ class CslMetadataGeneratorTest extends TestCase
      */
     private function getSampleChapter()
     {
-        // TODO: how to add the series title aka CSL collection-title ("CRREL Monograph") for this book chapter?
+        // TODO how to add the series title aka CSL collection-title ("CRREL Monograph") for this book chapter?
 
         $doc = new Document();
         $doc->store();
@@ -368,7 +368,7 @@ class CslMetadataGeneratorTest extends TestCase
         $doc->setPublisherName('Alfred-Wegener Institut für Meeres- und Polarforschung');
         $doc->setPublisherPlace('Bremerhaven');
 
-        // TODO: better way to only create a certain DnbInstitute if it doesn't exist
+        // TODO better way to only create a certain DnbInstitute if it doesn't exist
         $institutes = DnbInstitute::getAll();
         if (! empty($institutes)) {
             $institute = $institutes[0];

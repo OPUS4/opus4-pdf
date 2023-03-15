@@ -101,13 +101,13 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      */
     public function generate($document)
     {
-        // TODO: add support for more CSL properties?
+        // TODO add support for more CSL properties?
         //     - general: `id`, `contributor` (both not supported by CslRecord?)
         //     - chapter in a book: `container-author` (for the book author)
         //     - chapter in a book in a series: `collection-title` (for the series title)
         //     - book in a series: `collection-number`, `collection-editor` (series info)
 
-        // TODO: add support for more OPUS\Document properties?
+        // TODO add support for more OPUS\Document properties?
         //     - thesis: ThesisGrantor, ThesisDateAccepted
 
         // generate metadata in CSL JSON format

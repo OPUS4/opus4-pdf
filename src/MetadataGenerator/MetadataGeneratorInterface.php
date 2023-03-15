@@ -42,7 +42,7 @@ use Opus\Person;
  */
 interface MetadataGeneratorInterface
 {
-    // TODO: add constants for other supported metadata formats
+    // TODO add constants for other supported metadata formats
     const METADATA_FORMAT_CSL_JSON = 'csl_json';
 
     /**

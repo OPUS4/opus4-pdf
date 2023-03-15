@@ -177,7 +177,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      */
     public function getMainLicence($document)
     {
-        // TODO: #24 better handling of cases where a document contains multiple licences?
+        // TODO #24 better handling of cases where a document contains multiple licences?
 
         $docLicences = $document->getLicence();
 
@@ -315,7 +315,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         // 3. use Pandoc to replace placeholders in the current template file with appropriate document metadata
         // equivalent shell command:
         //   pandoc {$templatePath} --wrap=preserve --metadata-file={$metadataFilePath} --bibliography={$cslFilePath} \
-        //     --template={$templatePath} --variable=images-basepath:{$templateBaseDir} --output={$markdownFilePath}
+        //     --template={$templatePath} --variable=images-basepath:{$templateBaseDir} \
+        //     --variable=licence-logo-basepath:{$licenceLogosDir} --output={$markdownFilePath}
         $parameters = [];
 
         // input file
@@ -351,7 +352,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         try {
             $output = $this->pandoc->execute($parameters);
         } catch (Exception $e) {
-            // TODO: log exception
+            // TODO log exception
             return null;
         }
 
@@ -383,13 +384,17 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         //   Unicode characters as well as system fonts)
         array_push($parameters2, '--pdf-engine', 'xelatex');
 
+        // --pdf-engine-opt specifies to use PDF version 1.3 without compression
+        // NOTE: since this option seems to cause a Pandoc exception when passed through PHP code, we use the header
+        //       includes `\special{dvipdfmx:config V 3}\n\special{dvipdfmx:config z 0}` in the template file instead
+
         // --output specifies that generated output will be written to the given file path
         array_push($parameters2, '--output', $pdfFilePath);
 
         try {
             $output2 = $this->pandoc->execute($parameters2);
         } catch (Exception $e) {
-            // TODO: log exception
+            // TODO log exception
             return null;
         }
 

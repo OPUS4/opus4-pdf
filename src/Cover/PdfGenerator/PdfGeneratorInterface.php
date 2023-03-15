@@ -40,7 +40,7 @@ use Opus\Document;
  */
 interface PdfGeneratorInterface
 {
-    // TODO: add constants for other supported template formats & PDF engines
+    // TODO add constants for other supported template formats & PDF engines
     const TEMPLATE_FORMAT_MARKDOWN = 'markdown';
     const PDF_ENGINE_XELATEX       = 'xelatex';
 
