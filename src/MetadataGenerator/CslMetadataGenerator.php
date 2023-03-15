@@ -85,7 +85,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     /**
      * Sets the path to a directory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir)
     {

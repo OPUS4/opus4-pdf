@@ -54,35 +54,35 @@ interface PdfGeneratorInterface
     /**
      * Sets the path to a directory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir);
 
     /**
      * Returns the path to the template file that's used to generate the PDF.
      *
-     * @return string
+     * @return string|null
      */
     public function getTemplatePath();
 
     /**
      * Sets the path to the template file that's used to generate the PDF.
      *
-     * @param string $templatePath
+     * @param string|null $templatePath
      */
     public function setTemplatePath($templatePath);
 
     /**
      * Returns the path to a directory containing licence logo files to be used when generating the PDF.
      *
-     * @return string
+     * @return string|null
      */
     public function getLicenceLogosDir();
 
     /**
      * Sets the path to a directory containing licence logo files to be used when generating the PDF.
      *
-     * @param string $licenceLogosDir
+     * @param string|null $licenceLogosDir
      */
     public function setLicenceLogosDir($licenceLogosDir);
 
