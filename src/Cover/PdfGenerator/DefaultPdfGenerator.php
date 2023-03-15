@@ -46,6 +46,7 @@ use function file_get_contents;
 use function file_put_contents;
 use function is_writable;
 use function json_encode;
+use function ltrim;
 use function parse_url;
 use function substr;
 use function uniqid;
@@ -209,9 +210,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         }
 
         // remove any preceding path separator
-        if (substr($urlPath, 0, 1) === DIRECTORY_SEPARATOR) {
-            $urlPath = substr($urlPath, 1);
-        }
+        $urlPath = ltrim($urlPath, DIRECTORY_SEPARATOR);
 
         return $urlPath;
     }
