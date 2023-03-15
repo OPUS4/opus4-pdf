@@ -63,26 +63,22 @@ header-includes: |
     \end{minipage}
   }
   \lofoot{
-    \subsubsection{Nutzungsbedingungen}
-    \begin{minipage}[t][27mm][t]{165pt}
-    \tiny Dieser Text wird unter einer CC BY-NC-ND Lizenz \newline
-    (Namensnennung – Nicht-kommerziell – Keine Bearbeitungen) \newline
-    zur Verfügung gestellt. Nähere Auskünfte dazu finden Sie hier: \newline
-    \url{https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de}
+    \subsubsection{Terms of use}
+    \begin{minipage}[t][27mm][t]{307pt}
+    $if(licence-text)$\tiny This document is made available under these conditions: \newline$endif$
+    $if(licence-text)$\tiny \textbf{$licence-text$} \newline$endif$
+    $if(licence-url)$For more information see: \newline$endif$
+    $if(licence-url)$\url{$licence-url$}$endif$
     \end{minipage}
   }
   \cofoot{
-    \begin{minipage}[t][27mm][c]{34mm}
-    $if(licence-logo-basepath)$$if(licence-logo-name)$\rightline{\includegraphics[width=27mm]{$licence-logo-basepath$$licence-logo-name$}}$endif$$endif$
+    $if(licence-title)$\subsubsection{\hfill \footnotesize $licence-title$ ~}$endif$
+    \begin{minipage}[t][25.4mm][c]{34mm}
     \end{minipage}
   }
   \rofoot{
-    \subsubsection{\hfill Terms of use}
-    \begin{minipage}[t][27mm][t]{142pt}
-    \tiny This document is made available under a CC BY-NC-ND \newline
-    licence (Attribution – NonCommercial – NoDerivatives). \newline
-    For more information see: \newline
-    \url{https://creativecommons.org/licenses/by-nc-nd/4.0}
+    \begin{minipage}[t][27mm][c]{34mm}
+    $if(licence-logo-basepath)$$if(licence-logo-name)$\rightline{\includegraphics[width=27mm]{$licence-logo-basepath$$licence-logo-name$}}$endif$$endif$
     \end{minipage}
   }
 ---
