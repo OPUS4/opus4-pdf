@@ -32,6 +32,7 @@
 namespace Opus\Pdf\MetadataGenerator;
 
 use Opus\Common\Config;
+use Opus\Common\LoggingTrait;
 use Opus\Date;
 use Opus\Document;
 use Opus\Person;
@@ -59,6 +60,8 @@ use const DIRECTORY_SEPARATOR;
  */
 class CslMetadataGenerator implements MetadataGeneratorInterface
 {
+    use LoggingTrait;
+
     /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
 
@@ -224,6 +227,8 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     {
         $tempDir = $this->getTempDir();
         if (! is_writable($tempDir)) {
+            $this->getLogger()->err("Couldn't create CSL JSON metadata: temp directory ('$tempDir') is not writable");
+
             return null;
         }
 
@@ -236,11 +241,15 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
         // generate metadata in CSL JSON format
         $cslMetadata = $this->generate($document);
         if ($cslMetadata === null) {
+            $this->getLogger()->err("Couldn't create CSL JSON metadata");
+
             return null;
         }
 
         $result = file_put_contents($cslFilePath, $cslMetadata);
         if ($result === false) {
+            $this->getLogger()->err("Couldn't write CSL JSON metadata");
+
             return null;
         }
 

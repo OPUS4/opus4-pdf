@@ -33,6 +33,7 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 
 use Exception;
 use Opus\Common\Config;
+use Opus\Common\LoggingTrait;
 use Opus\Document;
 use Opus\Licence;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
@@ -64,6 +65,8 @@ use const PHP_URL_PATH;
  */
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
+    use LoggingTrait;
+
     /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
 
@@ -236,6 +239,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $licenceLogoPath = $licenceLogosDir . $licenceLogoName;
 
         if (! file_exists($licenceLogoPath)) {
+            $this->getLogger()->err("Couldn't find logo for licence '" . $licence->getName() . "' at '$licenceLogoPath'");
+
             return null;
         }
 
@@ -277,6 +282,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     {
         $templatePath = $this->getTemplatePath();
         if (! file_exists($templatePath)) {
+            $this->getLogger()->err("Couldn't generate PDF: missing template at '$templatePath'");
+
             return null;
         }
 
@@ -284,6 +291,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $tempDir = $this->getTempDir();
         if (! is_writable($tempDir)) {
+            $this->getLogger()->err("Couldn't generate PDF: temp directory ('$tempDir') is not writable");
+
             return null;
         }
 
@@ -351,11 +360,14 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         try {
             $output = $this->pandoc->execute($parameters);
         } catch (Exception $e) {
-            // TODO log exception
+            $this->getLogger()->err("Couldn't generate PDF: '$e'");
+
             return null;
         }
 
         if ($output !== true) {
+            $this->getLogger()->err("Couldn't generate PDF: no output from Pandoc");
+
             return null;
         }
 
@@ -393,11 +405,14 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         try {
             $output2 = $this->pandoc->execute($parameters2);
         } catch (Exception $e) {
-            // TODO log exception
+            $this->getLogger()->err("Couldn't generate PDF: '$e'");
+
             return null;
         }
 
         if ($output2 !== true) {
+            $this->getLogger()->err("Couldn't generate PDF: no output from Pandoc/XeLaTeX");
+
             return null;
         }
 
@@ -421,6 +436,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $tempDir = $this->getTempDir();
         if (! is_writable($tempDir)) {
+            $this->getLogger()->err("Couldn't create JSON metadata: temp directory ('$tempDir') is not writable");
+
             return null;
         }
 
@@ -488,6 +505,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $result = file_put_contents($metadataFilePath, $jsonString);
         if ($result === false) {
+            $this->getLogger()->err("Couldn't write JSON metadata");
+
             return null;
         }
 
@@ -510,6 +529,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $generator      = MetadataGeneratorFactory::create($metadataFormat);
 
         if ($generator === null) {
+            $this->getLogger()->err("Couldn't create metadata generator for '$metadataFormat'");
+
             return null;
         }
 

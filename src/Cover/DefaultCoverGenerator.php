@@ -35,6 +35,7 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Opus\Collection;
 use Opus\Common\Config;
+use Opus\Common\LoggingTrait;
 use Opus\Document;
 use Opus\File;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
@@ -57,6 +58,8 @@ use const PATHINFO_FILENAME;
  */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
+    use LoggingTrait;
+
     /** @var string Path to a file cache directory */
     private $filecacheDir = "";
 
@@ -471,6 +474,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
 
         if ($generator === null) {
+            $this->getLogger()->err("Couldn't create PDF generator for '$templateFormat' and '$pdfEngine'");
+
             return null;
         }
 
@@ -517,7 +522,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $merger->addFile($secondFilePath);
             $pdfData = $merger->merge();
         } catch (Exception $e) {
-            // TODO log exception
+            $this->getLogger()->err("Couldn't merge PDFs: '$e'");
+
             return null;
         }
 
