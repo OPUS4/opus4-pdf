@@ -27,7 +27,7 @@
 
 [production]
 
-;DB SETTINGS
+; DB SETTINGS
 ; db.params.host = "127.0.0.1"
 ; db.params.port = "3306"
 ; TODO Currently it is necessary to use the admin account here for testing

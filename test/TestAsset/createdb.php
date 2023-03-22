@@ -35,7 +35,7 @@ defined('APPLICATION_PATH')
 
 // Define application environment
 defined('APPLICATION_ENV')
-|| define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production'));
+|| define('APPLICATION_ENV', getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'production');
 
 // Configure include path.
 set_include_path(
@@ -59,11 +59,13 @@ $application = new Zend_Application(
     [
         "config" => [
             APPLICATION_PATH . '/test/config.ini',
-        ]
+        ],
     ]
 );
 
-Zend_Registry::set('opus.disableDatabaseVersionCheck', true);
+$options                                        = $application->getOptions();
+$options['opus']['disableDatabaseVersionCheck'] = true;
+$application->setOptions($options);
 
 // Bootstrapping application
 $application->bootstrap('Backend');
@@ -72,17 +74,17 @@ $application->bootstrap('Backend');
  * Prepare database.
  */
 
-$database = new Opus_Database();
+$database = new Opus\Database();
 
 $dbName = $database->getName();
 
-echo("Dropping database '$dbName' ... ");
+echo "Dropping database '$dbName' ... ";
 $database->drop();
-echo('done' . PHP_EOL);
+echo 'done' . PHP_EOL;
 
-echo("Creating database '$dbName' ... ");
+echo "Creating database '$dbName' ... ";
 $database->create();
-echo('done' . PHP_EOL);
+echo 'done' . PHP_EOL;
 
-echo(PHP_EOL . "Importing database schema ... " . PHP_EOL);
+echo PHP_EOL . "Importing database schema ... " . PHP_EOL;
 $database->importSchema();

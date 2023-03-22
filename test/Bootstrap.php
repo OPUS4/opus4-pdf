@@ -36,7 +36,7 @@ ini_set('display_errors', 1);
 
 // Define path to application directory
 defined('APPLICATION_PATH')
-|| define('APPLICATION_PATH', realpath(dirname(dirname(dirname(__FILE__)))));
+        || define('APPLICATION_PATH', realpath(dirname(dirname(__FILE__))));
 
 // Define application environment (use 'production' by default)
 define('APPLICATION_ENV', 'testing');
@@ -44,18 +44,41 @@ define('APPLICATION_ENV', 'testing');
 // Configure include path.
 $scriptDir = dirname(__FILE__);
 
-require_once APPLICATION_PATH . DIRECTORY_SEPARATOR . 'vendor/' . 'autoload.php';
+require_once APPLICATION_PATH . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 
 // Do test environment initializiation.
 $application = new Zend_Application(
     APPLICATION_ENV,
     [
         "config" => [
-            APPLICATION_PATH . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'config.ini'
-        ]
+            APPLICATION_PATH . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'config.ini',
+        ],
     ]
 );
 
-Zend_Registry::set('opus.disableDatabaseVersionCheck', true);
+$options                                        = $application->getOptions();
+$options['opus']['disableDatabaseVersionCheck'] = true;
+$application->setOptions($options);
 
-$application->bootstrap(['Database','Temp','OpusLocale']);
+$application->bootstrap(['Database', 'Temp', 'OpusLocale']);
+
+// make sure necessary directories are available
+ensureDirectory(APPLICATION_PATH . '/test/workspace');
+ensureDirectory(APPLICATION_PATH . '/test/workspace/cache');
+ensureDirectory(APPLICATION_PATH . '/test/workspace/filecache');
+ensureDirectory(APPLICATION_PATH . '/test/workspace/files');
+ensureDirectory(APPLICATION_PATH . '/test/workspace/log');
+ensureDirectory(APPLICATION_PATH . '/test/workspace/tmp');
+
+/**
+ * Creates the given directory if it doesn't exist.
+ *
+ * @param string $path The directory path to be created.
+ */
+function ensureDirectory($path)
+{
+    if (! is_dir($path)) {
+        mkdir($path);
+        echo "Created directory '$path'" . PHP_EOL;
+    }
+}
