@@ -33,16 +33,11 @@ jobs:
       - name: Install Composer and Dependencies
         run: curl -s http://getcomposer.org/installer | php && php composer.phar self-update && php composer.phar install
 
-      - name: Start MySQL
-        run: sudo systemctl start mysql.service
+      - name: MySQL
+        run: sudo bash bin/install_mysql_docker.sh
 
-      - name: Prepare Database
-        run: bash vendor/opus4-repo/framework/bin/prepare-database.sh --admin_pwd root --user_pwd root
-
-      - name: Prepare Test Environment
-        run: |
-          ant prepare-workspace prepare-config -DdbUserPassword=root -DdbAdminPassword=root
-          export APPLICATION_PATH=. && php vendor/opus4-repo/framework/db/createdb.php
+      - name: Prepare
+        run: ant prepare-workspace prepare-config -DdbUserPassword=root -DdbAdminPassword=root && php test/TestAsset/createdb.php
 
       - name: Install Fonts
         run: |

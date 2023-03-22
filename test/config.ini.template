@@ -22,18 +22,15 @@
 ; along with OPUS; if not, write to the Free Software Foundation, Inc., 51
 ; Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 ;
-; @copyright   Copyright (c) 2008-2019, OPUS 4 development team
+; @copyright   Copyright (c) 2008, OPUS 4 development team
 ; @license     http://www.gnu.org/licenses/gpl.html General Public License
-
-; Database adapter configuration using standard Zend_db option names.
-; Have a look on Zend_Db::factory() method for information about adapter creation.
 
 [production]
 
-; DB SETTINGS
+;DB SETTINGS
 ; db.params.host = "127.0.0.1"
 ; db.params.port = "3306"
-; Currently it is necessary to use the admin account here for testing
+; TODO Currently it is necessary to use the admin account here for testing
 db.params.username = @db.admin.name@
 db.params.password = @db.admin.password@
 db.params.dbname = @db.name@
