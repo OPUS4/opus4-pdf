@@ -31,8 +31,8 @@
 
 namespace Opus\Pdf\MetadataGenerator;
 
-use Opus\Common\Config;
-use Opus\Common\LoggingTrait;
+use Opus\Config;
+use Opus\LoggingTrait;
 use Opus\Date;
 use Opus\Document;
 use Opus\Person;

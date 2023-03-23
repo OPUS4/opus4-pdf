@@ -32,8 +32,8 @@
 namespace Opus\Pdf\Cover\PdfGenerator;
 
 use Exception;
-use Opus\Common\Config;
-use Opus\Common\LoggingTrait;
+use Opus\Config;
+use Opus\LoggingTrait;
 use Opus\Document;
 use Opus\Licence;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;

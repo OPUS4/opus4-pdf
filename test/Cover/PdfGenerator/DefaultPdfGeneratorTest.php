@@ -32,7 +32,7 @@
 namespace OpusTest\Pdf\Cover\PdfGenerator;
 
 use DateTime;
-use Opus\Common\Config;
+use Opus\Config;
 use Opus\Date;
 use Opus\Document;
 use Opus\Identifier;

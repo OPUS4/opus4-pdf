@@ -32,7 +32,7 @@
 namespace OpusTest\Pdf\MetadataGenerator;
 
 use DateTime;
-use Opus\Common\Config;
+use Opus\Config;
 use Opus\Date;
 use Opus\DnbInstitute;
 use Opus\Document;
