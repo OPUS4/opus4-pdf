@@ -33,9 +33,9 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 
 use Exception;
 use Opus\Config;
-use Opus\LoggingTrait;
 use Opus\Document;
 use Opus\Licence;
+use Opus\LoggingTrait;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;

@@ -35,9 +35,9 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Opus\Collection;
 use Opus\Config;
-use Opus\LoggingTrait;
 use Opus\Document;
 use Opus\File;
+use Opus\LoggingTrait;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
 

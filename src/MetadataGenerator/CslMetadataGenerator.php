@@ -32,9 +32,9 @@
 namespace Opus\Pdf\MetadataGenerator;
 
 use Opus\Config;
-use Opus\LoggingTrait;
 use Opus\Date;
 use Opus\Document;
+use Opus\LoggingTrait;
 use Opus\Person;
 use Seboettg\CiteData\Csl\Date as CslDate;
 use Seboettg\CiteData\Csl\Name as CslName;
