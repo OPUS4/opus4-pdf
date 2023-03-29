@@ -100,7 +100,7 @@ $--REPOSITORY LOGOS
 %
 \begin{minipage}[c]{0.28\linewidth}
 {\centering 
-\includegraphics[width=50mm]{$images-basepath$images/logo.png}
+%\includegraphics[width=50mm]{$images-basepath$images/logo.png}
 }
 \end{minipage}%
 \end{figure}

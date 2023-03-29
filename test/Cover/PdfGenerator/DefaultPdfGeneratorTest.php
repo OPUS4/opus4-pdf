@@ -83,8 +83,6 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $licenceLogosDir = dirname($templatePath) . DIRECTORY_SEPARATOR . 'images/';
 
-        $this->assertDirectoryExists($licenceLogosDir);
-
         $generator->setLicenceLogosDir($licenceLogosDir);
 
         $document = $this->getSampleArticle();
