@@ -10,6 +10,12 @@
 #   "Open Sans" (true type or open type) font to be installed. This font is available under
 #   the Apache License v.2.0 at <https://fonts.google.com/specimen/Open+Sans>.
 #   
+# - By default, this template generates a "suggested citation" from the document's
+#   metadata according to Chicago Manual of Style (author-date). When not commented
+#   out (see `citation-style:` below), this template requires any CSL style from
+#   <https://github.com/citation-style-language/styles> to generate the formatted
+#   citation. 
+#   
 # NOTES:
 # - This template can be converted to a cover PDF using Pandoc and XeTeX via two steps:
 #   
@@ -41,7 +47,7 @@ sansfont: "Open Sans"
 mainfont: "Open Sans"
 # fontsize: 10pt # KOMA-Script default: 11pt
 number-sections: false # specifies whether numbers should be printed in front of headings
-citation-style: styles/apa-opus.csl # specifies the citation style; we use a slightly modified APA version here, default is Chicago Manual of Style author-date
+# citation-style: apa.csl # specifies the citation style; defaults to Chicago Manual of Style author-date if commented out
 # bibliography: metadata.yaml # specifies the external bibliography; supported formats: BibLaTeX (.bib), BibTeX (.bibtex), CSL JSON (.json), CSL YAML (.yaml)
 nocite: |
   @*
