@@ -171,10 +171,6 @@ class CslMetadataGeneratorTest extends TestCase
         $title->setValue('Nutrient status of Baltic Sea ice: Evidence for control by snow-ice formation, ice permeability, and ice algae');
         $title->setLanguage('en');
 
-        $abstract = $doc->addTitleAbstract();
-        $abstract->setValue('Samples of land-fast sea ice collected along the Finnish coast of the Baltic Sea, between latitudes 60.2°N and 65.7°N, in January to April 2000 were analyzed for physical, biological, and chemical parameters. Both spatial and temporal variability were investigated. Snow-ice contributed in average a third of the total ice thickness, while the snow fraction (by mass) of the ice was 20% on average. Snow-ice formation increased the nitrogen concentrations substantially, mainly in the upper parts of the ice cover. Phosphorus on the other hand was controlled by biological uptake, with distinct maxima in the bottommost parts of the ice cover. The chlorophyll-a concentrations were dependent on the physical properties of the ice to some extent. In more saline waters the chlorophyll-a concentrations in the ice were variable (1–17 μg l−1). However, in the less saline waters of the Bothnian Bay the concentrations were generally considerably lower (<1 μg l−1) than elsewhere. This is presumably caused by formation of ice of low salinity, due to the low ambient salinity in the area and the under-ice flow of river waters, and formation of ice that has no habitable space for ice algae. Atmospheric nutrients possibly enhance the magnitude of the ice algae bloom, through downward flushing of surface deposited nutrients during periods when the ice was permeable. We surmise that atmospheric supply of nutrients plays an important role in biological productivity within the Baltic Sea ice sheet and potentially also in under-ice waters.');
-        $abstract->setLanguage('en');
-
         $doc->setPublishedDate(new Date(new DateTime('2003-08-09')));
 
         $parent = $doc->addTitleParent();
@@ -253,10 +249,6 @@ class CslMetadataGeneratorTest extends TestCase
         $title = $doc->addTitleMain();
         $title->setValue('Snow cover effects on Antarctic sea ice thickness');
         $title->setLanguage('en');
-
-        $abstract = $doc->addTitleAbstract();
-        $abstract->setValue('In model simulations of seasonal pack-ice growth, snow cover is treated as insulating layer that inhibits ice growth, but, during field work in 1986, it was found that several factors negate this predicted behaviour. Estimates that snow cover increases sea-ice thickness by 20 to 30% over model predictions by flooding and infiltration mechanisms.');
-        $abstract->setLanguage('en');
 
         $doc->setPublishedDate(new Date(DateTime::createFromFormat('!Y-m', '1990-02')));
 
