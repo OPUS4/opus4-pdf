@@ -128,7 +128,9 @@ class DefaultPdfGeneratorTest extends TestCase
     }
 
     /**
-     * Returns a sample Document object representing an academic journal article.
+     * Returns a sample Document object with fictive metadata representing an academic journal article.
+     *
+     * @link   https://en.wikipedia.org/wiki/Josiah_S._Carberry#Publications_under_the_name_of_J._S._Carberry
      *
      * @return Document Document object representing an article.
      */
@@ -141,55 +143,50 @@ class DefaultPdfGeneratorTest extends TestCase
         $doc->setLanguage("en");
 
         $author = new Person();
-        $author->setFirstName('Mats Anders');
-        $author->setLastName('Granskog');
+        $author->setFirstName('Josiah Stinkney');
+        $author->setLastName('Carberry');
         $author->setAcademicTitle('Ph.D.');
         $doc->addPersonAuthor($author);
 
         $author = new Person();
-        $author->setFirstName('Hermanni');
-        $author->setLastName('Kaartokallio');
-        $doc->addPersonAuthor($author);
-
-        $author = new Person();
-        $author->setFirstName('Kunio');
-        $author->setLastName('Shirasawa');
+        $author->setFirstName('Truman');
+        $author->setLastName('Grayson');
         $doc->addPersonAuthor($author);
 
         $title = $doc->addTitleMain();
-        $title->setValue('Nutrient status of Baltic Sea ice: Evidence for control by snow-ice formation, ice permeability, and ice algae');
+        $title->setValue('Toward a Unified Theory of High-Energy Metaphysics: Silly String Theory');
         $title->setLanguage('en');
 
         $abstract = $doc->addTitleAbstract();
-        $abstract->setValue('Samples of land-fast sea ice collected along the Finnish coast of the Baltic Sea, between latitudes 60.2°N and 65.7°N, in January to April 2000 were analyzed for physical, biological, and chemical parameters. Both spatial and temporal variability were investigated. Snow-ice contributed in average a third of the total ice thickness, while the snow fraction (by mass) of the ice was 20% on average. Snow-ice formation increased the nitrogen concentrations substantially, mainly in the upper parts of the ice cover. Phosphorus on the other hand was controlled by biological uptake, with distinct maxima in the bottommost parts of the ice cover. The chlorophyll-a concentrations were dependent on the physical properties of the ice to some extent. In more saline waters the chlorophyll-a concentrations in the ice were variable (1–17 μg l−1). However, in the less saline waters of the Bothnian Bay the concentrations were generally considerably lower (<1 μg l−1) than elsewhere. This is presumably caused by formation of ice of low salinity, due to the low ambient salinity in the area and the under-ice flow of river waters, and formation of ice that has no habitable space for ice algae. Atmospheric nutrients possibly enhance the magnitude of the ice algae bloom, through downward flushing of surface deposited nutrients during periods when the ice was permeable. We surmise that atmospheric supply of nutrients plays an important role in biological productivity within the Baltic Sea ice sheet and potentially also in under-ice waters.');
+        $abstract->setValue('The characteristic theme of the works of Stone is the bridge between culture and society. Several narratives concerning the fatal !aw, and subsequent dialectic, of semioticist class may be found. Thus, Debord uses the term ‘the subtextual paradigm of consensus’ to denote a cultural paradox. The subject is interpolated into a neocultural discourse that includes sexuality as a totality. But Marx’s critique of prepatriarchialist nihilism states that consciousness is capable of significance. The main theme of Dietrich’s model of cultural discourse is not construction, but neoconstruction. Thus, any number of narratives concerning the textual paradigm of narrative exist. Pretextual cultural theory suggests that context must come from the collective unconscious.');
         $abstract->setLanguage('en');
 
-        $doc->setPublishedDate(new Date(new DateTime('2003-08-09')));
+        $doc->setPublishedDate(new Date(new DateTime('2008-08-14')));
 
         $parent = $doc->addTitleParent();
-        $parent->setValue('Journal of Geophysical Research');
+        $parent->setValue('Journal of Psychoceramics');
         $parent->setLanguage('en');
 
-        $doc->setPublisherName('Wiley');
-        $doc->setPublisherPlace('New Jersey');
+        $doc->setPublisherName('Society of Psychoceramics');
+        $doc->setPublisherPlace('Providence, Rhode Island');
 
-        $doc->setVolume('108');
-        $doc->setIssue('C8');
-        $doc->setPageFirst(3253);
-        //$doc->setPageLast(3253);
-        $doc->setPageNumber(9);
+        $doc->setVolume('11');
+        $doc->setIssue('5');
+        $doc->setPageFirst(1);
+        $doc->setPageLast(3);
+        $doc->setPageNumber(4);
 
         $doi = new Identifier();
         $doi->setType('doi');
-        $doi->setValue('10.1029/2002JC001386');
+        $doi->setValue('10.5555/12345678');
 
         $url = new Identifier();
         $url->setType('url');
-        $url->setValue('https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2002JC001386');
+        $url->setValue('http://psychoceramics.labs.crossref.org/10.5555-12345678.html');
 
         $issn = new Identifier();
         $issn->setType('issn');
-        $issn->setValue('0148-0227');
+        $issn->setValue('0264-3561');
 
         $ids = [$doi, $url, $issn];
         $doc->setIdentifier($ids);
