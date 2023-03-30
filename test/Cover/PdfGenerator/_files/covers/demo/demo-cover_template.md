@@ -97,7 +97,7 @@ header-includes: |
   }
   \lofoot{
     $if(licence-text)$\subsubsection{$licence-heading$}$endif$
-    \begin{minipage}[t][27mm][t]{0.60\textwidth}
+    \begin{minipage}[t][27mm][t]{0.80\textwidth}
     $if(licence-text)$\tiny $licence-intro$ \newline$endif$
     $if(licence-text)$\tiny \textbf{$licence-text$} \newline$endif$
     $if(licence-url)$$licence-outro$ \newline$endif$
@@ -106,11 +106,11 @@ header-includes: |
   }
   \cofoot{
     $if(licence-title)$\subsubsection{\hfill \footnotesize $licence-title$ ~}$endif$
-    \begin{minipage}[t][25.4mm][c]{0.09\textwidth}
+    \begin{minipage}[t][25.4mm][c]{0.01\textwidth}
     \end{minipage}
   }
   \rofoot{
-    \begin{minipage}[t][27mm][c]{0.30\textwidth}
+    \begin{minipage}[t][27mm][c]{0.20\textwidth}
     $if(licence-logo-basepath)$$if(licence-logo-name)$\rightline{\includegraphics[width=27mm]{$licence-logo-basepath$$licence-logo-name$}}$endif$$endif$
     \end{minipage}
   }
