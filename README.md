@@ -76,7 +76,7 @@ following configuration options to your application's `config.ini` file:
 This will cause PDF cover sheets to be added in front of PDF files downloaded via the OPUS 4
 frontdoor.
 
-By default, OPUS 4 looks for PDF cover templates in the `/application/configs/covers` directory.
+By default, OPUS 4 looks for PDF cover templates in the `application/configs/covers` directory.
 You can optionally specify a different directory path via this configuration option:
 
     pdf.covers.path = APPLICATION_PATH "/application/configs/covers"
@@ -105,7 +105,7 @@ actual name (or path) of your collection-specific cover template (directory).
 Currently, the PDF cover sheet generation process can only make use of image files that are
 available locally.
 
-To have OPUS 4 look for licence logos within the `/public/img/licences` directory, add this
+To have OPUS 4 look for licence logos within a `public/img/licences` directory, add this
 configuration option:
 
     licences.logos.path = APPLICATION_PATH "/public/img/licences"
