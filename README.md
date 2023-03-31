@@ -28,7 +28,7 @@ To check the version of Pandoc that has been installed, run:
 
 ### Fonts
 
-PDF cover sheets will be generated via tamplate files. Note that the included
+PDF cover sheets will be generated via template files. Note that the included
 `demo-cover_template.md` file requires the "Open Sans" (true type or open type) font to
 be installed on the system. This font is available under the Apache License v.2.0 in the
 [Google Fonts library](https://fonts.google.com/specimen/Open+Sans).
