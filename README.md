@@ -3,6 +3,7 @@
 This package provides PDF support in OPUS 4 for instance to generate cover sheets or validate
 files.
 
+([Deutsche Dokumentation](LIESMICH.md))
 
 
 ## Requirements
