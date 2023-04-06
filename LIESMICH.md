@@ -87,16 +87,16 @@ Standardmäßig sucht OPUS 4 nach PDF-Deckblattvorlagen im Verzeichnis `applicat
 
     pdf.covers.path = APPLICATION_PATH "/application/configs/covers"
 
-OPUS 4 enthält zu Demonstrationszwecken eine simple PDF-Deckblattvorlage, die auch als Grundlage
-für die Erstellung eigener Deckblattvorlagen verwendet werden kann. Um diese Demo-Deckblattvorlage
-zu verwenden, fügen Sie bitte die folgende Option hinzu:
+Dieses Paket enthält im Verzeichnis `test/_files` eine simple PDF-Deckblattvorlage, die auch als
+Grundlage für die Erstellung eigener Deckblattvorlagen verwendet werden kann. Um diese
+Demo-Deckblattvorlage zu verwenden, legen Sie diese Vorlage bitte in das Deckblatt-Verzeichnis,
+welches Sie unter `pdf.covers.path` angegeben haben, und fügen dann diese Option hinzu:
 
     pdf.covers.default = 'demo-cover.md'
 
-Wenn Sie eine eigene PDF-Deckblattvorlage erstellt haben, legen Sie diese Vorlage bitte in das
-Deckblatt-Verzeichnis, welches Sie unter `pdf.covers.path` angegeben haben. Ersetzen Sie dann den
-Wert der `pdf.covers.default` Option mit dem Dateinamen Ihrer eigenen Vorlage (bzw., wenn Ihre
-Vorlage sich in einem eigenen Unterverzeichnis befindet, mit dem Pfad relativ zum angegebenen
+Wenn Sie eine eigene PDF-Deckblattvorlage erstellt haben, ersetzen Sie bitte den Wert der
+`pdf.covers.default` Option mit dem Dateinamen Ihrer eigenen Vorlage (bzw., wenn Ihre Vorlage
+sich in einem eigenen Unterverzeichnis befindet, mit dem Pfad relativ zum angegebenen
 Deckblatt-Verzeichnis).
 
 Optional erlaubt es OPUS 4 auch, für verschiedene OPUS 4-Sammlungen unterschiedliche

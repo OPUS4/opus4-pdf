@@ -82,15 +82,15 @@ You can optionally specify a different directory path via this configuration opt
 
     pdf.covers.path = APPLICATION_PATH "/application/configs/covers"
 
-OPUS 4 comes with a simple demo cover template which can be used as the base for any custom
-template. To use this demo cover template, add this option:
+This package contains a simple demo cover template in the `test/_files` directory which can be used
+as the base for any custom template. To use this demo cover template, put this template into the
+covers directory that you've specified for `pdf.covers.path`, and add this option:
 
     pdf.covers.default = 'demo-cover.md'
 
-If you've created a custom PDF cover template, put this template into the covers directory that
-you've specified for `pdf.covers.path`. Then replace the value for the `pdf.covers.default`
-option with the template's file name (or path relative to the covers directory if your template
-is located in its own sub-directory).
+If you've created a custom PDF cover template replace the value for the `pdf.covers.default`
+option with your template's file name (or path relative to the covers directory if your template
+is located in its own subdirectory).
 
 You may optionally specify different cover templates to be used for certain OPUS 4 collections.
 To do so, you can map a collection-specific cover template to a certain collection ID:
@@ -98,7 +98,8 @@ To do so, you can map a collection-specific cover template to a certain collecti
     collection.12345.cover = 'my-cover.md'
 
 Replace `12345` with the actual ID of your collection and `my-cover.md` with the actual name
-(or path) of your collection-specific cover template (directory).
+of your collection-specific cover template (or its relative path if it's located within a
+subdirectory).
 
 
 ### Displaying licence logos
