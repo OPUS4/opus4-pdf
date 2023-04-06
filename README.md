@@ -34,7 +34,7 @@ file requires the "Open Sans" (true type or open type) font to be installed on t
 font is available under the Apache License v.2.0 in the
 [Google Fonts library](https://fonts.google.com/specimen/Open+Sans). Alternatively, it can be
 obtained under the SIL Open Font License 1.1 from
-[bunny.net](https://fonts.bunny.net/family/open-sans)).
+[bunny.net](https://fonts.bunny.net/family/open-sans).
 
 The `Vagrantfile` file gives an example on how fonts can be installed on Ubuntu/Debian-based
 Linux systems from the command line.
