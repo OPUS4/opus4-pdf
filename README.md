@@ -141,3 +141,19 @@ The unit tests can then be run via these commands:
     $ vagrant up
     $ vagrant ssh
     $ composer test
+
+
+
+## Creating custom PDF cover templates
+
+The `testGenerateFile()` test in file `test/Cover/PdfGenerator/DefaultPdfGeneratorTest.php` creates
+a complete cover sheet and can therefore be used for testing when creating a custom PDF cover
+template. The generated cover sheet gets stored in the `workspace/tmp` directory. In order to avoid
+generated test files from getting deleted again, comment out the line `$this->deleteTempFiles();`
+in the file's `tearDown()` function (i.e. add `//` at the beginning of that line).
+
+In the application, downloaded files that include a cover sheet get cached in the
+`workspace/filecache` directory (original files will not be modified). As long as a cached version
+exists and the document of the file doesn't change, the cached version will be delivered on
+subsequent download requests. Therefore, to force a rebuild of the cover sheet during testing, the
+cached version must be deleted from the `workspace/filecache` directory.

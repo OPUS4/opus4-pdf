@@ -151,3 +151,20 @@ Die Unit-Tests können dann über folgende Kommandozeilenbefehle ausgeführt wer
     $ vagrant up
     $ vagrant ssh
     $ composer test
+
+
+
+## Erstellen eigener PDF-Deckblattvorlagen
+
+In Datei `test/Cover/PdfGenerator/DefaultPdfGeneratorTest.php` erstellt der Test `testGenerateFile()`
+ein vollständiges Deckblatt und kann daher bei der Erstellung eigener PDF-Deckblattvorlagen
+behilflich sein. Das generierte Deckblatt wird im `workspace/tmp` Verzeichnis abgelegt und verbleibt
+dort, wenn man in der `tearDown()` Funktion die Zeile `$this->deleteTempFiles();` auskommentiert
+(d.h. `//` am Anfang der Zeile einfügt).
+
+In der Applikation werden die mit einem Deckblatt versehenen, heruntergeladenen Dateien im
+`workspace/filecache` Verzeichnis gecached (die Original-Dateien werden nicht verändert). Solange
+eine gecachte Version existiert und sich das Dokument der Datei nicht ändert, wird diese gecachte
+Version bei darauf folgenden Download-Anfragen ausgeliefert. Um beim Testen ein erneutes Erstellen
+des Deckblattes zu erzwingen muss daher die gecachte Version aus dem `workspace/filecache`
+Verzeichnis gelöscht werden.
