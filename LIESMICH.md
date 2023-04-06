@@ -34,7 +34,11 @@ Kommandozeilenbefehl ausführen:
 Die PDF-Deckblätter werden über Vorlagendateien generiert. Bitte beachten Sie, dass zur Verwendung
 der Vorlagendatei `demo-cover.md` die Schriftart "Open Sans" (im True Type oder Open Type Format)
 auf dem System installiert sein muss. Diese Schriftart ist unter der Apache-Lizenz v.2.0 in der
-[Google Fonts-Bibliothek](https://fonts.google.com/specimen/Open+Sans) verfügbar.
+[Google Fonts-Bibliothek](https://fonts.google.com/specimen/Open+Sans) oder alternativ unter der
+SIL Open Font-Lizenz 1.1 über [bunny.net](https://fonts.bunny.net/family/open-sans) verfügbar.
+
+Die `Vagrantfile` Datei gibt ein Beispiel, wie auf Ubuntu/Debian-basierten Linux-Systemen Schriften
+über die Kommandozeile installiert werden können.
 
 
 ### Unit-Tests
