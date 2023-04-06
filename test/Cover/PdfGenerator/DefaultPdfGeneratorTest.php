@@ -130,8 +130,6 @@ class DefaultPdfGeneratorTest extends TestCase
     /**
      * Returns a sample Document object with fictive metadata representing an academic journal article.
      *
-     * @link   https://en.wikipedia.org/wiki/Josiah_S._Carberry#Publications_under_the_name_of_J._S._Carberry
-     *
      * @return Document Document object representing an article.
      */
     private function getSampleArticle()
@@ -143,38 +141,38 @@ class DefaultPdfGeneratorTest extends TestCase
         $doc->setLanguage("en");
 
         $author = new Person();
-        $author->setFirstName('Josiah Stinkney');
-        $author->setLastName('Carberry');
+        $author->setFirstName('John');
+        $author->setLastName('Doe');
         $author->setAcademicTitle('Ph.D.');
         $doc->addPersonAuthor($author);
 
         $author = new Person();
-        $author->setFirstName('Truman');
-        $author->setLastName('Grayson');
+        $author->setFirstName('Jane');
+        $author->setLastName('Roe');
         $doc->addPersonAuthor($author);
 
         $title = $doc->addTitleMain();
-        $title->setValue('Toward a Unified Theory of High-Energy Metaphysics: Silly String Theory');
+        $title->setValue('Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit');
         $title->setLanguage('en');
 
         $abstract = $doc->addTitleAbstract();
-        $abstract->setValue('The characteristic theme of the works of Stone is the bridge between culture and society. Several narratives concerning the fatal !aw, and subsequent dialectic, of semioticist class may be found. Thus, Debord uses the term ‘the subtextual paradigm of consensus’ to denote a cultural paradox. The subject is interpolated into a neocultural discourse that includes sexuality as a totality. But Marx’s critique of prepatriarchialist nihilism states that consciousness is capable of significance. The main theme of Dietrich’s model of cultural discourse is not construction, but neoconstruction. Thus, any number of narratives concerning the textual paradigm of narrative exist. Pretextual cultural theory suggests that context must come from the collective unconscious.');
+        $abstract->setValue('Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.');
         $abstract->setLanguage('en');
 
         $doc->setPublishedDate(new Date(new DateTime('2008-08-14')));
 
         $parent = $doc->addTitleParent();
-        $parent->setValue('Journal of Psychoceramics');
+        $parent->setValue('Journal of Latin Psychoeconomics');
         $parent->setLanguage('en');
 
-        $doc->setPublisherName('Society of Psychoceramics');
-        $doc->setPublisherPlace('Providence, Rhode Island');
+        $doc->setPublisherName('Italian Society of Psychoeconomics');
+        $doc->setPublisherPlace('Rome');
 
         $doc->setVolume('11');
-        $doc->setIssue('5');
-        $doc->setPageFirst(1);
-        $doc->setPageLast(3);
-        $doc->setPageNumber(4);
+        $doc->setIssue('2');
+        $doc->setPageFirst(3);
+        $doc->setPageLast(4);
+        $doc->setPageNumber(2);
 
         $doi = new Identifier();
         $doi->setType('doi');
@@ -186,7 +184,7 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $issn = new Identifier();
         $issn->setType('issn');
-        $issn->setValue('0264-3561');
+        $issn->setValue('5555-1234');
 
         $ids = [$doi, $url, $issn];
         $doc->setIdentifier($ids);
