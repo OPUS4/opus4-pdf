@@ -42,6 +42,7 @@ use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Opus\Person;
 use PHPUnit\Framework\TestCase;
 
+use function dirname;
 use function file_get_contents;
 
 use const DIRECTORY_SEPARATOR;
@@ -130,12 +131,12 @@ class CslMetadataGeneratorTest extends TestCase
     /**
      * Returns the full path to the specified fixture file.
      *
-     * @param string $fileName The file name (or path relative to the '_files' directory)
+     * @param string $fileName The file name (or path relative to the 'test/_files' directory)
      * @return string Path to file.
      */
     private function getFixturePath($fileName)
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $fileName;
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**

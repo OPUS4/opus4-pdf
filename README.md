@@ -29,9 +29,9 @@ To check the version of Pandoc that has been installed, run:
 
 ### Fonts
 
-PDF cover sheets will be generated via template files. Note that the included
-`demo-cover_template.md` file requires the "Open Sans" (true type or open type) font to
-be installed on the system. This font is available under the Apache License v.2.0 in the
+PDF cover sheets will be generated via template files. Note that the included `demo-cover.md`
+file requires the "Open Sans" (true type or open type) font to be installed on the system. This
+font is available under the Apache License v.2.0 in the
 [Google Fonts library](https://fonts.google.com/specimen/Open+Sans).
 
 
@@ -85,7 +85,7 @@ You can optionally specify a different directory path via this configuration opt
 OPUS 4 comes with a simple demo cover template which can be used as the base for any custom
 template. To use this demo cover template, add this option:
 
-    pdf.covers.default = 'demo-cover_template.md'
+    pdf.covers.default = 'demo-cover.md'
 
 If you've created a custom PDF cover template, put this template into the covers directory that
 you've specified for `pdf.covers.path`. Then replace the value for the `pdf.covers.default`
@@ -95,10 +95,10 @@ is located in its own sub-directory).
 You may optionally specify different cover templates to be used for certain OPUS 4 collections.
 To do so, you can map a collection-specific cover template to a certain collection ID:
 
-    collection.12345.cover = 'my-cover_template.md'
+    collection.12345.cover = 'my-cover.md'
 
-Replace `12345` with the actual ID of your collection and `my-cover_template.md` with the
-actual name (or path) of your collection-specific cover template (directory).
+Replace `12345` with the actual ID of your collection and `my-cover.md` with the actual name
+(or path) of your collection-specific cover template (directory).
 
 
 ### Displaying licence logos

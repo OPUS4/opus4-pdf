@@ -73,7 +73,7 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $this->assertNotNull($generator);
 
-        $templatePath = $this->getTemplatePath('demo' . DIRECTORY_SEPARATOR . 'demo-cover_template.md');
+        $templatePath = $this->getTemplatePath('demo-cover.md');
 
         $this->assertFileExists($templatePath);
 
@@ -103,12 +103,12 @@ class DefaultPdfGeneratorTest extends TestCase
     /**
      * Returns the full path to the given template.
      *
-     * @param string $templateName The template name (or path relative to the 'covers' directory)
+     * @param string $templateName The template name (or path relative to the 'test/_files' directory)
      * @return string Path to template.
      */
     private function getTemplatePath($templateName)
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'covers' . DIRECTORY_SEPARATOR . $templateName;
+        return dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $templateName;
     }
 
     /**

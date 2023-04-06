@@ -32,9 +32,9 @@ Kommandozeilenbefehl ausführen:
 ### Schriften
 
 Die PDF-Deckblätter werden über Vorlagendateien generiert. Bitte beachten Sie, dass zur Verwendung
-der Vorlagendatei `demo-cover_template.md` die Schriftart "Open Sans" (im True Type oder Open Type
-Format) auf dem System installiert sein muss. Diese Schriftart ist unter der Apache-Lizenz v.2.0
-in der [Google Fonts-Bibliothek](https://fonts.google.com/specimen/Open+Sans) verfügbar.
+der Vorlagendatei `demo-cover.md` die Schriftart "Open Sans" (im True Type oder Open Type Format)
+auf dem System installiert sein muss. Diese Schriftart ist unter der Apache-Lizenz v.2.0 in der
+[Google Fonts-Bibliothek](https://fonts.google.com/specimen/Open+Sans) verfügbar.
 
 
 ### Unit-Tests
@@ -91,7 +91,7 @@ OPUS 4 enthält zu Demonstrationszwecken eine simple PDF-Deckblattvorlage, die a
 für die Erstellung eigener Deckblattvorlagen verwendet werden kann. Um diese Demo-Deckblattvorlage
 zu verwenden, fügen Sie bitte die folgende Option hinzu:
 
-    pdf.covers.default = 'demo-cover_template.md'
+    pdf.covers.default = 'demo-cover.md'
 
 Wenn Sie eine eigene PDF-Deckblattvorlage erstellt haben, legen Sie diese Vorlage bitte in das
 Deckblatt-Verzeichnis, welches Sie unter `pdf.covers.path` angegeben haben. Ersetzen Sie dann den
@@ -103,9 +103,9 @@ Optional erlaubt es OPUS 4 auch, für verschiedene OPUS 4-Sammlungen unterschied
 Deckblattvorlagen zu verwenden. Dazu können Sie der ID einer bestimmten Sammlung eine
 sammlungsspezifische Deckblattvorlage zuordnen:
 
-    collection.12345.cover = 'my-cover_template.md'
+    collection.12345.cover = 'my-cover.md'
 
-Ersetzen Sie `12345` durch die tatsächliche ID Ihrer Sammlung und `my-cover_template.md` durch den
+Ersetzen Sie `12345` durch die tatsächliche ID Ihrer Sammlung und `my-cover.md` durch den
 tatsächlichen Dateinamen Ihrer sammlungsspezifischen Deckblattvorlage (bzw. durch den relativen Pfad
 zu dem Unterverzeichnis innerhalb des Deckblatt-Verzeichnisses, in dem sich Ihre Deckblattvorlage
 befindet).
