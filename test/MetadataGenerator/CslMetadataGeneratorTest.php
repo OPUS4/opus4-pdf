@@ -44,6 +44,7 @@ use PHPUnit\Framework\TestCase;
 
 use function dirname;
 use function file_get_contents;
+use function trim;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -52,7 +53,7 @@ class CslMetadataGeneratorTest extends TestCase
     /** @var MetadataGeneratorInterface */
     protected $metadataGenerator;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
