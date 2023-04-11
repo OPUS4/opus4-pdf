@@ -52,7 +52,7 @@ class CslMetadataGeneratorTest extends TestCase
     /** @var MetadataGeneratorInterface */
     protected $metadataGenerator;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
