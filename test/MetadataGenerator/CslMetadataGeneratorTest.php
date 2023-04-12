@@ -372,7 +372,7 @@ class CslMetadataGeneratorTest extends TestCase
         if (! empty($institutes)) {
             $institute = $institutes[0];
         } else {
-            $institute = new DnbInstitute();
+            $institute = DnbInstitute::new();
             $institute->setName('Universität Hintertupfing');
             $institute->setCity('Hintertupfing');
             $institute->setDepartment('Fachbereich 1 – Psychoökonomie');
