@@ -54,10 +54,5 @@
     "cs-check": "phpcs -n",
     "cs-report": "phpcs -n --report=checkstyle --report-file=build/checkstyle.xml",
     "cs-fix": "phpcbf"
-  },
-  "config": {
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true
-    }
   }
 }
