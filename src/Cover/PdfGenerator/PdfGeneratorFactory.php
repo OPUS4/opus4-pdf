@@ -45,7 +45,7 @@ class PdfGeneratorFactory
      */
     public static function create($templateFormat, $pdfEngine)
     {
-        // TODO: support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
+        // TODO support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
         $generatorClass = null;
 

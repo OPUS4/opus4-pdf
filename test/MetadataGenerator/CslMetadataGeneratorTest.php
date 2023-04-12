@@ -32,6 +32,7 @@
 namespace OpusTest\Pdf\MetadataGenerator;
 
 use DateTime;
+use Opus\Common\Config;
 use Opus\Common\Date;
 use Opus\Common\DnbInstitute;
 use Opus\Common\Document;
@@ -122,7 +123,7 @@ class CslMetadataGeneratorTest extends TestCase
 
         $this->assertNotNull($generator);
 
-        $generator->setTempDir(APPLICATION_PATH . '/test/workspace/tmp/');
+        $generator->setTempDir(Config::getInstance()->getTempPath());
 
         return $generator;
     }
@@ -217,7 +218,7 @@ class CslMetadataGeneratorTest extends TestCase
      */
     private function getSampleChapter()
     {
-        // TODO: how to add the series title aka CSL collection-title ("CRREL Monograph") for this book chapter?
+        // TODO how to add the series title aka CSL collection-title ("CRREL Monograph") for this book chapter?
 
         $doc = Document::new();
         $doc->store();
@@ -368,7 +369,7 @@ class CslMetadataGeneratorTest extends TestCase
         $doc->setPublisherName('Alfred-Wegener Institut für Meeres- und Polarforschung');
         $doc->setPublisherPlace('Bremerhaven');
 
-        // TODO: better way to only create a certain DnbInstitute if it doesn't exist
+        // TODO better way to only create a certain DnbInstitute if it doesn't exist
         $institutes = DnbInstitute::getAll();
         if (! empty($institutes)) {
             $institute = $institutes[0];

@@ -51,7 +51,7 @@ interface CoverGeneratorInterface
     /**
      * Sets the path to a workspace subdirectory that stores cached document files.
      *
-     * @param string $filecacheDir
+     * @param string|null $filecacheDir
      */
     public function setFilecacheDir($filecacheDir);
 
@@ -65,7 +65,7 @@ interface CoverGeneratorInterface
     /**
      * Sets the path to a workspace subdirectory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir);
 
@@ -79,7 +79,7 @@ interface CoverGeneratorInterface
     /**
      * Sets the path to a configuration directory that stores template files.
      *
-     * @param string $templatesDir
+     * @param string|null $templatesDir
      */
     public function setTemplatesDir($templatesDir);
 
@@ -91,6 +91,21 @@ interface CoverGeneratorInterface
      * @return string|null Template name or path relative to templates directory.
      */
     public function getTemplateName($document);
+
+    /**
+     * Returns the path to a directory that stores licence logo files, or null if no such
+     * directory has been defined.
+     *
+     * @return string|null
+     */
+    public function getLicenceLogosDir();
+
+    /**
+     * Sets the path to a directory that stores licence logo files.
+     *
+     * @param string|null $licenceLogosDir
+     */
+    public function setLicenceLogosDir($licenceLogosDir);
 
     /**
      * Returns the file path to a file copy that includes an appropriate cover page.

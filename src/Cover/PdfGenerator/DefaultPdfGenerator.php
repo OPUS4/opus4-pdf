@@ -34,6 +34,8 @@ namespace Opus\Pdf\Cover\PdfGenerator;
 use Exception;
 use Opus\Common\Config;
 use Opus\Common\DocumentInterface;
+use Opus\Common\LicenceInterface;
+use Opus\Common\LoggingTrait;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;
@@ -45,10 +47,13 @@ use function file_get_contents;
 use function file_put_contents;
 use function is_writable;
 use function json_encode;
+use function ltrim;
+use function parse_url;
 use function substr;
 use function uniqid;
 
 use const DIRECTORY_SEPARATOR;
+use const PHP_URL_PATH;
 
 /**
  * Generates a PDF for a document based on a template.
@@ -60,11 +65,16 @@ use const DIRECTORY_SEPARATOR;
  */
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
+    use LoggingTrait;
+
     /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
 
     /** @var string Path to the template file to be used for PDF generation */
     private $templatePath = "";
+
+    /** @var string Path to a directory that stores licence logo files */
+    private $licenceLogosDir = "";
 
     /** @var MetadataGeneratorInterface|null Metadata generator to create CSL JSON metadata */
     private $metadataGenerator;
@@ -95,7 +105,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     /**
      * Sets the path to a directory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir)
     {
@@ -108,7 +118,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     /**
      * Returns the path to the template file that's used to generate the PDF.
      *
-     * @return string
+     * @return string|null
      */
     public function getTemplatePath()
     {
@@ -118,7 +128,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     /**
      * Sets the path to the template file that's used to generate the PDF.
      *
-     * @param string $templatePath
+     * @param string|null $templatePath
      */
     public function setTemplatePath($templatePath)
     {
@@ -143,13 +153,108 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     }
 
     /**
+     * Returns the path to a directory containing licence logo files to be used when generating the PDF.
+     *
+     * @return string|null
+     */
+    public function getLicenceLogosDir()
+    {
+        return $this->licenceLogosDir;
+    }
+
+    /**
+     * Sets the path to a directory containing licence logo files to be used when generating the PDF.
+     *
+     * @param string|null $licenceLogosDir
+     */
+    public function setLicenceLogosDir($licenceLogosDir)
+    {
+        $this->licenceLogosDir = $licenceLogosDir;
+    }
+
+    /**
+     * Returns the "main" licence of the given document, or null if the document has no license(s) assigned.
+     * Note that, currently, this method simply treats the document's first licence as its "main" license.
+     *
+     * @param DocumentInterface $document
+     * @return LicenceInterface|null
+     */
+    public function getMainLicence($document)
+    {
+        // TODO #24 better handling of cases where a document contains multiple licences?
+
+        $docLicences = $document->getLicence();
+
+        if (! empty($docLicences)) {
+            $docLicence = $docLicences[0];
+            return $docLicence->getModel();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the file name (or path relative to the licence logos directory) of a licence logo that
+     * represents the given licence.
+     *
+     * @param LicenceInterface $licence
+     * @return string|null Licence logo name or path relative to licence logos directory.
+     */
+    public function getLicenceLogoName($licence)
+    {
+        $licenceLogoUrl = $licence->getLinkLogo();
+        if (empty($licenceLogoUrl)) {
+            return null;
+        }
+
+        $urlPath = parse_url($licenceLogoUrl, PHP_URL_PATH);
+        if (empty($urlPath)) {
+            return null;
+        }
+
+        // remove any preceding path separator
+        $urlPath = ltrim($urlPath, DIRECTORY_SEPARATOR);
+
+        return $urlPath;
+    }
+
+    /**
+     * Returns the absolute path to the licence logo file to be used for the given licence.
+     *
+     * @param LicenceInterface $licence
+     * @return string|null Absolute path to licence logo file.
+     */
+    protected function getLicenceLogoPath($licence)
+    {
+        $licenceLogosDir = $this->getLicenceLogosDir();
+        if (empty($licenceLogosDir)) {
+            return null;
+        }
+
+        $licenceLogoName = $this->getLicenceLogoName($licence);
+        if (empty($licenceLogoName)) {
+            return null;
+        }
+
+        $licenceLogoPath = $licenceLogosDir . $licenceLogoName;
+
+        if (! file_exists($licenceLogoPath)) {
+            $this->getLogger()->err("Couldn't find logo for licence '" . $licence->getName() . "' at '$licenceLogoPath'");
+
+            return null;
+        }
+
+        return $licenceLogoPath;
+    }
+
+    /**
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which a PDF shall be generated.
-     * @param string            $tempFilename The file name (without its file extension) to be used for any
-     *          temporary file(s) that may be generated during PDF generation. May be empty in which case
-     *          a default name will be used.
+     * @param string   $tempFilename The file name (without its file extension) to be used for any
+     * temporary file(s) that may be generated during PDF generation. May be empty in which case
+     * a default name will be used.
      * @return string|null Generated PDF data.
      */
     public function generate($document, $tempFilename = '')
@@ -168,15 +273,17 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * PDF file. Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which a PDF shall be generated.
-     * @param string            $tempFilename The file name (without its file extension) to be used for any
-     *          temporary file(s) that may be generated during PDF generation. May be empty in which case
-     *          a default name will be used.
+     * @param string   $tempFilename The file name (without its file extension) to be used for any
+     * temporary file(s) that may be generated during PDF generation. May be empty in which case
+     * a default name will be used.
      * @return string|null Path to generated PDF file.
      */
     public function generateFile($document, $tempFilename = '')
     {
         $templatePath = $this->getTemplatePath();
         if (! file_exists($templatePath)) {
+            $this->getLogger()->err("Couldn't generate PDF: missing template at '$templatePath'");
+
             return null;
         }
 
@@ -184,8 +291,12 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $tempDir = $this->getTempDir();
         if (! is_writable($tempDir)) {
+            $this->getLogger()->err("Couldn't generate PDF: temp directory ('$tempDir') is not writable");
+
             return null;
         }
+
+        $licenceLogosDir = $this->getLicenceLogosDir();
 
         if (empty($tempFilename)) {
             $tempFilename = $document->getId() . '-' . uniqid();
@@ -212,7 +323,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         // 3. use Pandoc to replace placeholders in the current template file with appropriate document metadata
         // equivalent shell command:
         //   pandoc {$templatePath} --wrap=preserve --metadata-file={$metadataFilePath} --bibliography={$cslFilePath} \
-        //     --template={$templatePath} --variable=images-basepath:{$templateBaseDir} --output={$markdownFilePath}
+        //     --template={$templatePath} --variable=images-basepath:{$templateBaseDir} \
+        //     --variable=licence-logo-basepath:{$licenceLogosDir} --output={$markdownFilePath}
         $parameters = [];
 
         // input file
@@ -222,7 +334,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         // --wrap is used to preserve the line wrapping from the input files
         array_push($parameters, '--wrap', 'preserve');
 
-        // --bibliography specifies an external bibliography file
+        // --metadata-file specifies the path to a JSON file containing the document's general metadata
         array_push($parameters, '--metadata-file', $metadataFilePath);
 
         // --bibliography specifies an external bibliography file
@@ -236,17 +348,26 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         //   path of the `images` directory containing any images/logos
         array_push($parameters, '--variable', 'images-basepath:' . $templateBaseDir);
 
+        // --variable is used to populate the `$licence-logo-basepath$` placeholder in the template with the
+        //   path to a directory containing license logos (arranged/named according to https://licensebuttons.net)
+        if (! empty($licenceLogosDir)) {
+            array_push($parameters, '--variable', 'licence-logo-basepath:' . $licenceLogosDir);
+        }
+
         // --output specifies that generated output will be written to the given file path
         array_push($parameters, '--output', $markdownFilePath);
 
         try {
             $output = $this->pandoc->execute($parameters);
         } catch (Exception $e) {
-            // TODO: log exception
+            $this->getLogger()->err("Couldn't generate PDF: '$e'");
+
             return null;
         }
 
         if ($output !== true) {
+            $this->getLogger()->err("Couldn't generate PDF: no output from Pandoc");
+
             return null;
         }
 
@@ -274,17 +395,24 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         //   Unicode characters as well as system fonts)
         array_push($parameters2, '--pdf-engine', 'xelatex');
 
+        // --pdf-engine-opt specifies to use PDF version 1.3 without compression
+        // NOTE: since this option seems to cause a Pandoc exception when passed through PHP code, we use the header
+        //       includes `\special{dvipdfmx:config V 3}\n\special{dvipdfmx:config z 0}` in the template file instead
+
         // --output specifies that generated output will be written to the given file path
         array_push($parameters2, '--output', $pdfFilePath);
 
         try {
             $output2 = $this->pandoc->execute($parameters2);
         } catch (Exception $e) {
-            // TODO: log exception
+            $this->getLogger()->err("Couldn't generate PDF: '$e'");
+
             return null;
         }
 
         if ($output2 !== true) {
+            $this->getLogger()->err("Couldn't generate PDF: no output from Pandoc/XeLaTeX");
+
             return null;
         }
 
@@ -296,8 +424,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * generated metadata file. Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which metadata shall be generated.
-     * @param string            $tempFilename The file name (without its file extension) to be used for the
-     *          generated metadata file. May be empty in which case a default name will be used.
+     * @param string   $tempFilename The file name (without its file extension) to be used for the
+     * generated metadata file. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
     protected function generalMetadataFile($document, $tempFilename = '')
@@ -308,6 +436,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $tempDir = $this->getTempDir();
         if (! is_writable($tempDir)) {
+            $this->getLogger()->err("Couldn't create JSON metadata: temp directory ('$tempDir') is not writable");
+
             return null;
         }
 
@@ -347,10 +477,36 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
             $documentMetadata['lang'] = $language;
         }
 
+        $licence = $this->getMainLicence($document);
+
+        if ($licence !== null) {
+            $licenceTitle = $licence->getName();
+            if (! empty($licenceTitle)) {
+                $documentMetadata['licence-title'] = $licenceTitle;
+            }
+
+            $licenceText = $licence->getNameLong();
+            if (! empty($licenceText)) {
+                $documentMetadata['licence-text'] = $licenceText;
+            }
+
+            $licenceUrl = $licence->getLinkLicence();
+            if (! empty($licenceUrl)) {
+                $documentMetadata['licence-url'] = $licenceUrl;
+            }
+
+            $licenceLogoPath = $this->getLicenceLogoPath($licence);
+            if ($licenceLogoPath !== null) {
+                $documentMetadata['licence-logo-name'] = $this->getLicenceLogoName($licence);
+            }
+        }
+
         $jsonString = json_encode($documentMetadata);
 
         $result = file_put_contents($metadataFilePath, $jsonString);
         if ($result === false) {
+            $this->getLogger()->err("Couldn't write JSON metadata");
+
             return null;
         }
 
@@ -373,6 +529,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $generator      = MetadataGeneratorFactory::create($metadataFormat);
 
         if ($generator === null) {
+            $this->getLogger()->err("Couldn't create metadata generator for '$metadataFormat'");
+
             return null;
         }
 

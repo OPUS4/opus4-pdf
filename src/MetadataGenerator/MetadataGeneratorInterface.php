@@ -42,7 +42,7 @@ use Opus\Common\PersonInterface;
  */
 interface MetadataGeneratorInterface
 {
-    // TODO: add constants for other supported metadata formats
+    // TODO add constants for other supported metadata formats
     const METADATA_FORMAT_CSL_JSON = 'csl_json';
 
     /**
@@ -55,7 +55,7 @@ interface MetadataGeneratorInterface
     /**
      * Sets the path to a directory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir);
 

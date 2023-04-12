@@ -14,18 +14,20 @@
 # - This template can be converted to a cover PDF using Pandoc and XeTeX via two steps:
 #   
 #   - when using a single .yaml file containing both, general and bibliographic metadata:
-#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output=cover.md`
+#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md /PATH/TO/metadata.yaml --wrap=preserve --bibliography=/PATH/TO/metadata.yaml --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --variable=licence-logo-basepath:/PATH/TO/LICENCE_LOGO_DIR/ --output=cover.md`
 #     - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/metadata.yaml --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output=cover.pdf`
 #   
 #   - when using separate .json files for general and bibliographic metadata:
-#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md --wrap=preserve --metadata-file=/PATH/TO/meta.json --bibliography=/PATH/TO/csl.json --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --output=cover.md`
+#     - `pandoc /PATH/TO/TEMPLATE_DIR/cover-template.md --wrap=preserve --metadata-file=/PATH/TO/meta.json --bibliography=/PATH/TO/csl.json --template=/PATH/TO/TEMPLATE_DIR/cover-template.md --variable=images-basepath:/PATH/TO/TEMPLATE_DIR/ --variable=licence-logo-basepath:/PATH/TO/LICENCE_LOGO_DIR/ --output=cover.md`
 #     - `pandoc cover.md --resource-path=/PATH/TO/TEMPLATE_DIR/ --bibliography=/PATH/TO/csl.json --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" --output=cover.pdf`
 #   
 # - As in the examples above, this template requires two calls to pandoc with the following arguments:
 #   - `--wrap=` set to `preserve` which causes Pandoc to preserve the line wrapping from this template file
+#   - `--metadata-file=` set to the path of the metadata file containing the document's general metadata
 #   - `--bibliography=` set to the path of the metadata file containing the document's bibliographic metadata
 #   - `--template=` set to the path of this template file
 #   - `--variable=` set to `images-basepath:` and followed by the base path of the `images` subdirectory containing images used by this template
+#   - `--variable=` set to `licence-logo-basepath:` and followed by the path to a directory containing license logos (arranged/named according to <https://licensebuttons.net>)
 #   - `--resource-path=` set to the base path of the `styles` subdirectory containing the citation style used by this template
 #   - `--citeproc` which causes a formatted citation to be generated from the bibliographic metadata
 #   - `--pdf-engine=` set to `xelatex` which specifies that XeTeX will be used to generate the PDF (allowing the template to use Unicode & system fonts)
@@ -61,26 +63,22 @@ header-includes: |
     \end{minipage}
   }
   \lofoot{
-    \subsubsection{Nutzungsbedingungen}
-    \begin{minipage}[t][27mm][t]{165pt}
-    \tiny Dieser Text wird unter einer CC BY-NC-ND Lizenz \newline
-    (Namensnennung – Nicht-kommerziell – Keine Bearbeitungen) \newline
-    zur Verfügung gestellt. Nähere Auskünfte dazu finden Sie hier: \newline
-    \url{https://creativecommons.org/licenses/by-nc-nd/4.0/deed.de}
+    \subsubsection{Terms of use}
+    \begin{minipage}[t][27mm][t]{307pt}
+    $if(licence-text)$\tiny This document is made available under these conditions: \newline$endif$
+    $if(licence-text)$\tiny \textbf{$licence-text$} \newline$endif$
+    $if(licence-url)$For more information see: \newline$endif$
+    $if(licence-url)$\url{$licence-url$}$endif$
     \end{minipage}
   }
   \cofoot{
-    \begin{minipage}[t][27mm][c]{34mm}
-    \rightline{\includegraphics[width=27mm]{$images-basepath$images/by-nc-nd.png}}
+    $if(licence-title)$\subsubsection{\hfill \footnotesize $licence-title$ ~}$endif$
+    \begin{minipage}[t][25.4mm][c]{34mm}
     \end{minipage}
   }
   \rofoot{
-    \subsubsection{\hfill Terms of use}
-    \begin{minipage}[t][27mm][t]{142pt}
-    \tiny This document is made available under a CC BY-NC-ND \newline
-    licence (Attribution – NonCommercial – NoDerivatives). \newline
-    For more information see: \newline
-    \url{https://creativecommons.org/licenses/by-nc-nd/4.0}
+    \begin{minipage}[t][27mm][c]{34mm}
+    $if(licence-logo-basepath)$$if(licence-logo-name)$\rightline{\includegraphics[width=27mm]{$licence-logo-basepath$$licence-logo-name$}}$endif$$endif$
     \end{minipage}
   }
 ---
