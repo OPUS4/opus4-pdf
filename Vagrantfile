@@ -16,6 +16,7 @@ apt-get -yq install mysql-server
 apt-get -yq install php8.1-curl
 apt-get -yq install php8.1-dom
 apt-get -yq install php8.1-mysql
+apt-get -yq install php8.1-mbstring
 
 # Install required tools
 apt-get -yq install texlive-xetex
