@@ -255,7 +255,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      *
      * @param DocumentInterface $document
      * @param FileInterface     $file
-     * @param string   $cachedFilePath Path to a cached file representing the given file in the filecache directory.
+     * @param string            $cachedFilePath Path to a cached file representing the given file in the filecache
+     * directory.
      * @return bool
      */
     protected function cachedFileExists($document, $file, $cachedFilePath)
@@ -491,8 +492,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Saves the given file at the given path. Returns true if storage was successful,
-     * otherwise returns false.
+     * Saves the given file at the given path. Returns true if storage was successful, otherwise returns false.
      *
      * @param string $fileData File data to be stored at the given path.
      * @param string $filePath Path at which the given file data shall be stored.
