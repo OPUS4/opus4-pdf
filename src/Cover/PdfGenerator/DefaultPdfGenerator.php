@@ -252,9 +252,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which a PDF shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for any
-     * temporary file(s) that may be generated during PDF generation. May be empty in which case
-     * a default name will be used.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any temporary
+     * file(s) that may be generated during PDF generation. May be empty in which case  a default name will be used.
      * @return string|null Generated PDF data.
      */
     public function generate($document, $tempFilename = '')
@@ -273,9 +272,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * PDF file. Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which a PDF shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for any
-     * temporary file(s) that may be generated during PDF generation. May be empty in which case
-     * a default name will be used.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any temporary
+     * file(s) that may be generated during PDF generation. May be empty in which case a default name will be used.
      * @return string|null Path to generated PDF file.
      */
     public function generateFile($document, $tempFilename = '')
@@ -424,8 +422,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * generated metadata file. Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which metadata shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for the
-     * generated metadata file. May be empty in which case a default name will be used.
+     * @param string            $tempFilename The file name (without its file extension) to be used
+     * for the generated metadata file. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
     protected function generalMetadataFile($document, $tempFilename = '')

@@ -218,9 +218,8 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      * metadata file. Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which metadata shall be generated.
-     * @param string   $tempFilename The file name (without its file extension) to be used for any
-     * temporary file(s) that may be generated during metadata generation. May be empty in which case
-     * a default name will be used.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any temporary
+     * file(s) that may be generated during metadata generation. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
     public function generateFile($document, $tempFilename = '')
@@ -308,7 +307,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      * TODO move this function to a more appropriate place
      *
      * @param  PersonInterface[] $persons Array of Person objects for which a formatted string shall be created.
-     * @param  bool     $shortenFirstNames Specifies whether first name(s) shall be reduced to initials.
+     * @param  bool              $shortenFirstNames Specifies whether first name(s) shall be reduced to initials.
      * By default, first names are used without modification.
      * @return string|null Formatted string of person names.
      */
