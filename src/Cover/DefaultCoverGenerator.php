@@ -38,8 +38,8 @@ use Opus\Common\Config;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
-use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
-use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
+use Opus\Pdf\Cover\PdfGeneratorFactory;
+use Opus\Pdf\Cover\PdfGeneratorInterface;
 
 use function file_exists;
 use function file_put_contents;

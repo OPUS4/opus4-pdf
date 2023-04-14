@@ -29,7 +29,7 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Pdf\Cover\PdfGenerator;
+namespace Opus\Pdf\Cover;
 
 use Exception;
 use Opus\Common\Config;

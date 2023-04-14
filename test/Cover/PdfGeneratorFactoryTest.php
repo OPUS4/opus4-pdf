@@ -29,10 +29,10 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Pdf\Cover\PdfGenerator;
+namespace OpusTest\Pdf\Cover;
 
-use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
-use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
+use Opus\Pdf\Cover\PdfGeneratorFactory;
+use Opus\Pdf\Cover\PdfGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 
 class PdfGeneratorFactoryTest extends TestCase

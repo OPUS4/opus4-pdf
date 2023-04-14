@@ -29,7 +29,7 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace OpusTest\Pdf\Cover\PdfGenerator;
+namespace OpusTest\Pdf\Cover;
 
 use DateTime;
 use Opus\Common\Config;
@@ -38,8 +38,8 @@ use Opus\Common\Document;
 use Opus\Common\Identifier;
 use Opus\Common\Licence;
 use Opus\Common\Person;
-use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorFactory;
-use Opus\Pdf\Cover\PdfGenerator\PdfGeneratorInterface;
+use Opus\Pdf\Cover\PdfGeneratorFactory;
+use Opus\Pdf\Cover\PdfGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 
 use function dirname;
@@ -109,7 +109,7 @@ class DefaultPdfGeneratorTest extends TestCase
      */
     private function getTemplatePath($templateName)
     {
-        return dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $templateName;
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $templateName;
     }
 
     /**
