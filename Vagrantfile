@@ -42,8 +42,8 @@ SCRIPT
 
 $xdebug = <<SCRIPT
 apt-get -yq install php8.1-xdebug
-if ! grep "xdebug.mode=debug" /etc/php/7.1/mods-available/xdebug.ini > /dev/null; then
-  echo -e "xdebug.mode=debug\nxdebug.client_host=10.0.2.2\nxdebug.client_port=9003" >> /etc/php/7.1/mods-available/xdebug.ini
+if ! grep "xdebug.mode=debug" /etc/php/8.1/mods-available/xdebug.ini > /dev/null; then
+  echo -e "xdebug.mode=debug\nxdebug.client_host=10.0.2.15\nxdebug.client_port=9003" >> /etc/php/8.1/mods-available/xdebug.ini
 fi
 SCRIPT
 
