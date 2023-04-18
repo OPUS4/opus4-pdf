@@ -112,8 +112,8 @@ subdirectory).
 Currently, the PDF cover sheet generation process can only make use of image files that are
 available locally.
 
-To have OPUS 4 look for licence logos within a `public/img/licences` directory, add this
-configuration option:
+By default, the application looks for licence logos within a `public/img/licences` directory,
+but you can also specify another directory via the `licences.logos.path` option:
 
     licences.logos.path = APPLICATION_PATH "/public/img/licences"
 

@@ -121,8 +121,9 @@ Falls Bilddateien in Deckblattvorlagen verwendet werden sollen, so müssen diese
 System verfügbar sein.
 
 OPUS 4 kann zum Beispiel zu einer mit einem Dokument verknüpften Lizenz ein entsprechendes
-Lizenzlogo im PDF-Deckblatt anzeigen. Die folgende Option instruiert OPUS 4, im Verzeichnis
-`public/img/licences` nach Lizenzlogo-Dateien zu suchen:
+Lizenzlogo im PDF-Deckblatt anzeigen. Standardmäßig sucht die Anwendung im Verzeichnis
+`public/img/licences` nach Lizenzlogos. Über die Option `licences.logos.path` kann aber auch
+ein anderes Verzeichnis angegeben werden:
 
     licences.logos.path = APPLICATION_PATH "/public/img/licences"
 
