@@ -55,8 +55,10 @@ dpkg -i pandoc-2.17.1.1-1-amd64.deb
 SCRIPT
 
 $fonts = <<SCRIPT
-# Install "Open Sans" font family (available under the Apache License v.2.0 at https://fonts.google.com/specimen/Open+Sans)
-# to be used for PDF cover generation by templates in test/Cover/PdfGenerator/_files/covers
+# Install "Open Sans" font family (available under the Apache License v.2.0 at
+# https://fonts.google.com/specimen/Open+Sans or under the SIL Open Font License 1.1
+# at https://fonts.bunny.net/family/open-sans) to be used for PDF cover generation by
+# templates in test/_files
 mkdir -p /usr/share/fonts/opentype
 cd /home/vagrant
 wget https://fonts.google.com/download?family=Open%20Sans -O Open_Sans.zip
