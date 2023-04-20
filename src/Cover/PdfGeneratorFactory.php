@@ -29,7 +29,7 @@
  * @license     http://www.gnu.org/licenses/gpl.html General Public License
  */
 
-namespace Opus\Pdf\Cover\PdfGenerator;
+namespace Opus\Pdf\Cover;
 
 use Opus\Common\Util\ClassLoaderHelper;
 
@@ -45,7 +45,7 @@ class PdfGeneratorFactory
      */
     public static function create($templateFormat, $pdfEngine)
     {
-        // TODO: support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
+        // TODO support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
         $generatorClass = null;
 

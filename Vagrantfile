@@ -16,6 +16,7 @@ apt-get -yq install mysql-server
 apt-get -yq install php8.1-curl
 apt-get -yq install php8.1-dom
 apt-get -yq install php8.1-mysql
+apt-get -yq install php8.1-mbstring
 
 # Install required tools
 apt-get -yq install texlive-xetex
@@ -41,8 +42,8 @@ SCRIPT
 
 $xdebug = <<SCRIPT
 apt-get -yq install php8.1-xdebug
-if ! grep "xdebug.mode=debug" /etc/php/7.1/mods-available/xdebug.ini > /dev/null; then
-  echo -e "xdebug.mode=debug\nxdebug.client_host=10.0.2.2\nxdebug.client_port=9003" >> /etc/php/7.1/mods-available/xdebug.ini
+if ! grep "xdebug.mode=debug" /etc/php/8.1/mods-available/xdebug.ini > /dev/null; then
+  echo -e "xdebug.mode=debug\nxdebug.client_host=10.0.2.15\nxdebug.client_port=9003" >> /etc/php/8.1/mods-available/xdebug.ini
 fi
 SCRIPT
 
@@ -54,8 +55,10 @@ dpkg -i pandoc-2.17.1.1-1-amd64.deb
 SCRIPT
 
 $fonts = <<SCRIPT
-# Install "Open Sans" font family (available under the Apache License v.2.0 at https://fonts.google.com/specimen/Open+Sans)
-# to be used for PDF cover generation by templates in test/Cover/PdfGenerator/_files/covers
+# Install "Open Sans" font family (available under the Apache License v.2.0 at
+# https://fonts.google.com/specimen/Open+Sans or under the SIL Open Font License 1.1
+# at https://fonts.bunny.net/family/open-sans) to be used for PDF cover generation by
+# templates in test/_files
 mkdir -p /usr/share/fonts/opentype
 cd /home/vagrant
 wget https://fonts.google.com/download?family=Open%20Sans -O Open_Sans.zip

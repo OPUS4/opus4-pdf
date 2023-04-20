@@ -45,7 +45,7 @@ class CoverGeneratorFactory
     {
         $generatorClass = DefaultCoverGenerator::class; // default class name
 
-        // TODO: allow to override the default cover generator class
+        // TODO allow to override the default cover generator class
 /*
         if (isset($config->pdf->covers->generatorClass)) {
             $generatorClass = $config->pdf->covers->generatorClass;
