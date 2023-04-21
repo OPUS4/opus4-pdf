@@ -444,13 +444,12 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns a PDF generator instance to create a cover for the given document and file.
+     * Returns a PDF generator instance to create a cover for the given document.
      *
      * @param DocumentInterface $document
-     * @param FileInterface     $file
      * @return PdfGeneratorInterface|null
      */
-    protected function getPdfGenerator($document, $file)
+    protected function getPdfGenerator($document)
     {
         // TODO support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
