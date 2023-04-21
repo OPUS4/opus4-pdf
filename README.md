@@ -146,14 +146,30 @@ The unit tests can then be run via these commands:
 
 ## Creating custom PDF cover templates
 
-The `testGenerateFile()` test in file `test/Cover/PdfGenerator/DefaultPdfGeneratorTest.php` creates
-a complete cover sheet and can therefore be used for testing when creating a custom PDF cover
-template. The generated cover sheet gets stored in the `workspace/tmp` directory. In order to avoid
-generated test files from getting deleted again, comment out the line `$this->deleteTempFiles();`
-in the file's `tearDown()` function (i.e. add `//` at the beginning of that line).
-
 In the application, downloaded files that include a cover sheet get cached in the
 `workspace/filecache` directory (original files will not be modified). As long as a cached version
 exists and the document of the file doesn't change, the cached version will be delivered on
-subsequent download requests. Therefore, to force a rebuild of the cover sheet during testing, the
-cached version must be deleted from the `workspace/filecache` directory.
+subsequent download requests.
+
+The `opus4` console tool includes a `cover:generate` command which will generate a PDF cover for a
+given document ID. This command will always force a rebuild of the cover sheet which can be useful
+when developing a custom cover template.
+
+To display the command's help, execute this command on the console:
+
+    bin/opus4 --help cover:generate
+
+In order to generate a PDF cover for a document using the current default template, execute this
+command:
+
+    bin/opus4 cover:generate ID
+
+Replace `ID` with the document's actual ID. The generated PDF cover will be written to the current
+working directory using the document's ID as its file name. You can use the `--out` option to
+specify a different file name, e.g. "cover.pdf":
+
+    bin/opus4 cover:generate --out=cover.pdf ID
+
+Finally, you can use the `--template` option to specify the path to a custom cover template, e.g.:
+
+    bin/opus4 cover:generate --out=cover.pdf --template=./application/configs/covers/my-cover.md ID

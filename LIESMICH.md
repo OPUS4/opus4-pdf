@@ -157,15 +157,31 @@ Die Unit-Tests können dann über folgende Kommandozeilenbefehle ausgeführt wer
 
 ## Erstellen eigener PDF-Deckblattvorlagen
 
-In Datei `test/Cover/PdfGenerator/DefaultPdfGeneratorTest.php` erstellt der Test `testGenerateFile()`
-ein vollständiges Deckblatt und kann daher bei der Erstellung eigener PDF-Deckblattvorlagen
-behilflich sein. Das generierte Deckblatt wird im `workspace/tmp` Verzeichnis abgelegt und verbleibt
-dort, wenn man in der `tearDown()` Funktion die Zeile `$this->deleteTempFiles();` auskommentiert
-(d.h. `//` am Anfang der Zeile einfügt).
-
 In der Applikation werden die mit einem Deckblatt versehenen, heruntergeladenen Dateien im
 `workspace/filecache` Verzeichnis gecached (die Original-Dateien werden nicht verändert). Solange
 eine gecachte Version existiert und sich das Dokument der Datei nicht ändert, wird diese gecachte
-Version bei darauf folgenden Download-Anfragen ausgeliefert. Um beim Testen ein erneutes Erstellen
-des Deckblattes zu erzwingen muss daher die gecachte Version aus dem `workspace/filecache`
-Verzeichnis gelöscht werden.
+Version bei darauf folgenden Download-Anfragen ausgeliefert.
+
+Das `opus4` Konsolentool enthält ein `cover:generate` Kommando, das ein PDF-Deckblatt für die
+angegebene Dokument-ID generiert. Dieses Kommando erstellt stets ein neues Deckblatt, was bei der
+Entwicklung einer eigenen Vorlage nützlich sein kann.
+
+Um die Hilfe des Kommandos anzuzeigen, führen Sie diesen Befehl auf der Konsole aus:
+
+    bin/opus4 --help cover:generate
+
+Um ein PDF-Deckblatt für ein Dokument mit der aktuellen Standardvorlage zu generieren, führen Sie
+diesen Befehl aus:
+
+    bin/opus4 cover:generate ID
+
+Ersetzen Sie dabei `ID` mit der tatsächlichen ID des Dokuments. Das generierte PDF-Deckblatt wird
+in das aktuelle Arbeitsverzeichnis geschrieben, wobei die Dokument-ID als Dateiname verwendet wird.
+Sie können die `--out` Option verwenden, um einen anderen Dateinamen anzugeben, z.B. "cover.pdf":
+
+    bin/opus4 cover:generate --out=cover.pdf ID
+
+Schließlich können Sie die `--template` Option verwenden, um den Pfad zu einer eigenen Vorlage
+anzugeben, z.B.:
+
+    bin/opus4 cover:generate --out=cover.pdf --template=./application/configs/covers/my-cover.md ID
