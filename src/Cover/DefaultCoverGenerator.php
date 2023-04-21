@@ -478,8 +478,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns a PDF generator instance to create a cover for the given document.
      *
      * @param DocumentInterface $document The document for which a cover shall be created.
-     * @param string|null $templatePath (Optional) The absolute path to the template file to be used. If not given or
-     * the path doesn't exist, the default template that's appropriate for the given document will be used.
+     * @param string|null       $templatePath (Optional) The absolute path to the template file to be used. If not
+     * given or the path doesn't exist, the default template that's appropriate for the given document will be used.
      * @return PdfGeneratorInterface|null
      */
     protected function getPdfGenerator($document, $templatePath = null)
