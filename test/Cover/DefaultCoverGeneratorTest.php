@@ -31,7 +31,9 @@
 
 namespace OpusTest\Pdf\Cover;
 
+use Opus\Common\CollectionInterface;
 use Opus\Common\CollectionRole;
+use Opus\Common\CollectionRoleInterface;
 use Opus\Common\Document;
 use Opus\Pdf\Cover\CoverGeneratorFactory;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +48,7 @@ class DefaultCoverGeneratorTest extends TestCase
     /** @var CollectionInterface */
     protected $collectionFixture;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -60,7 +62,7 @@ class DefaultCoverGeneratorTest extends TestCase
         $this->roleFixture->store();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (is_object($this->roleFixture)) {
             $this->roleFixture->delete();
@@ -73,7 +75,7 @@ class DefaultCoverGeneratorTest extends TestCase
     {
         $this->markTestIncomplete('not implemented yet');
 
-        // TODO: create File with pathName and parentId & call DefaultCoverGenerator->getCachedFilename($file)
+        // TODO create File with pathName and parentId & call DefaultCoverGenerator->getCachedFilename($file)
     }
 
     public function testGetTemplateName()
@@ -81,9 +83,9 @@ class DefaultCoverGeneratorTest extends TestCase
         $this->markTestIncomplete('not fully implemented yet');
 
         // NOTE: This test currently requires a test/config.ini setting like this:
-        //            `collection.16031.cover = 'demo/demo-cover_template.md'`
-        //        The collection ID must equal the ID of the last created collection in the database + 2
-        // TODO: alter this test so that it doesn't require a certain collection ID in test/config.ini
+        //            `collection.16031.cover = 'demo-cover.md'`
+        //       The collection ID must equal the ID of the last created collection in the database + 2
+        // TODO alter this test so that it doesn't require a certain collection ID in test/config.ini
 
         /** @var CollectionInterface $subcollection */
         $subcollection = $this->collectionFixture->addFirstChild();
@@ -106,6 +108,6 @@ class DefaultCoverGeneratorTest extends TestCase
 
         $templateName = $generator->getTemplateName($doc);
 
-        $this->assertEquals('demo/demo-cover_template.md', $templateName);
+        $this->assertEquals('demo-cover.md', $templateName);
     }
 }

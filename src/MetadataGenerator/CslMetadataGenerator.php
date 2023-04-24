@@ -34,6 +34,7 @@ namespace Opus\Pdf\MetadataGenerator;
 use Opus\Common\Config;
 use Opus\Common\Date;
 use Opus\Common\DocumentInterface;
+use Opus\Common\LoggingTrait;
 use Opus\Common\PersonInterface;
 use Seboettg\CiteData\Csl\Date as CslDate;
 use Seboettg\CiteData\Csl\Name as CslName;
@@ -59,6 +60,8 @@ use const DIRECTORY_SEPARATOR;
  */
 class CslMetadataGenerator implements MetadataGeneratorInterface
 {
+    use LoggingTrait;
+
     /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
 
@@ -85,7 +88,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     /**
      * Sets the path to a directory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir)
     {
@@ -101,13 +104,13 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      */
     public function generate($document)
     {
-        // TODO: add support for more CSL properties?
+        // TODO add support for more CSL properties?
         //     - general: `id`, `contributor` (both not supported by CslRecord?)
         //     - chapter in a book: `container-author` (for the book author)
         //     - chapter in a book in a series: `collection-title` (for the series title)
         //     - book in a series: `collection-number`, `collection-editor` (series info)
 
-        // TODO: add support for more OPUS\Document properties?
+        // TODO add support for more OPUS\Document properties?
         //     - thesis: ThesisGrantor, ThesisDateAccepted
 
         // generate metadata in CSL JSON format
@@ -215,15 +218,16 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      * metadata file. Returns null in case of failure.
      *
      * @param DocumentInterface $document The document for which metadata shall be generated.
-     * @param string            $tempFilename The file name (without its file extension) to be used for any
-     *          temporary file(s) that may be generated during metadata generation. May be empty in which case
-     *          a default name will be used.
+     * @param string            $tempFilename The file name (without its file extension) to be used for any temporary
+     * file(s) that may be generated during metadata generation. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
     public function generateFile($document, $tempFilename = '')
     {
         $tempDir = $this->getTempDir();
         if (! is_writable($tempDir)) {
+            $this->getLogger()->err("Couldn't create CSL JSON metadata: temp directory ('$tempDir') is not writable");
+
             return null;
         }
 
@@ -236,11 +240,15 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
         // generate metadata in CSL JSON format
         $cslMetadata = $this->generate($document);
         if ($cslMetadata === null) {
+            $this->getLogger()->err("Couldn't create CSL JSON metadata");
+
             return null;
         }
 
         $result = file_put_contents($cslFilePath, $cslMetadata);
         if ($result === false) {
+            $this->getLogger()->err("Couldn't write CSL JSON metadata");
+
             return null;
         }
 
@@ -248,7 +256,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     }
 
     /**
-     * Creates and returns a formatted date string from the given Opus\Date object according to level 0
+     * Creates and returns a formatted date string from the given Opus Date object according to level 0
      * of the Extended Date/Time Format (EDTF) specification. Depending on the given date, the generated
      * date string has year, month or day precision. Examples:
      *
@@ -294,13 +302,13 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     }
 
     /**
-     * Creates and returns a formatted string of person names for the given array of Opus\Person objects.
+     * Creates and returns a formatted string of person names for the given array of Person objects.
      *
      * TODO move this function to a more appropriate place
      *
      * @param  PersonInterface[] $persons Array of Person objects for which a formatted string shall be created.
      * @param  bool              $shortenFirstNames Specifies whether first name(s) shall be reduced to initials.
-     *          By default, first names are used without modification.
+     * By default, first names are used without modification.
      * @return string|null Formatted string of person names.
      */
     public function personsString($persons, $shortenFirstNames = false)
@@ -324,7 +332,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     /**
      * Returns true if the given OPUS type describes a part within a container, false if not.
      *
-     * @param  string $type The Opus\Document type to be checked.
+     * @param  string $type The Document type to be checked.
      * @return bool Whether the type describes a part within a container.
      */
     protected function documentTypeHasContainer($type)
@@ -342,9 +350,9 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     }
 
     /**
-     * Returns the CSL type representing the given Opus\Document type.
+     * Returns the CSL type representing the given Document type.
      *
-     * @param  string $type The Opus\Document type which shall be mapped to a CSL type.
+     * @param  string $type The Document type which shall be mapped to a CSL type.
      * @return string|null CSL type or null in case no matching type was found.
      */
     protected function cslType($type)
@@ -386,7 +394,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
     }
 
     /**
-     * Creates and returns an array of CSL name objects for the given array of Opus\Person objects.
+     * Creates and returns an array of CSL name objects for the given array of Person objects.
      *
      * @link   https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html#name-fields
      *

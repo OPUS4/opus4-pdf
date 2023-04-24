@@ -32,8 +32,8 @@
 namespace Opus\Pdf\MetadataGenerator;
 
 use Opus\Common\Date;
-use Opus\Common\Document;
-use Opus\Common\Person;
+use Opus\Common\DocumentInterface;
+use Opus\Common\PersonInterface;
 
 /**
  * Interface for generating metadata for a document in a bibliographic metadata format.
@@ -42,7 +42,7 @@ use Opus\Common\Person;
  */
 interface MetadataGeneratorInterface
 {
-    // TODO: add constants for other supported metadata formats
+    // TODO add constants for other supported metadata formats
     const METADATA_FORMAT_CSL_JSON = 'csl_json';
 
     /**
@@ -55,7 +55,7 @@ interface MetadataGeneratorInterface
     /**
      * Sets the path to a directory that stores temporary files.
      *
-     * @param string $tempDir
+     * @param string|null $tempDir
      */
     public function setTempDir($tempDir);
 
