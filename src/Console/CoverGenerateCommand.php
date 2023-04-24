@@ -114,6 +114,10 @@ EOT;
 
         $docId        = $input->getArgument(self::ARGUMENT_DOC_ID);
         $outputName   = $input->getOption(self::OPTION_OUTPUT_FILE);
+
+        // TODO '--template' option should support specifying just the name of a template like in the configuration
+        //      for collections. It should not be necessary to specify full paths, although this can be supported
+        //      additionally.
         $templatePath = $input->getOption(self::OPTION_TEMPLATE_PATH);
 
         $coverGenerator = new DefaultCoverGenerator();
@@ -122,6 +126,7 @@ EOT;
             return Command::FAILURE;
         }
 
+        // TODO Output file should be generated directly
         $coverName  = basename($coverPath);
         $outputPath = getcwd() . DIRECTORY_SEPARATOR . ($outputName ?? $coverName);
         copy($coverPath, $outputPath);

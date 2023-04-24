@@ -216,6 +216,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * @param string|null $templatePath (Optional) The absolute path to the template file to be used. If not given
      * or the path doesn't exist, the default template that's appropriate for the given document will be used.
      * @return string|null File path.
+     *
+     * TODO DocumentInterface object should not be instantiated here
      */
     public function processDocumentId($documentId, $templatePath = null)
     {
