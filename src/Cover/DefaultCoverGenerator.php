@@ -35,6 +35,7 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
 use Opus\Common\Config;
+use Opus\Common\Document;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
@@ -205,6 +206,38 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     public function setLicenceLogosDir($licenceLogosDir)
     {
         $this->licenceLogosDir = $licenceLogosDir;
+    }
+
+    /**
+     * Returns the file path to a cover file that's generated for the document specified by the given ID.
+     * Returns null if cover generation fails.
+     *
+     * @param int         $documentId Id of the document for which a cover shall be generated.
+     * @param string|null $templatePath (Optional) The absolute path to the template file to be used. If not given
+     * or the path doesn't exist, the default template that's appropriate for the given document will be used.
+     * @return string|null File path.
+     *
+     * TODO DocumentInterface object should not be instantiated here
+     */
+    public function processDocumentId($documentId, $templatePath = null)
+    {
+        $document = Document::get($documentId);
+        if ($document === null) {
+            return null;
+        }
+
+        $pdfGenerator = $this->getPdfGenerator($document, $templatePath);
+        if ($pdfGenerator === null) {
+            return null;
+        }
+
+        $tempFilename = $document->getId();
+        $coverPath    = $pdfGenerator->generateFile($document, $tempFilename);
+        if ($coverPath === null) {
+            return null;
+        }
+
+        return $coverPath;
     }
 
     /**
@@ -444,18 +477,20 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns a PDF generator instance to create a cover for the given document and file.
+     * Returns a PDF generator instance to create a cover for the given document.
      *
-     * @param DocumentInterface $document
-     * @param FileInterface     $file
+     * @param DocumentInterface $document The document for which a cover shall be created.
+     * @param string|null       $templatePath (Optional) The absolute path to the template file to be used. If not
+     * given or the path doesn't exist, the default template that's appropriate for the given document will be used.
      * @return PdfGeneratorInterface|null
      */
-    protected function getPdfGenerator($document, $file)
+    protected function getPdfGenerator($document, $templatePath = null)
     {
         // TODO support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
-        $templatePath = $this->getTemplatePath($document);
-
+        if ($templatePath === null || ! file_exists($templatePath)) {
+            $templatePath = $this->getTemplatePath($document);
+        }
         if ($templatePath === null) {
             return null;
         }
