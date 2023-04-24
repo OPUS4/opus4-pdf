@@ -112,8 +112,8 @@ EOT;
     {
         // TODO Support other PDF generator implementations
 
-        $docId        = $input->getArgument(self::ARGUMENT_DOC_ID);
-        $outputName   = $input->getOption(self::OPTION_OUTPUT_FILE);
+        $docId      = $input->getArgument(self::ARGUMENT_DOC_ID);
+        $outputName = $input->getOption(self::OPTION_OUTPUT_FILE);
 
         // TODO '--template' option should support specifying just the name of a template like in the configuration
         //      for collections. It should not be necessary to specify full paths, although this can be supported
