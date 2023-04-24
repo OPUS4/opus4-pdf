@@ -168,7 +168,7 @@ Entwicklung einer eigenen Vorlage nützlich sein kann.
 
 Um die Hilfe des Kommandos anzuzeigen, führen Sie diesen Befehl auf der Konsole aus:
 
-    bin/opus4 --help cover:generate
+    bin/opus4 help cover:generate
 
 Um ein PDF-Deckblatt für ein Dokument mit der aktuellen Standardvorlage zu generieren, führen Sie
 diesen Befehl aus:

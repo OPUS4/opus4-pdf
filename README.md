@@ -157,7 +157,7 @@ when developing a custom cover template.
 
 To display the command's help, execute this command on the console:
 
-    bin/opus4 --help cover:generate
+    bin/opus4 help cover:generate
 
 In order to generate a PDF cover for a document using the current default template, execute this
 command:
