@@ -258,7 +258,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return $cachedFilePath;
         }
 
-        $pdfGenerator = $this->getPdfGenerator($document, $file);
+        $pdfGenerator = $this->getPdfGenerator($document);
         if ($pdfGenerator === null) {
             return $filePath;
         }
