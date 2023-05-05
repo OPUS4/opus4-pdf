@@ -71,7 +71,7 @@ class CoverGenerateCommand extends Command
         $help = <<<EOT
 The <fg=green>cover:generate</> command can be used to generate a PDF cover for a single document.
 
-If no <fg=green>out</> file (*.pdf) is given the output file name will be "DOCUMENT_ID.pdf".
+If no <fg=green>out</> file (*.pdf) is given the output file name will be "\<DocID\>.pdf".
 
 If no <fg=green>template</> path is provided or the given path doesn't exist, the default template that's
 appropriate for the specified document will be used.
@@ -112,12 +112,8 @@ EOT;
     {
         // TODO Support other PDF generator implementations
 
-        $docId      = $input->getArgument(self::ARGUMENT_DOC_ID);
-        $outputName = $input->getOption(self::OPTION_OUTPUT_FILE);
-
-        // TODO '--template' option should support specifying just the name of a template like in the configuration
-        //      for collections. It should not be necessary to specify full paths, although this can be supported
-        //      additionally.
+        $docId        = $input->getArgument(self::ARGUMENT_DOC_ID);
+        $outputName   = $input->getOption(self::OPTION_OUTPUT_FILE);
         $templatePath = $input->getOption(self::OPTION_TEMPLATE_PATH);
 
         $coverGenerator = new DefaultCoverGenerator();

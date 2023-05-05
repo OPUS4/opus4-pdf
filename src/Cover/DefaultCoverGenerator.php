@@ -214,8 +214,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns null if cover generation fails.
      *
      * @param int         $documentId Id of the document for which a cover shall be generated.
-     * @param string|null $templatePath (Optional) The absolute path to the template file to be used. If not given
-     * or the path doesn't exist, the default template that's appropriate for the given document will be used.
+     * @param string|null $templatePath (Optional) The absolute path (or path relative to the templates directory) of
+     * the template file to be used. If not given or the path doesn't exist, the default template that's appropriate
+     * for the given document will be used.
      * @return string|null File path.
      *
      * TODO DocumentInterface object should not be instantiated here
@@ -261,7 +262,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return $cachedFilePath;
         }
 
-        $pdfGenerator = $this->getPdfGenerator($document, $file);
+        $pdfGenerator = $this->getPdfGenerator($document);
         if ($pdfGenerator === null) {
             $this->getLogger()->err('Couldn\'t get PDF generator');
             return $filePath;
@@ -489,15 +490,21 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      * Returns a PDF generator instance to create a cover for the given document.
      *
      * @param DocumentInterface $document The document for which a cover shall be created.
-     * @param string|null       $templatePath (Optional) The absolute path to the template file to be used. If not
-     * given or the path doesn't exist, the default template that's appropriate for the given document will be used.
+     * @param string|null       $templatePath (Optional) The absolute path (or path relative to the templates directory)
+     * of the template file to be used. If not given or the path doesn't exist, the default template that's appropriate
+     * for the given document will be used.
      * @return PdfGeneratorInterface|null
      */
     protected function getPdfGenerator($document, $templatePath = null)
     {
         // TODO support more template format(s) and PDF engine(s) via different PdfGeneratorInterface implementation(s)
 
+        if ($templatePath !== null && ! file_exists($templatePath)) {
+            // look for given template file in default template directory
+            $templatePath = $this->getTemplatesDir() . $templatePath;
+        }
         if ($templatePath === null || ! file_exists($templatePath)) {
+            // use the document's default template
             $templatePath = $this->getTemplatePath($document);
         }
         if ($templatePath === null) {
