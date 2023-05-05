@@ -187,6 +187,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             }
 
             if (empty($licenceLogosDir)) {
+                $this->getLogger()->err('Couldn\'t get licence logos directory');
                 return null;
             }
         }
@@ -223,17 +224,20 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     {
         $document = Document::get($documentId);
         if ($document === null) {
+            $this->getLogger()->err("Couldn't get document with ID $documentId");
             return null;
         }
 
         $pdfGenerator = $this->getPdfGenerator($document, $templatePath);
         if ($pdfGenerator === null) {
+            $this->getLogger()->err('Couldn\'t get PDF generator');
             return null;
         }
 
         $tempFilename = $document->getId();
         $coverPath    = $pdfGenerator->generateFile($document, $tempFilename);
         if ($coverPath === null) {
+            $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
             return null;
         }
 
@@ -259,6 +263,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         $pdfGenerator = $this->getPdfGenerator($document, $file);
         if ($pdfGenerator === null) {
+            $this->getLogger()->err('Couldn\'t get PDF generator');
             return $filePath;
         }
 
@@ -267,6 +272,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $coverPath = $pdfGenerator->generateFile($document, $tempFilename);
 
         if ($coverPath === null) {
+            $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
             return $filePath;
         }
 
@@ -274,6 +280,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         $savedSuccessfully = $this->saveFileData($mergedPdfData, $cachedFilePath);
         if (! $savedSuccessfully) {
+            $this->getLogger()->err("Couldn't save merged PDF data to cached file $cachedFilePath");
             return $filePath;
         }
 
@@ -464,12 +471,14 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $templateName = $this->getTemplateName($document);
 
         if ($templateName === null) {
+            $this->getLogger()->err('Couldn\'t get template name');
             return null;
         }
 
         $templatePath = $templatesDir . $templateName;
 
         if (! file_exists($templatePath)) {
+            $this->getLogger()->err("Template file doesn't exist: $templatePath");
             return null;
         }
 
@@ -492,6 +501,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templatePath = $this->getTemplatePath($document);
         }
         if ($templatePath === null) {
+            $this->getLogger()->err('Couldn\'t get PDF generator since there\'s no template file');
             return null;
         }
 
@@ -509,7 +519,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         if ($generator === null) {
             $this->getLogger()->err("Couldn't create PDF generator for '$templateFormat' and '$pdfEngine'");
-
             return null;
         }
 
@@ -556,7 +565,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $pdfData = $merger->merge();
         } catch (Exception $e) {
             $this->getLogger()->err("Couldn't merge PDFs: '$e'");
-
             return null;
         }
 
