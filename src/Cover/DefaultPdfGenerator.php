@@ -443,6 +443,22 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $documentMetadata = [];
 
+        $config = Config::get();
+
+        if (isset($config->name)) {
+            $repositoryName = $config->name;
+            if (! empty($repositoryName)) {
+                $documentMetadata['repository-name'] = $repositoryName;
+            }
+        }
+
+        if (isset($config->url)) {
+            $repositoryUrl = $config->url;
+            if (! empty($repositoryUrl)) {
+                $documentMetadata['repository-url'] = $repositoryUrl;
+            }
+        }
+
         $publishedDate = $document->getPublishedDate();
         if ($publishedDate !== null) {
             $dateString = $this->metadataGenerator->extendedDateString($publishedDate);
