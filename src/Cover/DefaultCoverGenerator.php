@@ -231,7 +231,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         $pdfGenerator = $this->getPdfGenerator($document, $templatePath);
         if ($pdfGenerator === null) {
-            $this->getLogger()->err('Couldn\'t get PDF generator');
             return null;
         }
 
@@ -264,7 +263,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         $pdfGenerator = $this->getPdfGenerator($document);
         if ($pdfGenerator === null) {
-            $this->getLogger()->err('Couldn\'t get PDF generator');
             return $filePath;
         }
 
@@ -472,7 +470,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $templateName = $this->getTemplateName($document);
 
         if ($templateName === null) {
-            $this->getLogger()->err('Couldn\'t get template name');
             return null;
         }
 
@@ -508,7 +505,6 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templatePath = $this->getTemplatePath($document);
         }
         if ($templatePath === null) {
-            $this->getLogger()->err('Couldn\'t get PDF generator since there\'s no template file');
             return null;
         }
 
