@@ -443,19 +443,17 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $documentMetadata = [];
 
+        // include configuration variables
+        // TODO move the list of supported config options to a better place
+        $configOptionKeys = ['name', 'url'];
+
         $config = Config::get();
-
-        if (isset($config->name)) {
-            $repositoryName = $config->name;
-            if (! empty($repositoryName)) {
-                $documentMetadata['repository-name'] = $repositoryName;
-            }
-        }
-
-        if (isset($config->url)) {
-            $repositoryUrl = $config->url;
-            if (! empty($repositoryUrl)) {
-                $documentMetadata['repository-url'] = $repositoryUrl;
+        foreach ($configOptionKeys as $optionKey) {
+            if (isset($config->{$optionKey})) {
+                $optionValue = $config->{$optionKey};
+                if (! empty($optionValue)) {
+                    $documentMetadata['config-' . $optionKey] = $optionValue;
+                }
             }
         }
 
