@@ -449,11 +449,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $config = Config::get();
         foreach ($configOptionKeys as $optionKey) {
-            if (isset($config->{$optionKey})) {
-                $optionValue = $config->{$optionKey};
-                if (! empty($optionValue)) {
-                    $documentMetadata['config-' . $optionKey] = $optionValue;
-                }
+            $optionValue = Config::getValueFromConfig($config, $optionKey);
+            if (! empty($optionValue)) {
+                $documentMetadata['config-' . $optionKey] = $optionValue;
             }
         }
 
