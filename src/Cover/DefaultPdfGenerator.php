@@ -313,7 +313,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         }
 
         // 1. generate general metadata for the given document in JSON format
-        $metadataFilePath = $this->generalMetadataFile($document, $tempFilename);
+        $metadataFilePath = $this->generateGeneralMetadataFile($document, $tempFilename);
 
         // 2. generate citation data for the given document in CSL JSON format
         $cslFilePath = $this->metadataGenerator->generateFile($document, $tempFilename);
@@ -426,7 +426,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * for the generated metadata file. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
-    protected function generalMetadataFile($document, $tempFilename = '')
+    protected function generateGeneralMetadataFile($document, $tempFilename = '')
     {
         if (empty($tempFilename)) {
             $tempFilename = $document->getId() . '-' . uniqid();
