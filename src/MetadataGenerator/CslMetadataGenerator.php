@@ -139,7 +139,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
         $publishedDate       = $document->getPublishedDate();
         $publishedYear       = $document->getPublishedYear();
         if ($publishedDate !== null) {
-            $publishedDateString = $this->extendedDateString($publishedDate);
+            $publishedDateString = self::extendedDateString($publishedDate);
         } elseif (! empty($publishedYear)) {
             $publishedDateString = strval($publishedYear);
         }
@@ -271,7 +271,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      * @param  Date $date The date for which a formatted date string shall be generated.
      * @return string|null Formatted date string or null in case of failure.
      */
-    public function extendedDateString($date)
+    public static function extendedDateString($date)
     {
         if ($date === null) {
             return null;
@@ -311,7 +311,7 @@ class CslMetadataGenerator implements MetadataGeneratorInterface
      * By default, first names are used without modification.
      * @return string|null Formatted string of person names.
      */
-    public function personsString($persons, $shortenFirstNames = false)
+    public static function personsString($persons, $shortenFirstNames = false)
     {
         $personStrings = [];
 

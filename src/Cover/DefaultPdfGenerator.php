@@ -36,10 +36,12 @@ use Opus\Common\Config;
 use Opus\Common\DocumentInterface;
 use Opus\Common\LicenceInterface;
 use Opus\Common\LoggingTrait;
+use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
 use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;
 
+use function array_merge;
 use function array_push;
 use function dirname;
 use function file_exists;
@@ -248,6 +250,108 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     }
 
     /**
+     * Returns metadata created from Config.ini values for the given Config option keys.
+     *
+     * @param string[] $optionKeys List of Config option keys.
+     * @return string[] List of metadata created from Config.ini values.
+     */
+    protected function getMetadataFromConfigOptions($optionKeys)
+    {
+        $configMetadata = [];
+
+        $config = Config::get();
+
+        foreach ($optionKeys as $key) {
+            $value = Config::getValueFromConfig($config, $key);
+            if (empty($value)) {
+                $this->getLogger()->err("Failed to generate metadata for '$key': The configuration contains no value for this key");
+            } else {
+                $configMetadata['config-' . $key] = $value;
+            }
+        }
+
+        return $configMetadata;
+    }
+
+    /**
+     * Returns metadata for the given document.
+     *
+     * @param DocumentInterface $document
+     * @return string[] List of document metadata.
+     */
+    protected function getDocumentMetadata($document)
+    {
+        $documentMetadata = [];
+
+        $publishedDate = $document->getPublishedDate();
+        if ($publishedDate !== null) {
+            $dateString = CslMetadataGenerator::extendedDateString($publishedDate);
+            if ($dateString !== null) {
+                $documentMetadata['date-meta'] = $dateString;
+            }
+        }
+
+        $persons = $document->getPersonAuthor();
+        if (empty($persons)) {
+            $persons = $document->getPersonEditor();
+        }
+        $personsString = CslMetadataGenerator::personsString($persons);
+        if (! empty($personsString)) {
+            $documentMetadata['author-meta'] = $personsString;
+        }
+
+        $mainTitle = $document->getMainTitle();
+        if (! empty($mainTitle)) {
+            $documentMetadata['title'] = $mainTitle->getValue();
+        }
+
+        $mainAbstract = $document->getMainAbstract();
+        if (! empty($mainAbstract)) {
+            $documentMetadata['abstract'] = $mainAbstract->getValue();
+        }
+
+        $language = $document->getLanguage();
+        if (! empty($language)) {
+            $documentMetadata['lang'] = $language;
+        }
+
+        return $documentMetadata;
+    }
+
+    /**
+     * Returns metadata for the given licence.
+     *
+     * @param LicenceInterface $licence
+     * @return string[] List of licence metadata.
+     */
+    protected function getLicenceMetadata($licence)
+    {
+        $licenceMetadata = [];
+
+        $licenceTitle = $licence->getName();
+        if (! empty($licenceTitle)) {
+            $licenceMetadata['licence-title'] = $licenceTitle;
+        }
+
+        $licenceText = $licence->getNameLong();
+        if (! empty($licenceText)) {
+            $licenceMetadata['licence-text'] = $licenceText;
+        }
+
+        $licenceUrl = $licence->getLinkLicence();
+        if (! empty($licenceUrl)) {
+            $licenceMetadata['licence-url'] = $licenceUrl;
+        }
+
+        $licenceLogoPath = $this->getLicenceLogoPath($licence);
+        if ($licenceLogoPath !== null) {
+            $licenceMetadata['licence-logo-name'] = $this->getLicenceLogoName($licence);
+        }
+
+        return $licenceMetadata;
+    }
+
+    /**
      * Creates a PDF that's appropriate for the given document and returns the generated PDF data.
      * Returns null in case of failure.
      *
@@ -426,7 +530,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * for the generated metadata file. May be empty in which case a default name will be used.
      * @return string|null Path to generated metadata file.
      */
-    protected function generateGeneralMetadataFile($document, $tempFilename = '')
+    public function generateGeneralMetadataFile($document, $tempFilename = '')
     {
         if (empty($tempFilename)) {
             $tempFilename = $document->getId() . '-' . uniqid();
@@ -441,77 +545,31 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $metadataFilePath = $tempDir . $tempFilename . '-meta.json';
 
-        $documentMetadata = [];
+        $metadata = [];
 
         // include configuration variables
         // TODO move the list of supported config options to a better place
         $configOptionKeys = ['name', 'url'];
 
-        $config = Config::get();
-        foreach ($configOptionKeys as $optionKey) {
-            $optionValue = Config::getValueFromConfig($config, $optionKey);
-            if (! empty($optionValue)) {
-                $documentMetadata['config-' . $optionKey] = $optionValue;
-            }
+        $configMetadata = $this->getMetadataFromConfigOptions($configOptionKeys);
+        if (! empty($configMetadata)) {
+            $metadata = array_merge($metadata, $configMetadata);
         }
 
-        $publishedDate = $document->getPublishedDate();
-        if ($publishedDate !== null) {
-            $dateString = $this->metadataGenerator->extendedDateString($publishedDate);
-            if ($dateString !== null) {
-                $documentMetadata['date-meta'] = $dateString;
-            }
-        }
-
-        $persons = $document->getPersonAuthor();
-        if (empty($persons)) {
-            $persons = $document->getPersonEditor();
-        }
-        $personsString = $this->metadataGenerator->personsString($persons);
-        if (! empty($personsString)) {
-            $documentMetadata['author-meta'] = $personsString;
-        }
-
-        $mainTitle = $document->getMainTitle();
-        if (! empty($mainTitle)) {
-            $documentMetadata['title'] = $mainTitle->getValue();
-        }
-
-        $mainAbstract = $document->getMainAbstract();
-        if (! empty($mainAbstract)) {
-            $documentMetadata['abstract'] = $mainAbstract->getValue();
-        }
-
-        $language = $document->getLanguage();
-        if (! empty($language)) {
-            $documentMetadata['lang'] = $language;
+        $documentMetadata = $this->getDocumentMetadata($document);
+        if (! empty($documentMetadata)) {
+            $metadata = array_merge($metadata, $documentMetadata);
         }
 
         $licence = $this->getMainLicence($document);
-
         if ($licence !== null) {
-            $licenceTitle = $licence->getName();
-            if (! empty($licenceTitle)) {
-                $documentMetadata['licence-title'] = $licenceTitle;
-            }
-
-            $licenceText = $licence->getNameLong();
-            if (! empty($licenceText)) {
-                $documentMetadata['licence-text'] = $licenceText;
-            }
-
-            $licenceUrl = $licence->getLinkLicence();
-            if (! empty($licenceUrl)) {
-                $documentMetadata['licence-url'] = $licenceUrl;
-            }
-
-            $licenceLogoPath = $this->getLicenceLogoPath($licence);
-            if ($licenceLogoPath !== null) {
-                $documentMetadata['licence-logo-name'] = $this->getLicenceLogoName($licence);
+            $licenceMetadata = $this->getLicenceMetadata($licence);
+            if (! empty($licenceMetadata)) {
+                $metadata = array_merge($metadata, $licenceMetadata);
             }
         }
 
-        $jsonString = json_encode($documentMetadata);
+        $jsonString = json_encode($metadata);
 
         $result = file_put_contents($metadataFilePath, $jsonString);
         if ($result === false) {

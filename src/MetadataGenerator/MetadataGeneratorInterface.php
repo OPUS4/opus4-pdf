@@ -96,7 +96,7 @@ interface MetadataGeneratorInterface
      * @param  Date $date The date for which a formatted date string shall be generated.
      * @return string|null Formatted date string or null in case of failure.
      */
-    public function extendedDateString($date);
+    public static function extendedDateString($date);
 
     /**
      * Creates and returns a formatted string of person names for the given array of Opus\Person objects.
@@ -106,5 +106,5 @@ interface MetadataGeneratorInterface
      * @param  PersonInterface[] $persons Array of Person objects for which a formatted string shall be created.
      * @return string|null Formatted string of person names.
      */
-    public function personsString($persons);
+    public static function personsString($persons);
 }
