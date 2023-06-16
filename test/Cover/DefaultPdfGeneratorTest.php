@@ -44,8 +44,10 @@ use PHPUnit\Framework\TestCase;
 
 use function dirname;
 use function file_exists;
+use function file_get_contents;
 use function strlen;
 use function substr;
+use function trim;
 use function unlink;
 
 use const DIRECTORY_SEPARATOR;
@@ -74,7 +76,7 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $this->assertNotNull($generator);
 
-        $templatePath = $this->getTemplatePath('demo-cover.md');
+        $templatePath = $this->getFixturePath('demo-cover.md');
 
         $this->assertFileExists($templatePath);
 
@@ -101,15 +103,38 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->assertFileExists($pdfFilePath);
     }
 
-    /**
-     * Returns the full path to the given template.
-     *
-     * @param string $templateName The template name (or path relative to the 'test/_files' directory)
-     * @return string Path to template.
-     */
-    private function getTemplatePath($templateName)
+    public function testGenerateGeneralMetadataFile()
     {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $templateName;
+        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
+        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
+
+        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
+
+        $this->assertNotNull($generator);
+
+        $document = $this->getSampleArticle();
+
+        $metadataFilePath = $generator->generateGeneralMetadataFile($document);
+        $metaJson         = trim(file_get_contents($metadataFilePath));
+
+        $fixturePath     = $this->getFixturePath('Article-meta.json');
+        $metaJsonFixture = trim(file_get_contents($fixturePath));
+
+        // mark output files for deletion
+        $this->tempFiles[] = $metadataFilePath;
+
+        $this->assertEquals($metaJson, $metaJsonFixture);
+    }
+
+    /**
+     * Returns the full path to the specified template or fixture file.
+     *
+     * @param string $fileName The file name (or path relative to the 'test/_files' directory)
+     * @return string Path to file.
+     */
+    private function getFixturePath($fileName)
+    {
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**
