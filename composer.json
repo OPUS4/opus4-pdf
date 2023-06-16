@@ -10,7 +10,7 @@
   "homepage": "https://www.opus-repository.org",
   "require": {
     "ext-json": "*",
-    "opus4-repo/opus4-common": "^4.8",
+    "opus4-repo/opus4-common": "dev-master as 4.8.1",
     "iio/libmergepdf": "^4.0",
     "ueberdosis/pandoc": "^0.7.0",
     "seboettg/citedata": "@dev"
@@ -19,7 +19,7 @@
     "phpunit/phpunit": "<9",
     "opus4-repo/codesniffer": "dev-laminas",
     "phpmetrics/phpmetrics": "2.7.4",
-    "opus4-repo/framework": "^4.8"
+    "opus4-repo/framework": "dev-master as 4.8.1"
   },
   "config": {
     "allow-plugins": {
