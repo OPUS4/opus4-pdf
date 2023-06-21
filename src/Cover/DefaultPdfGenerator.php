@@ -44,9 +44,11 @@ use Pandoc\Pandoc;
 use function array_merge;
 use function array_push;
 use function dirname;
+use function explode;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
+use function implode;
 use function is_writable;
 use function json_encode;
 use function ltrim;
@@ -284,7 +286,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * @param string[] $optionKeys List of Config option keys.
      * @return string[] List of metadata created from Config.ini values.
      */
-    protected function getMetadataFromConfigOptions($optionKeys)
+    public function getMetadataFromConfigOptions($optionKeys)
     {
         $configMetadata = [];
 
@@ -295,7 +297,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
             if (empty($value)) {
                 $this->getLogger()->err("Failed to generate metadata for '$key': The configuration contains no value for this key");
             } else {
-                $configMetadata['config-' . $key] = $value;
+                $subkeys = explode('.', $key);
+
+                $configMetadata['config-' . implode('-', $subkeys)] = $value;
             }
         }
 
