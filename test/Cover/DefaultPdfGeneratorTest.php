@@ -123,6 +123,45 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->assertEquals($metaJson, $metaJsonFixture);
     }
 
+    public function testMetadataGenerationFromExistingConfigOptions()
+    {
+        $optionKeys     = ['name', 'oai.repository.name'];
+        $configMetadata = $this->getMetadataFromConfigOptions($optionKeys);
+
+        // compare with corresponding configuration variables in test/test.ini
+        $expectedMetadata = [
+            'config-name'                => 'OPUS 4 Test Repository',
+            'config-oai-repository-name' => 'OPUS 4 Test Repository',
+        ];
+
+        $this->assertEquals($configMetadata, $expectedMetadata);
+    }
+
+    public function testMetadataGenerationFromNonexistingConfigOption()
+    {
+        $optionKeys     = ['nonexisting.config.option'];
+        $configMetadata = $this->getMetadataFromConfigOptions($optionKeys);
+
+        $expectedMetadata = [];
+
+        $this->assertEquals($configMetadata, $expectedMetadata);
+    }
+
+    /**
+     * Returns metadata created from Config.ini values for the given Config option keys.
+     *
+     * @param string[] $optionKeys List of Config option keys.
+     * @return string[] List of metadata created from Config.ini values.
+     */
+    public function getMetadataFromConfigOptions($optionKeys)
+    {
+        $this->xetexPdfGenerator->setConfigOptionKeys($optionKeys);
+
+        $this->assertEquals($optionKeys, $this->xetexPdfGenerator->getConfigOptionKeys());
+
+        return $this->xetexPdfGenerator->getMetadataFromConfigOptions($optionKeys);
+    }
+
     /**
      * Returns a XeTeX- and pandoc-based PDF generator instance to generate a PDF for a document based on a template.
      *
