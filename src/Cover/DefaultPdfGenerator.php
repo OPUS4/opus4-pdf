@@ -78,6 +78,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     /** @var string Path to a directory that stores licence logo files */
     private $licenceLogosDir = "";
 
+    /** @var string[] List of configuration option keys whose values will be made available as metadata */
+    private $configOptionKeys = [];
+
     /** @var MetadataGeneratorInterface|null Metadata generator to create CSL JSON metadata */
     private $metadataGenerator;
 
@@ -172,6 +175,32 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     public function setLicenceLogosDir($licenceLogosDir)
     {
         $this->licenceLogosDir = $licenceLogosDir;
+    }
+
+    /**
+     * Returns the list of Config option keys whose values will be made available as metadata during PDF generation.
+     *
+     * @return string[] List of Config option keys
+     */
+    public function getConfigOptionKeys()
+    {
+        $configOptionKeys = $this->configOptionKeys;
+
+        if (empty($configOptionKeys)) {
+            $configOptionKeys = ['name', 'url'];
+        }
+
+        return $configOptionKeys;
+    }
+
+    /**
+     * Sets the list of Config option keys whose values shall be made available as metadata during PDF generation.
+     *
+     * @param string[] $configOptionKeys
+     */
+    public function setConfigOptionKeys(array $configOptionKeys): void
+    {
+        $this->configOptionKeys = $configOptionKeys;
     }
 
     /**
@@ -547,11 +576,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $metadata = [];
 
-        // include configuration variables
-        // TODO move the list of supported config options to a better place
-        $configOptionKeys = ['name', 'url'];
-
-        $configMetadata = $this->getMetadataFromConfigOptions($configOptionKeys);
+        $configMetadata = $this->getMetadataFromConfigOptions($this->getConfigOptionKeys());
         if (! empty($configMetadata)) {
             $metadata = array_merge($metadata, $configMetadata);
         }
