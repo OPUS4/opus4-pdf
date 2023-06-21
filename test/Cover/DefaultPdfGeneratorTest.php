@@ -38,6 +38,7 @@ use Opus\Common\Document;
 use Opus\Common\Identifier;
 use Opus\Common\Licence;
 use Opus\Common\Person;
+use Opus\Pdf\Cover\DefaultPdfGenerator;
 use Opus\Pdf\Cover\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGeneratorInterface;
 use PHPUnit\Framework\TestCase;
@@ -57,6 +58,16 @@ class DefaultPdfGeneratorTest extends TestCase
     /** @var array */
     private $tempFiles = [];
 
+    /** @var DefaultPdfGenerator */
+    protected $xetexPdfGenerator;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->xetexPdfGenerator = $this->getXetexPdfGenerator();
+    }
+
     /**
      * Clean up any files that were registered by tests for deletion.
      */
@@ -69,28 +80,21 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testGenerateFile()
     {
-        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
-        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
-
-        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
-
-        $this->assertNotNull($generator);
-
         $templatePath = $this->getFixturePath('demo-cover.md');
 
         $this->assertFileExists($templatePath);
 
-        $generator->setTemplatePath($templatePath);
+        $this->xetexPdfGenerator->setTemplatePath($templatePath);
 
-        $generator->setTempDir(Config::getInstance()->getTempPath());
+        $this->xetexPdfGenerator->setTempDir(Config::getInstance()->getTempPath());
 
         $licenceLogosDir = dirname($templatePath) . DIRECTORY_SEPARATOR . 'images/';
 
-        $generator->setLicenceLogosDir($licenceLogosDir);
+        $this->xetexPdfGenerator->setLicenceLogosDir($licenceLogosDir);
 
         $document = $this->getSampleArticle();
 
-        $pdfFilePath = $generator->generateFile($document, 'demo-cover');
+        $pdfFilePath = $this->xetexPdfGenerator->generateFile($document, 'demo-cover');
 
         // mark output files for deletion
         $filePathWithoutExtension = substr($pdfFilePath, 0, strlen($pdfFilePath) - 4);
@@ -105,16 +109,9 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testGenerateGeneralMetadataFile()
     {
-        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
-        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
-
-        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
-
-        $this->assertNotNull($generator);
-
         $document = $this->getSampleArticle();
 
-        $metadataFilePath = $generator->generateGeneralMetadataFile($document);
+        $metadataFilePath = $this->xetexPdfGenerator->generateGeneralMetadataFile($document);
         $metaJson         = trim(file_get_contents($metadataFilePath));
 
         $fixturePath     = $this->getFixturePath('Article-meta.json');
@@ -124,6 +121,23 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->tempFiles[] = $metadataFilePath;
 
         $this->assertEquals($metaJson, $metaJsonFixture);
+    }
+
+    /**
+     * Returns a XeTeX- and pandoc-based PDF generator instance to generate a PDF for a document based on a template.
+     *
+     * @return DefaultPdfGenerator
+     */
+    protected function getXetexPdfGenerator()
+    {
+        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
+        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
+
+        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
+
+        $this->assertNotNull($generator);
+
+        return $generator;
     }
 
     /**
