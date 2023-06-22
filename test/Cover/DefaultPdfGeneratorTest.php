@@ -126,12 +126,24 @@ class DefaultPdfGeneratorTest extends TestCase
     public function testMetadataGenerationFromExistingConfigOptions()
     {
         $optionKeys     = ['name', 'oai.repository.name'];
-        $configMetadata = $this->getMetadataFromConfigOptions($optionKeys);
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
         // compare with corresponding configuration variables in test/test.ini
         $expectedMetadata = [
             'config-name'                => 'OPUS 4 Test Repository',
-            'config-oai-repository-name' => 'OPUS 4 Test Repository',
+            'config-oai-repository-name' => 'OPUS 4 OAI Repository',
+        ];
+
+        $this->assertEquals($configMetadata, $expectedMetadata);
+    }
+
+    public function testMetadataGenerationFromPartlyNonexistingConfigOptions()
+    {
+        $optionKeys     = ['name', 'nonexisting.config.option'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+
+        $expectedMetadata = [
+            'config-name' => 'OPUS 4 Test Repository',
         ];
 
         $this->assertEquals($configMetadata, $expectedMetadata);
@@ -140,7 +152,7 @@ class DefaultPdfGeneratorTest extends TestCase
     public function testMetadataGenerationFromNonexistingConfigOption()
     {
         $optionKeys     = ['nonexisting.config.option'];
-        $configMetadata = $this->getMetadataFromConfigOptions($optionKeys);
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
         $expectedMetadata = [];
 
@@ -153,13 +165,13 @@ class DefaultPdfGeneratorTest extends TestCase
      * @param string[] $optionKeys List of Config option keys.
      * @return string[] List of metadata created from Config.ini values.
      */
-    public function getMetadataFromConfigOptions($optionKeys)
+    public function getMetadataFromConfig($optionKeys)
     {
         $this->xetexPdfGenerator->setConfigOptionKeys($optionKeys);
 
         $this->assertEquals($optionKeys, $this->xetexPdfGenerator->getConfigOptionKeys());
 
-        return $this->xetexPdfGenerator->getMetadataFromConfigOptions($optionKeys);
+        return $this->xetexPdfGenerator->getMetadataFromConfig($optionKeys);
     }
 
     /**

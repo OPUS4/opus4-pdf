@@ -44,15 +44,14 @@ use Pandoc\Pandoc;
 use function array_merge;
 use function array_push;
 use function dirname;
-use function explode;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function implode;
 use function is_writable;
 use function json_encode;
 use function ltrim;
 use function parse_url;
+use function str_replace;
 use function substr;
 use function uniqid;
 
@@ -200,7 +199,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      *
      * @param string[] $configOptionKeys
      */
-    public function setConfigOptionKeys(array $configOptionKeys): void
+    public function setConfigOptionKeys($configOptionKeys)
     {
         $this->configOptionKeys = $configOptionKeys;
     }
@@ -286,7 +285,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * @param string[] $optionKeys List of Config option keys.
      * @return string[] List of metadata created from Config.ini values.
      */
-    public function getMetadataFromConfigOptions($optionKeys)
+    public function getMetadataFromConfig($optionKeys)
     {
         $configMetadata = [];
 
@@ -295,11 +294,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         foreach ($optionKeys as $key) {
             $value = Config::getValueFromConfig($config, $key);
             if (empty($value)) {
-                $this->getLogger()->err("Failed to generate metadata for '$key': The configuration contains no value for this key");
+                $this->getLogger()->err(__FUNCTION__ . ": Config key '$key' not found or has no value");
             } else {
-                $subkeys = explode('.', $key);
-
-                $configMetadata['config-' . implode('-', $subkeys)] = $value;
+                $configMetadata['config-' . str_replace('.', '-', $key)] = $value;
             }
         }
 
@@ -580,7 +577,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
 
         $metadata = [];
 
-        $configMetadata = $this->getMetadataFromConfigOptions($this->getConfigOptionKeys());
+        $configMetadata = $this->getMetadataFromConfig($this->getConfigOptionKeys());
         if (! empty($configMetadata)) {
             $metadata = array_merge($metadata, $configMetadata);
         }
