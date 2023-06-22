@@ -149,9 +149,9 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->assertEquals($configMetadata, $expectedMetadata);
     }
 
-    public function testMetadataGenerationFromNonexistingConfigOption()
+    public function testMetadataGenerationFromNonexistingConfigOptions()
     {
-        $optionKeys     = ['nonexisting.config.option'];
+        $optionKeys     = ['oai.baseurl', 'nonexisting.config.option']; // empty value or key not found
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
         $expectedMetadata = [];
