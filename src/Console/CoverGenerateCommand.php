@@ -31,6 +31,7 @@
 
 namespace Opus\Pdf\Console;
 
+use Opus\Common\Document;
 use Opus\Pdf\Cover\DefaultCoverGenerator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -116,8 +117,13 @@ EOT;
         $outputName   = $input->getOption(self::OPTION_OUTPUT_FILE);
         $templatePath = $input->getOption(self::OPTION_TEMPLATE_PATH);
 
+        $document = Document::get($docId);
+        if ($document === null) {
+            return Command::FAILURE;
+        }
+
         $coverGenerator = new DefaultCoverGenerator();
-        $coverPath      = $coverGenerator->processDocumentId($docId, $templatePath);
+        $coverPath      = $coverGenerator->processDocument($document, $templatePath);
         if ($coverPath === null) {
             return Command::FAILURE;
         }

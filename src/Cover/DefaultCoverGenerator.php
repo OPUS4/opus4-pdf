@@ -36,7 +36,6 @@ use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
 use Opus\Common\Config;
 use Opus\Common\ConfigTrait;
-use Opus\Common\Document;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
@@ -212,25 +211,17 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Returns the file path to a cover file that's generated for the document specified by the given ID.
-     * Returns null if cover generation fails.
+     * Returns the file path to a cover file that's generated for the specified document. Returns null if cover
+     * generation fails.
      *
-     * @param int         $documentId Id of the document for which a cover shall be generated.
-     * @param string|null $templatePath (Optional) The absolute path (or path relative to the templates directory) of
-     * the template file to be used. If not given or the path doesn't exist, the default template that's appropriate
+     * @param DocumentInterface $document The document for which a cover shall be generated.
+     * @param string|null       $templatePath (Optional) The absolute path (or path relative to the templates directory)
+     * of the template file to be used. If not given or the path doesn't exist, the default template that's appropriate
      * for the given document will be used.
      * @return string|null File path.
-     *
-     * TODO DocumentInterface object should not be instantiated here
      */
-    public function processDocumentId($documentId, $templatePath = null)
+    public function processDocument($document, $templatePath = null)
     {
-        $document = Document::get($documentId);
-        if ($document === null) {
-            $this->getLogger()->err("Couldn't get document with ID $documentId");
-            return null;
-        }
-
         $pdfGenerator = $this->getPdfGenerator($document, $templatePath);
         if ($pdfGenerator === null) {
             return null;
