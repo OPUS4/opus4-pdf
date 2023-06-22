@@ -33,6 +33,7 @@ namespace Opus\Pdf\Cover;
 
 use Exception;
 use Opus\Common\Config;
+use Opus\Common\ConfigTrait;
 use Opus\Common\DocumentInterface;
 use Opus\Common\LicenceInterface;
 use Opus\Common\LoggingTrait;
@@ -68,6 +69,7 @@ use const PHP_URL_PATH;
  */
 class DefaultPdfGenerator implements PdfGeneratorInterface
 {
+    use ConfigTrait;
     use LoggingTrait;
 
     /** @var string Path to a directory that stores temporary files */
@@ -289,10 +291,8 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     {
         $configMetadata = [];
 
-        $config = Config::get();
-
         foreach ($optionKeys as $key) {
-            $value = Config::getValueFromConfig($config, $key);
+            $value = Config::getValueFromConfig($this->getConfig(), $key);
             if (empty($value)) {
                 $this->getLogger()->err(__FUNCTION__ . ": Config key '$key' not found or has no value");
             } else {
