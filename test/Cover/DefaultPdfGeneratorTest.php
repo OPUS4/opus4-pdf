@@ -33,6 +33,7 @@ namespace OpusTest\Pdf\Cover;
 
 use DateTime;
 use Opus\Common\Config;
+use Opus\Common\ConfigTrait;
 use Opus\Common\Date;
 use Opus\Common\Document;
 use Opus\Common\Identifier;
@@ -55,6 +56,8 @@ use const DIRECTORY_SEPARATOR;
 
 class DefaultPdfGeneratorTest extends TestCase
 {
+    use ConfigTrait;
+
     /** @var array */
     private $tempFiles = [];
 
@@ -109,6 +112,10 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testGenerateGeneralMetadataFile()
     {
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+        Config::setValueInConfig($config, 'url', 'https://www.opus-repository.org');
+
         $document = $this->getSampleArticle();
 
         $metadataFilePath = $this->xetexPdfGenerator->generateGeneralMetadataFile($document);
@@ -125,36 +132,45 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testMetadataGenerationFromExistingConfigOptions()
     {
-        $optionKeys     = ['name', 'oai.repository.name'];
-        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+        Config::setValueInConfig($config, 'oai.repository.name', 'OPUS 4 OAI Repository');
 
-        // compare with corresponding configuration variables in test/test.ini
         $expectedMetadata = [
             'config-name'                => 'OPUS 4 Test Repository',
             'config-oai-repository-name' => 'OPUS 4 OAI Repository',
         ];
+
+        $optionKeys     = ['name', 'oai.repository.name'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
         $this->assertEquals($configMetadata, $expectedMetadata);
     }
 
     public function testMetadataGenerationFromPartlyNonexistingConfigOptions()
     {
-        $optionKeys     = ['name', 'nonexisting.config.option'];
-        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
 
         $expectedMetadata = [
             'config-name' => 'OPUS 4 Test Repository',
         ];
+
+        $optionKeys     = ['name', 'nonexisting.config.option'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
         $this->assertEquals($configMetadata, $expectedMetadata);
     }
 
     public function testMetadataGenerationFromNonexistingConfigOptions()
     {
-        $optionKeys     = ['oai.baseurl', 'nonexisting.config.option']; // empty value or key not found
-        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'oai.baseurl', '');
 
         $expectedMetadata = [];
+
+        $optionKeys     = ['oai.baseurl', 'nonexisting.config.option'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
         $this->assertEquals($configMetadata, $expectedMetadata);
     }
