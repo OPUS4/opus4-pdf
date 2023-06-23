@@ -33,7 +33,6 @@ namespace OpusTest\Pdf\Cover;
 
 use DateTime;
 use Opus\Common\Config;
-use Opus\Common\ConfigTrait;
 use Opus\Common\Date;
 use Opus\Common\Document;
 use Opus\Common\Identifier;
@@ -41,6 +40,7 @@ use Opus\Common\Licence;
 use Opus\Common\Person;
 use Opus\Pdf\Cover\DefaultPdfGenerator;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 
 use function dirname;
 use function file_exists;
@@ -54,8 +54,6 @@ use const DIRECTORY_SEPARATOR;
 
 class DefaultPdfGeneratorTest extends TestCase
 {
-    use ConfigTrait;
-
     /** @var array */
     private $tempFiles = [];
 
@@ -75,6 +73,8 @@ class DefaultPdfGeneratorTest extends TestCase
     public function tearDown(): void
     {
         $this->deleteTempFiles();
+
+        $this->xetexPdfGenerator->setConfig(null);
 
         parent::tearDown();
     }
@@ -110,9 +110,10 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testGenerateGeneralMetadataFile()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
-        Config::setValueInConfig($config, 'url', 'https://www.opus-repository.org');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'name' => 'OPUS 4 Test Repository',
+            'url'  => 'https://www.opus-repository.org',
+        ]));
 
         $document = $this->getSampleArticle();
 
@@ -130,9 +131,14 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testMetadataGenerationFromExistingConfigOptions()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
-        Config::setValueInConfig($config, 'oai.repository.name', 'OPUS 4 OAI Repository');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'name' => 'OPUS 4 Test Repository',
+            'oai'  => [
+                'repository' => [
+                    'name' => 'OPUS 4 OAI Repository',
+                ],
+            ],
+        ]));
 
         $expectedMetadata = [
             'config-name'                => 'OPUS 4 Test Repository',
@@ -147,8 +153,9 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testMetadataGenerationFromPartlyNonexistingConfigOptions()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'name' => 'OPUS 4 Test Repository',
+        ]));
 
         $expectedMetadata = [
             'config-name' => 'OPUS 4 Test Repository',
@@ -162,8 +169,9 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testMetadataGenerationFromNonexistingConfigOptions()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'oai.baseurl', '');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'oai.baseurl' => '',
+        ]));
 
         $expectedMetadata = [];
 
