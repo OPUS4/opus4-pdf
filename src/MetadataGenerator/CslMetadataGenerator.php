@@ -58,7 +58,7 @@ use const DIRECTORY_SEPARATOR;
  * @link https://github.com/citation-style-language/schema#csl-json-schema
  * @link https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html
  */
-class CslMetadataGenerator implements MetadataGeneratorInterface
+class CslMetadataGenerator
 {
     use LoggingTrait;
 
