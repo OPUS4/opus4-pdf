@@ -39,8 +39,7 @@ use Opus\Common\Document;
 use Opus\Common\DocumentInterface;
 use Opus\Common\Identifier;
 use Opus\Common\Person;
-use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
-use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
+use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
 use PHPUnit\Framework\TestCase;
 
 use function dirname;
@@ -51,14 +50,15 @@ use const DIRECTORY_SEPARATOR;
 
 class CslMetadataGeneratorTest extends TestCase
 {
-    /** @var MetadataGeneratorInterface */
+    /** @var CslMetadataGenerator */
     protected $metadataGenerator;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->metadataGenerator = $this->getMetadataGenerator();
+        $this->metadataGenerator = new CslMetadataGenerator();
+        $this->metadataGenerator->setTempDir(Config::getInstance()->getTempPath());
     }
 
     public function testGenerateWithArticle()
@@ -71,7 +71,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('Article-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     public function testGenerateWithChapter()
@@ -84,7 +84,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('Chapter-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     public function testGenerateWithEditedBook()
@@ -97,7 +97,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('EditedBook-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     public function testGenerateWithDoctoralThesis()
@@ -110,24 +110,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('DoctoralThesis-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
-    }
-
-    /**
-     * Returns a metadata generator instance to create CSL JSON metadata for a document.
-     *
-     * @return MetadataGeneratorInterface
-     */
-    protected function getMetadataGenerator()
-    {
-        $metadataFormat = MetadataGeneratorInterface::METADATA_FORMAT_CSL_JSON;
-        $generator      = MetadataGeneratorFactory::create($metadataFormat);
-
-        $this->assertNotNull($generator);
-
-        $generator->setTempDir(Config::getInstance()->getTempPath());
-
-        return $generator;
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     /**

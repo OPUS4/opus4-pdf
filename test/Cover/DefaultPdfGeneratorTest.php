@@ -33,16 +33,14 @@ namespace OpusTest\Pdf\Cover;
 
 use DateTime;
 use Opus\Common\Config;
-use Opus\Common\ConfigTrait;
 use Opus\Common\Date;
 use Opus\Common\Document;
 use Opus\Common\Identifier;
 use Opus\Common\Licence;
 use Opus\Common\Person;
 use Opus\Pdf\Cover\DefaultPdfGenerator;
-use Opus\Pdf\Cover\PdfGeneratorFactory;
-use Opus\Pdf\Cover\PdfGeneratorInterface;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 
 use function dirname;
 use function file_exists;
@@ -56,8 +54,6 @@ use const DIRECTORY_SEPARATOR;
 
 class DefaultPdfGeneratorTest extends TestCase
 {
-    use ConfigTrait;
-
     /** @var array */
     private $tempFiles = [];
 
@@ -68,7 +64,7 @@ class DefaultPdfGeneratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->xetexPdfGenerator = $this->getXetexPdfGenerator();
+        $this->xetexPdfGenerator = new DefaultPdfGenerator();
     }
 
     /**
@@ -112,9 +108,10 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testGenerateGeneralMetadataFile()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
-        Config::setValueInConfig($config, 'url', 'https://www.opus-repository.org');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'name' => 'OPUS 4 Test Repository',
+            'url'  => 'https://www.opus-repository.org',
+        ]));
 
         $document = $this->getSampleArticle();
 
@@ -127,14 +124,19 @@ class DefaultPdfGeneratorTest extends TestCase
         // mark output files for deletion
         $this->tempFiles[] = $metadataFilePath;
 
-        $this->assertEquals($metaJson, $metaJsonFixture);
+        $this->assertEquals($metaJsonFixture, $metaJson);
     }
 
     public function testMetadataGenerationFromExistingConfigOptions()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
-        Config::setValueInConfig($config, 'oai.repository.name', 'OPUS 4 OAI Repository');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'name' => 'OPUS 4 Test Repository',
+            'oai'  => [
+                'repository' => [
+                    'name' => 'OPUS 4 OAI Repository',
+                ],
+            ],
+        ]));
 
         $expectedMetadata = [
             'config-name'                => 'OPUS 4 Test Repository',
@@ -144,13 +146,14 @@ class DefaultPdfGeneratorTest extends TestCase
         $optionKeys     = ['name', 'oai.repository.name'];
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
-        $this->assertEquals($configMetadata, $expectedMetadata);
+        $this->assertEquals($expectedMetadata, $configMetadata);
     }
 
     public function testMetadataGenerationFromPartlyNonexistingConfigOptions()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'name' => 'OPUS 4 Test Repository',
+        ]));
 
         $expectedMetadata = [
             'config-name' => 'OPUS 4 Test Repository',
@@ -159,20 +162,21 @@ class DefaultPdfGeneratorTest extends TestCase
         $optionKeys     = ['name', 'nonexisting.config.option'];
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
-        $this->assertEquals($configMetadata, $expectedMetadata);
+        $this->assertEquals($expectedMetadata, $configMetadata);
     }
 
     public function testMetadataGenerationFromNonexistingConfigOptions()
     {
-        $config = $this->getConfig();
-        Config::setValueInConfig($config, 'oai.baseurl', '');
+        $this->xetexPdfGenerator->setConfig(new Zend_Config([
+            'oai.baseurl' => '',
+        ]));
 
         $expectedMetadata = [];
 
         $optionKeys     = ['oai.baseurl', 'nonexisting.config.option'];
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
-        $this->assertEquals($configMetadata, $expectedMetadata);
+        $this->assertEquals($expectedMetadata, $configMetadata);
     }
 
     /**
@@ -188,23 +192,6 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->assertEquals($optionKeys, $this->xetexPdfGenerator->getConfigOptionKeys());
 
         return $this->xetexPdfGenerator->getMetadataFromConfig($optionKeys);
-    }
-
-    /**
-     * Returns a XeTeX- and pandoc-based PDF generator instance to generate a PDF for a document based on a template.
-     *
-     * @return DefaultPdfGenerator
-     */
-    protected function getXetexPdfGenerator()
-    {
-        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
-        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
-
-        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
-
-        $this->assertNotNull($generator);
-
-        return $generator;
     }
 
     /**
