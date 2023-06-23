@@ -612,23 +612,13 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      */
     protected function getMetadataGenerator()
     {
-        $generator = $this->metadataGenerator;
-        if ($generator !== null) {
-            return $generator;
-        }
-
-        try {
+        if ($this->metadataGenerator === null) {
             $generator = new CslMetadataGenerator();
-        } catch (Exception $e) {
-            $this->getLogger()->err("Couldn't create CSL JSON metadata generator: '$e'");
+            $generator->setTempDir($this->getTempDir());
 
-            return null;
+            $this->metadataGenerator = $generator;
         }
 
-        $generator->setTempDir($this->getTempDir());
-
-        $this->metadataGenerator = $generator;
-
-        return $generator;
+        return $this->metadataGenerator;
     }
 }
