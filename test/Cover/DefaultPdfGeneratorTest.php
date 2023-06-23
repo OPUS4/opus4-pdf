@@ -74,8 +74,6 @@ class DefaultPdfGeneratorTest extends TestCase
     {
         $this->deleteTempFiles();
 
-        $this->xetexPdfGenerator->setConfig(null);
-
         parent::tearDown();
     }
 
