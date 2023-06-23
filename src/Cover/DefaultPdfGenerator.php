@@ -38,8 +38,6 @@ use Opus\Common\DocumentInterface;
 use Opus\Common\LicenceInterface;
 use Opus\Common\LoggingTrait;
 use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
-use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
-use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
 use Pandoc\Pandoc;
 
 use function array_merge;
@@ -84,7 +82,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     /** @var string[] List of configuration option keys whose values will be made available as metadata */
     private $configOptionKeys = [];
 
-    /** @var MetadataGeneratorInterface|null Metadata generator to create CSL JSON metadata */
+    /** @var CslMetadataGenerator|null Metadata generator to create CSL JSON metadata */
     private $metadataGenerator;
 
     /** @var Pandoc|null Wrapper for the pandoc shell utility */
@@ -610,7 +608,7 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
     /**
      * Returns a metadata generator instance to create CSL JSON metadata for a document.
      *
-     * @return MetadataGeneratorInterface|null
+     * @return CslMetadataGenerator|null
      */
     protected function getMetadataGenerator()
     {
@@ -619,11 +617,10 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
             return $generator;
         }
 
-        $metadataFormat = MetadataGeneratorInterface::METADATA_FORMAT_CSL_JSON;
-        $generator      = MetadataGeneratorFactory::create($metadataFormat);
-
-        if ($generator === null) {
-            $this->getLogger()->err("Couldn't create metadata generator for '$metadataFormat'");
+        try {
+            $generator = new CslMetadataGenerator();
+        } catch (Exception $e) {
+            $this->getLogger()->err("Couldn't create CSL JSON metadata generator: '$e'");
 
             return null;
         }
