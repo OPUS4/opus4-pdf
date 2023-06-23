@@ -64,7 +64,7 @@ class DefaultPdfGeneratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->xetexPdfGenerator = $this->getXetexPdfGenerator();
+        $this->xetexPdfGenerator = new DefaultPdfGenerator();
     }
 
     /**
@@ -194,20 +194,6 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->assertEquals($optionKeys, $this->xetexPdfGenerator->getConfigOptionKeys());
 
         return $this->xetexPdfGenerator->getMetadataFromConfig($optionKeys);
-    }
-
-    /**
-     * Returns a XeTeX- and pandoc-based PDF generator instance to generate a PDF for a document based on a template.
-     *
-     * @return DefaultPdfGenerator
-     */
-    protected function getXetexPdfGenerator()
-    {
-        $generator = new DefaultPdfGenerator();
-
-        $this->assertNotNull($generator);
-
-        return $generator;
     }
 
     /**

@@ -57,7 +57,8 @@ class CslMetadataGeneratorTest extends TestCase
     {
         parent::setUp();
 
-        $this->metadataGenerator = $this->getMetadataGenerator();
+        $this->metadataGenerator = new CslMetadataGenerator();
+        $this->metadataGenerator->setTempDir(Config::getInstance()->getTempPath());
     }
 
     public function testGenerateWithArticle()
@@ -110,22 +111,6 @@ class CslMetadataGeneratorTest extends TestCase
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
         $this->assertEquals($cslJsonFixture, $cslJson);
-    }
-
-    /**
-     * Returns a metadata generator instance to create CSL JSON metadata for a document.
-     *
-     * @return CslMetadataGenerator
-     */
-    protected function getMetadataGenerator()
-    {
-        $generator = new CslMetadataGenerator();
-
-        $this->assertNotNull($generator);
-
-        $generator->setTempDir(Config::getInstance()->getTempPath());
-
-        return $generator;
     }
 
     /**
