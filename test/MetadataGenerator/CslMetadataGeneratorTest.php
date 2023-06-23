@@ -39,8 +39,7 @@ use Opus\Common\Document;
 use Opus\Common\DocumentInterface;
 use Opus\Common\Identifier;
 use Opus\Common\Person;
-use Opus\Pdf\MetadataGenerator\MetadataGeneratorFactory;
-use Opus\Pdf\MetadataGenerator\MetadataGeneratorInterface;
+use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
 use PHPUnit\Framework\TestCase;
 
 use function dirname;
@@ -51,7 +50,7 @@ use const DIRECTORY_SEPARATOR;
 
 class CslMetadataGeneratorTest extends TestCase
 {
-    /** @var MetadataGeneratorInterface */
+    /** @var CslMetadataGenerator */
     protected $metadataGenerator;
 
     public function setUp(): void
@@ -116,12 +115,11 @@ class CslMetadataGeneratorTest extends TestCase
     /**
      * Returns a metadata generator instance to create CSL JSON metadata for a document.
      *
-     * @return MetadataGeneratorInterface
+     * @return CslMetadataGenerator
      */
     protected function getMetadataGenerator()
     {
-        $metadataFormat = MetadataGeneratorInterface::METADATA_FORMAT_CSL_JSON;
-        $generator      = MetadataGeneratorFactory::create($metadataFormat);
+        $generator = new CslMetadataGenerator();
 
         $this->assertNotNull($generator);
 

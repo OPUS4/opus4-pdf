@@ -40,8 +40,6 @@ use Opus\Common\Identifier;
 use Opus\Common\Licence;
 use Opus\Common\Person;
 use Opus\Pdf\Cover\DefaultPdfGenerator;
-use Opus\Pdf\Cover\PdfGeneratorFactory;
-use Opus\Pdf\Cover\PdfGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 
 use function dirname;
@@ -197,10 +195,7 @@ class DefaultPdfGeneratorTest extends TestCase
      */
     protected function getXetexPdfGenerator()
     {
-        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
-        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
-
-        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
+        $generator = new DefaultPdfGenerator();
 
         $this->assertNotNull($generator);
 
