@@ -33,27 +33,43 @@ namespace OpusTest\Pdf\Cover;
 
 use DateTime;
 use Opus\Common\Config;
+use Opus\Common\ConfigTrait;
 use Opus\Common\Date;
 use Opus\Common\Document;
 use Opus\Common\Identifier;
 use Opus\Common\Licence;
 use Opus\Common\Person;
+use Opus\Pdf\Cover\DefaultPdfGenerator;
 use Opus\Pdf\Cover\PdfGeneratorFactory;
 use Opus\Pdf\Cover\PdfGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 
 use function dirname;
 use function file_exists;
+use function file_get_contents;
 use function strlen;
 use function substr;
+use function trim;
 use function unlink;
 
 use const DIRECTORY_SEPARATOR;
 
 class DefaultPdfGeneratorTest extends TestCase
 {
+    use ConfigTrait;
+
     /** @var array */
     private $tempFiles = [];
+
+    /** @var DefaultPdfGenerator */
+    protected $xetexPdfGenerator;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->xetexPdfGenerator = $this->getXetexPdfGenerator();
+    }
 
     /**
      * Clean up any files that were registered by tests for deletion.
@@ -67,28 +83,21 @@ class DefaultPdfGeneratorTest extends TestCase
 
     public function testGenerateFile()
     {
-        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
-        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
-
-        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
-
-        $this->assertNotNull($generator);
-
-        $templatePath = $this->getTemplatePath('demo-cover.md');
+        $templatePath = $this->getFixturePath('demo-cover.md');
 
         $this->assertFileExists($templatePath);
 
-        $generator->setTemplatePath($templatePath);
+        $this->xetexPdfGenerator->setTemplatePath($templatePath);
 
-        $generator->setTempDir(Config::getInstance()->getTempPath());
+        $this->xetexPdfGenerator->setTempDir(Config::getInstance()->getTempPath());
 
         $licenceLogosDir = dirname($templatePath) . DIRECTORY_SEPARATOR . 'images/';
 
-        $generator->setLicenceLogosDir($licenceLogosDir);
+        $this->xetexPdfGenerator->setLicenceLogosDir($licenceLogosDir);
 
         $document = $this->getSampleArticle();
 
-        $pdfFilePath = $generator->generateFile($document, 'demo-cover');
+        $pdfFilePath = $this->xetexPdfGenerator->generateFile($document, 'demo-cover');
 
         // mark output files for deletion
         $filePathWithoutExtension = substr($pdfFilePath, 0, strlen($pdfFilePath) - 4);
@@ -101,15 +110,112 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->assertFileExists($pdfFilePath);
     }
 
-    /**
-     * Returns the full path to the given template.
-     *
-     * @param string $templateName The template name (or path relative to the 'test/_files' directory)
-     * @return string Path to template.
-     */
-    private function getTemplatePath($templateName)
+    public function testGenerateGeneralMetadataFile()
     {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $templateName;
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+        Config::setValueInConfig($config, 'url', 'https://www.opus-repository.org');
+
+        $document = $this->getSampleArticle();
+
+        $metadataFilePath = $this->xetexPdfGenerator->generateGeneralMetadataFile($document);
+        $metaJson         = trim(file_get_contents($metadataFilePath));
+
+        $fixturePath     = $this->getFixturePath('Article-meta.json');
+        $metaJsonFixture = trim(file_get_contents($fixturePath));
+
+        // mark output files for deletion
+        $this->tempFiles[] = $metadataFilePath;
+
+        $this->assertEquals($metaJson, $metaJsonFixture);
+    }
+
+    public function testMetadataGenerationFromExistingConfigOptions()
+    {
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+        Config::setValueInConfig($config, 'oai.repository.name', 'OPUS 4 OAI Repository');
+
+        $expectedMetadata = [
+            'config-name'                => 'OPUS 4 Test Repository',
+            'config-oai-repository-name' => 'OPUS 4 OAI Repository',
+        ];
+
+        $optionKeys     = ['name', 'oai.repository.name'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+
+        $this->assertEquals($configMetadata, $expectedMetadata);
+    }
+
+    public function testMetadataGenerationFromPartlyNonexistingConfigOptions()
+    {
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'name', 'OPUS 4 Test Repository');
+
+        $expectedMetadata = [
+            'config-name' => 'OPUS 4 Test Repository',
+        ];
+
+        $optionKeys     = ['name', 'nonexisting.config.option'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+
+        $this->assertEquals($configMetadata, $expectedMetadata);
+    }
+
+    public function testMetadataGenerationFromNonexistingConfigOptions()
+    {
+        $config = $this->getConfig();
+        Config::setValueInConfig($config, 'oai.baseurl', '');
+
+        $expectedMetadata = [];
+
+        $optionKeys     = ['oai.baseurl', 'nonexisting.config.option'];
+        $configMetadata = $this->getMetadataFromConfig($optionKeys);
+
+        $this->assertEquals($configMetadata, $expectedMetadata);
+    }
+
+    /**
+     * Returns metadata created from Config.ini values for the given Config option keys.
+     *
+     * @param string[] $optionKeys List of Config option keys.
+     * @return string[] List of metadata created from Config.ini values.
+     */
+    public function getMetadataFromConfig($optionKeys)
+    {
+        $this->xetexPdfGenerator->setConfigOptionKeys($optionKeys);
+
+        $this->assertEquals($optionKeys, $this->xetexPdfGenerator->getConfigOptionKeys());
+
+        return $this->xetexPdfGenerator->getMetadataFromConfig($optionKeys);
+    }
+
+    /**
+     * Returns a XeTeX- and pandoc-based PDF generator instance to generate a PDF for a document based on a template.
+     *
+     * @return DefaultPdfGenerator
+     */
+    protected function getXetexPdfGenerator()
+    {
+        $templateFormat = PdfGeneratorInterface::TEMPLATE_FORMAT_MARKDOWN;
+        $pdfEngine      = PdfGeneratorInterface::PDF_ENGINE_XELATEX;
+
+        $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
+
+        $this->assertNotNull($generator);
+
+        return $generator;
+    }
+
+    /**
+     * Returns the full path to the specified template or fixture file.
+     *
+     * @param string $fileName The file name (or path relative to the 'test/_files' directory)
+     * @return string Path to file.
+     */
+    private function getFixturePath($fileName)
+    {
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $fileName;
     }
 
     /**

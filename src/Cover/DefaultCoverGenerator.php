@@ -35,6 +35,7 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
 use Opus\Common\Config;
+use Opus\Common\ConfigTrait;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
@@ -56,6 +57,7 @@ use const PATHINFO_FILENAME;
  */
 class DefaultCoverGenerator implements CoverGeneratorInterface
 {
+    use ConfigTrait;
     use LoggingTrait;
 
     /** @var string Path to a file cache directory */
@@ -140,7 +142,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $templatesDir = $this->templatesDir;
 
         if (empty($templatesDir)) {
-            $config = Config::get();
+            $config = $this->getConfig();
 
             if (isset($config->pdf->covers->path)) {
                 $templatesDir = $config->pdf->covers->path;
@@ -179,7 +181,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $licenceLogosDir = $this->licenceLogosDir;
 
         if (empty($licenceLogosDir)) {
-            $config = Config::get();
+            $config = $this->getConfig();
 
             if (isset($config->licences->logos->path)) {
                 $licenceLogosDir = $config->licences->logos->path;
@@ -379,7 +381,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     protected function getDefaultTemplateName()
     {
-        $config       = Config::get();
+        $config       = $this->getConfig();
         $templateName = null;
 
         if (isset($config->pdf->covers->default)) {
@@ -429,9 +431,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         //       (instead of an int).
         // TODO better implementation of the template name/rel.path <-> collection ID mapping
 
-        $config = Config::get();
-
-        $collectionConfig = $config->collection;
+        $collectionConfig = $this->getConfig()->collection;
         if ($collectionConfig === null) {
             return null;
         }
