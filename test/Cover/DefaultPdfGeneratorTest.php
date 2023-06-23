@@ -127,7 +127,7 @@ class DefaultPdfGeneratorTest extends TestCase
         // mark output files for deletion
         $this->tempFiles[] = $metadataFilePath;
 
-        $this->assertEquals($metaJson, $metaJsonFixture);
+        $this->assertEquals($metaJsonFixture, $metaJson);
     }
 
     public function testMetadataGenerationFromExistingConfigOptions()
@@ -144,7 +144,7 @@ class DefaultPdfGeneratorTest extends TestCase
         $optionKeys     = ['name', 'oai.repository.name'];
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
-        $this->assertEquals($configMetadata, $expectedMetadata);
+        $this->assertEquals($expectedMetadata, $configMetadata);
     }
 
     public function testMetadataGenerationFromPartlyNonexistingConfigOptions()
@@ -159,7 +159,7 @@ class DefaultPdfGeneratorTest extends TestCase
         $optionKeys     = ['name', 'nonexisting.config.option'];
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
-        $this->assertEquals($configMetadata, $expectedMetadata);
+        $this->assertEquals($expectedMetadata, $configMetadata);
     }
 
     public function testMetadataGenerationFromNonexistingConfigOptions()
@@ -172,7 +172,7 @@ class DefaultPdfGeneratorTest extends TestCase
         $optionKeys     = ['oai.baseurl', 'nonexisting.config.option'];
         $configMetadata = $this->getMetadataFromConfig($optionKeys);
 
-        $this->assertEquals($configMetadata, $expectedMetadata);
+        $this->assertEquals($expectedMetadata, $configMetadata);
     }
 
     /**

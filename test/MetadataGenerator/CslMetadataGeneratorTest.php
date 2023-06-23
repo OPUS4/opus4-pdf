@@ -71,7 +71,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('Article-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     public function testGenerateWithChapter()
@@ -84,7 +84,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('Chapter-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     public function testGenerateWithEditedBook()
@@ -97,7 +97,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('EditedBook-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     public function testGenerateWithDoctoralThesis()
@@ -110,7 +110,7 @@ class CslMetadataGeneratorTest extends TestCase
         $fixturePath    = $this->getFixturePath('DoctoralThesis-csl.json');
         $cslJsonFixture = trim(file_get_contents($fixturePath));
 
-        $this->assertEquals($cslJson, $cslJsonFixture);
+        $this->assertEquals($cslJsonFixture, $cslJson);
     }
 
     /**
