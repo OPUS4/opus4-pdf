@@ -41,7 +41,6 @@ use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
 use Pandoc\Pandoc;
 
 use function array_merge;
-use function array_push;
 use function dirname;
 use function file_exists;
 use function file_get_contents;
@@ -521,45 +520,46 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $parameters = [];
 
         // input file
-        array_push($parameters, $templatePath);
+        $content = file_get_contents($templatePath);
 
         // options
         // --wrap is used to preserve the line wrapping from the input files
-        array_push($parameters, '--wrap', 'preserve');
+        $parameters['wrap'] = 'preserve';
 
         // --metadata-file specifies the path to a JSON file containing the document's general metadata
         if (! empty($metadataFilePath)) {
-            array_push($parameters, '--metadata-file', $metadataFilePath);
+            $parameters['metadata-file'] = $metadataFilePath;
         }
 
         // --bibliography specifies an external bibliography file
         if (! empty($bibFilePath)) {
-            array_push($parameters, '--bibliography', $bibFilePath);
+            $parameters['bibliography'] = $bibFilePath;
         }
 
         // --template specifies a custom template for conversion (the file at $templatePath serves as both,
         //   input file and template file)
-        array_push($parameters, '--template', $templatePath);
+        $parameters['template'] = $templatePath;
 
         // --variable is used to populate the `$images-basepath$` placeholder in the template with the base
         //   path of the directory containing any images/logos
         if (! empty($imagesDir)) {
-            array_push($parameters, '--variable', 'images-basepath:' . $imagesDir);
+            $parameters['variable'] = 'images-basepath:' . $imagesDir;
         }
 
         // --variable is used to populate the `$licence-logo-basepath$` placeholder in the template with the
         //   path to a directory containing license logos (arranged/named according to https://licensebuttons.net)
-        if (! empty($licenceLogosDir)) {
-            array_push($parameters, '--variable', 'licence-logo-basepath:' . $licenceLogosDir);
-        }
+        // TODO how to add multiple occurrences of the same key (like `--variable=... --variable=...`)
+//        if (! empty($licenceLogosDir)) {
+//            $parameters['variable'] = 'licence-logo-basepath:' . $licenceLogosDir;
+//        }
 
         // --output specifies that generated output will be written to the given file path
-        array_push($parameters, '--output', $outFilePath);
+        $parameters['output'] = $outFilePath;
 
         $pandoc = $this->getPandoc();
 
         try {
-            $output = $pandoc->execute($parameters);
+            $output = $pandoc->runWith($content, $parameters);
         } catch (Exception $e) {
             $this->getLogger()->err("Couldn't generate Markdown file: '$e'");
 
@@ -607,39 +607,39 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $parameters = [];
 
         // input file
-        array_push($parameters, $markdownFilePath);
+        $content = file_get_contents($markdownFilePath);
 
         // options
         // --resource-path specifies the base path of the directory containing the used citation style
         if (! empty($resourceDir)) {
-            array_push($parameters, '--resource-path', $resourceDir);
+            $parameters['resource-path'] = $resourceDir;
         }
 
         // --bibliography specifies an external bibliography file
         if (! empty($bibFilePath)) {
-            array_push($parameters, '--bibliography', $bibFilePath);
+            $parameters['bibliography'] = $bibFilePath;
         }
 
         // --citeproc causes a formatted citation to be generated from the bibliographic metadata
         if (! empty($bibFilePath)) {
-            array_push($parameters, '--citeproc');
+            $parameters['citeproc'] = '';
         }
 
         // --pdf-engine specifies that XeTeX will be used to generate the PDF (allowing the template to make use of
         //   Unicode characters as well as system fonts)
-        array_push($parameters, '--pdf-engine', 'xelatex');
+        $parameters['pdf-engine'] = 'xelatex';
 
         // --pdf-engine-opt specifies to use PDF version 1.3 without compression
         // NOTE: since this option seems to cause a Pandoc exception when passed through PHP code, we use the header
         //       includes `\special{dvipdfmx:config V 3}\n\special{dvipdfmx:config z 0}` in the template file instead
 
         // --output specifies that generated output will be written to the given file path
-        array_push($parameters, '--output', $outFilePath);
+        $parameters['output'] = $outFilePath;
 
         $pandoc = $this->getPandoc();
 
         try {
-            $output = $pandoc->execute($parameters);
+            $output = $pandoc->runWith($content, $parameters);
         } catch (Exception $e) {
             $this->getLogger()->err("Couldn't generate PDF: '$e'");
 
