@@ -456,6 +456,12 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
             $licenceLogosDir
         );
 
+        if (empty($markdownFilePath)) {
+            $this->getLogger()->err("Couldn't generate PDF: missing Markdown file path");
+
+            return null;
+        }
+
         // 4. use Pandoc & XeTeX to convert the generated Markdown file to PDF
         $pdfFilePath = $this->generatePdfFromMarkdown(
             $markdownFilePath,

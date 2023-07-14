@@ -95,6 +95,8 @@ class DefaultPdfGeneratorTest extends TestCase
 
         $pdfFilePath = $this->xetexPdfGenerator->generateFile($document, 'demo-cover');
 
+        $this->assertNotNull($pdfFilePath);
+
         // mark output files for deletion
         $filePathWithoutExtension = substr($pdfFilePath, 0, strlen($pdfFilePath) - 4);
         $this->tempFiles[]        = $filePathWithoutExtension . '.md';
@@ -102,7 +104,6 @@ class DefaultPdfGeneratorTest extends TestCase
         $this->tempFiles[]        = $filePathWithoutExtension . '-meta.json';
         $this->tempFiles[]        = $pdfFilePath;
 
-        $this->assertNotNull($pdfFilePath);
         $this->assertFileExists($pdfFilePath);
     }
 
