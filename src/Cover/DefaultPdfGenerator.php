@@ -435,10 +435,6 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $markdownFilePath = $tempDir . $tempFilename . '.md';
         $pdfFilePath      = $tempDir . $tempFilename . '.pdf';
 
-        if (! $this->pandoc) {
-            $this->pandoc = new Pandoc();
-        }
-
         $this->metadataGenerator = $this->getMetadataGenerator();
         if ($this->metadataGenerator === null) {
             return null;
@@ -451,10 +447,71 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         $cslFilePath = $this->metadataGenerator->generateFile($document, $tempFilename);
 
         // 3. use Pandoc to replace placeholders in the current template file with appropriate document metadata
+        $markdownFilePath = $this->generateMarkdown(
+            $templatePath,
+            $markdownFilePath,
+            $metadataFilePath,
+            $cslFilePath,
+            $templateBaseDir,
+            $licenceLogosDir
+        );
+
+        // 4. use Pandoc & XeTeX to convert the generated Markdown file to PDF
+        $pdfFilePath = $this->generatePdfFromMarkdown(
+            $markdownFilePath,
+            $pdfFilePath,
+            $cslFilePath,
+            $templateBaseDir
+        );
+
+        return $pdfFilePath;
+    }
+
+    /**
+     * Returns a Pandoc instance (creating it if it doesn't exist yet).
+     *
+     * @return Pandoc
+     */
+    protected function getPandoc()
+    {
+        if (! $this->pandoc) {
+            $this->pandoc = new Pandoc();
+        }
+
+        return $this->pandoc;
+    }
+
+    /**
+     * Creates a Markdown file based on the given template and metadata. Returns the path to the generated Markdown file
+     * or null in case of failure.
+     *
+     * @param string      $templatePath Path to a Markdown template file to be used during Markdown generation.
+     * @param string      $outFilePath Path at which the generated Markdown output shall be stored.
+     * @param string|null $metadataFilePath (Optional) Path to a JSON file containing the document's general metadata.
+     * @param string|null $bibFilePath (Optional) Path to an external bibliography file (e.g. in CSL JSON format).
+     * @param string|null $imagesDir (Optional) Path to a directory containing image or logo files.
+     * @param string|null $licenceLogosDir (Optional) Path to a directory containing license logo files.
+     * @return string|null Path to generated Markdown file.
+     */
+    protected function generateMarkdown($templatePath, $outFilePath, $metadataFilePath, $bibFilePath, $imagesDir, $licenceLogosDir)
+    {
+        if (! file_exists($templatePath)) {
+            $this->getLogger()->err("Couldn't generate Markdown file: missing template at '$templatePath'");
+
+            return null;
+        }
+
+        if (empty($outFilePath)) {
+            $this->getLogger()->err("Couldn't generate Markdown file: missing output file path");
+
+            return null;
+        }
+
+        // use Pandoc to replace placeholders in the current template file with appropriate document metadata
         // equivalent shell command:
-        //   pandoc {$templatePath} --wrap=preserve --metadata-file={$metadataFilePath} --bibliography={$cslFilePath} \
-        //     --template={$templatePath} --variable=images-basepath:{$templateBaseDir} \
-        //     --variable=licence-logo-basepath:{$licenceLogosDir} --output={$markdownFilePath}
+        //   pandoc {$templatePath} --wrap=preserve --metadata-file={$metadataFilePath} --bibliography={$bibFilePath} \
+        //     --template={$templatePath} --variable=images-basepath:{$imagesDir} \
+        //     --variable=licence-logo-basepath:{$licenceLogosDir} --output={$outFilePath}
         $parameters = [];
 
         // input file
@@ -465,18 +522,24 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         array_push($parameters, '--wrap', 'preserve');
 
         // --metadata-file specifies the path to a JSON file containing the document's general metadata
-        array_push($parameters, '--metadata-file', $metadataFilePath);
+        if (! empty($metadataFilePath)) {
+            array_push($parameters, '--metadata-file', $metadataFilePath);
+        }
 
         // --bibliography specifies an external bibliography file
-        array_push($parameters, '--bibliography', $cslFilePath);
+        if (! empty($bibFilePath)) {
+            array_push($parameters, '--bibliography', $bibFilePath);
+        }
 
         // --template specifies a custom template for conversion (the file at $templatePath serves as both,
         //   input file and template file)
         array_push($parameters, '--template', $templatePath);
 
         // --variable is used to populate the `$images-basepath$` placeholder in the template with the base
-        //   path of the `images` directory containing any images/logos
-        array_push($parameters, '--variable', 'images-basepath:' . $templateBaseDir);
+        //   path of the directory containing any images/logos
+        if (! empty($imagesDir)) {
+            array_push($parameters, '--variable', 'images-basepath:' . $imagesDir);
+        }
 
         // --variable is used to populate the `$licence-logo-basepath$` placeholder in the template with the
         //   path to a directory containing license logos (arranged/named according to https://licensebuttons.net)
@@ -485,10 +548,92 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         }
 
         // --output specifies that generated output will be written to the given file path
-        array_push($parameters, '--output', $markdownFilePath);
+        array_push($parameters, '--output', $outFilePath);
+
+        $pandoc = $this->getPandoc();
 
         try {
-            $output = $this->pandoc->execute($parameters);
+            $output = $pandoc->execute($parameters);
+        } catch (Exception $e) {
+            $this->getLogger()->err("Couldn't generate Markdown file: '$e'");
+
+            return null;
+        }
+
+        if ($output !== true) {
+            $this->getLogger()->err("Couldn't generate Markdown file: no output from Pandoc");
+
+            return null;
+        }
+
+        return $outFilePath;
+    }
+
+    /**
+     * Creates a PDF from the Markdown file at the given file path and returns the path to the generated
+     * PDF file. Returns null in case of failure.
+     *
+     * @param string      $markdownFilePath Path to a Markdown file that shall be converted to PDF.
+     * @param string      $outFilePath Path at which the generated PDF output shall be stored.
+     * @param string|null $bibFilePath (Optional) Path to an external bibliography file (e.g. in CSL JSON format).
+     * @param string|null $resourceDir (Optional) Path to a resource directory containing the used CSL style.
+     * @return string|null Path to generated PDF file.
+     */
+    protected function generatePdfFromMarkdown($markdownFilePath, $outFilePath, $bibFilePath, $resourceDir)
+    {
+        if (! file_exists($markdownFilePath)) {
+            $this->getLogger()->err("Couldn't generate PDF: missing Markdown file path");
+
+            return null;
+        }
+
+        if (empty($outFilePath)) {
+            $this->getLogger()->err("Couldn't generate PDF: missing output file path");
+
+            return null;
+        }
+
+        // use Pandoc & XeTeX to convert the generated Markdown file to PDF
+        // equivalent shell command:
+        //   pandoc {$markdownFilePath} --resource-path={$resourceDir} --bibliography={$bibFilePath} \
+        //     --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" \
+        //     --output={$outFilePath}
+        $parameters = [];
+
+        // input file
+        array_push($parameters, $markdownFilePath);
+
+        // options
+        // --resource-path specifies the base path of the directory containing the used citation style
+        if (! empty($resourceDir)) {
+            array_push($parameters, '--resource-path', $resourceDir);
+        }
+
+        // --bibliography specifies an external bibliography file
+        if (! empty($bibFilePath)) {
+            array_push($parameters, '--bibliography', $bibFilePath);
+        }
+
+        // --citeproc causes a formatted citation to be generated from the bibliographic metadata
+        if (! empty($bibFilePath)) {
+            array_push($parameters, '--citeproc');
+        }
+
+        // --pdf-engine specifies that XeTeX will be used to generate the PDF (allowing the template to make use of
+        //   Unicode characters as well as system fonts)
+        array_push($parameters, '--pdf-engine', 'xelatex');
+
+        // --pdf-engine-opt specifies to use PDF version 1.3 without compression
+        // NOTE: since this option seems to cause a Pandoc exception when passed through PHP code, we use the header
+        //       includes `\special{dvipdfmx:config V 3}\n\special{dvipdfmx:config z 0}` in the template file instead
+
+        // --output specifies that generated output will be written to the given file path
+        array_push($parameters, '--output', $outFilePath);
+
+        $pandoc = $this->getPandoc();
+
+        try {
+            $output = $pandoc->execute($parameters);
         } catch (Exception $e) {
             $this->getLogger()->err("Couldn't generate PDF: '$e'");
 
@@ -496,57 +641,12 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
         }
 
         if ($output !== true) {
-            $this->getLogger()->err("Couldn't generate PDF: no output from Pandoc");
-
-            return null;
-        }
-
-        // 4. use Pandoc & XeTeX to convert the generated Markdown file to PDF
-        // equivalent shell command:
-        //   pandoc {$markdownFilePath} --resource-path={$templateBaseDir} --bibliography={$cslFilePath} \
-        //     --citeproc --pdf-engine=xelatex --pdf-engine-opt=-output-driver="xdvipdfmx -V 3 -z 0" \
-        //     --output={$pdfFilePath}
-        $parameters2 = [];
-
-        // input file
-        array_push($parameters2, $markdownFilePath);
-
-        // options
-        // --resource-path specifies the base path of the `styles` directory which contains the used citation style
-        array_push($parameters2, '--resource-path', $templateBaseDir);
-
-        // --bibliography specifies an external bibliography file (see above)
-        array_push($parameters2, '--bibliography', $cslFilePath);
-
-        // --citeproc causes a formatted citation to be generated from the bibliographic metadata
-        array_push($parameters2, '--citeproc');
-
-        // --pdf-engine specifies that XeTeX will be used to generate the PDF (allowing the template to make use of
-        //   Unicode characters as well as system fonts)
-        array_push($parameters2, '--pdf-engine', 'xelatex');
-
-        // --pdf-engine-opt specifies to use PDF version 1.3 without compression
-        // NOTE: since this option seems to cause a Pandoc exception when passed through PHP code, we use the header
-        //       includes `\special{dvipdfmx:config V 3}\n\special{dvipdfmx:config z 0}` in the template file instead
-
-        // --output specifies that generated output will be written to the given file path
-        array_push($parameters2, '--output', $pdfFilePath);
-
-        try {
-            $output2 = $this->pandoc->execute($parameters2);
-        } catch (Exception $e) {
-            $this->getLogger()->err("Couldn't generate PDF: '$e'");
-
-            return null;
-        }
-
-        if ($output2 !== true) {
             $this->getLogger()->err("Couldn't generate PDF: no output from Pandoc/XeLaTeX");
 
             return null;
         }
 
-        return $pdfFilePath;
+        return $outFilePath;
     }
 
     /**
