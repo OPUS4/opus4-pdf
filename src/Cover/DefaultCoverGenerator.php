@@ -36,6 +36,7 @@ use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
 use Opus\Common\Config;
 use Opus\Common\ConfigTrait;
+use Opus\Common\Cover\CoverGeneratorInterface;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;

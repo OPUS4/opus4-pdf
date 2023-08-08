@@ -34,8 +34,8 @@ namespace OpusTest\Pdf\Cover;
 use Opus\Common\CollectionInterface;
 use Opus\Common\CollectionRole;
 use Opus\Common\CollectionRoleInterface;
+use Opus\Common\Cover\CoverGeneratorFactory;
 use Opus\Common\Document;
-use Opus\Pdf\Cover\CoverGeneratorFactory;
 use PHPUnit\Framework\TestCase;
 
 use function is_object;

@@ -31,8 +31,8 @@
 
 namespace OpusTest\Pdf\Cover;
 
-use Opus\Pdf\Cover\CoverGeneratorFactory;
-use Opus\Pdf\Cover\CoverGeneratorInterface;
+use Opus\Common\Cover\CoverGeneratorFactory;
+use Opus\Common\Cover\CoverGeneratorInterface;
 use PHPUnit\Framework\TestCase;
 
 class CoverGeneratorFactoryTest extends TestCase
