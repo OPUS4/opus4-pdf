@@ -31,14 +31,19 @@
 
 namespace OpusTest\Pdf\Cover;
 
+use Opus\Common\Config;
 use Opus\Common\Cover\CoverGeneratorFactory;
 use Opus\Common\Cover\CoverGeneratorInterface;
+use Opus\Pdf\Cover\DefaultCoverGenerator;
 use PHPUnit\Framework\TestCase;
 
 class CoverGeneratorFactoryTest extends TestCase
 {
     public function testCreate()
     {
+        $generatorClass = DefaultCoverGenerator::class;
+        Config::setValueInConfig(Config::get(), 'pdf.covers.generatorClass', $generatorClass);
+
         $generator = CoverGeneratorFactory::create();
 
         $this->assertNotNull($generator);
