@@ -98,15 +98,36 @@ class DefaultCoverGeneratorTest extends SimpleTestCase
         // TODO create File with pathName and parentId & call DefaultCoverGenerator->getCachedFilename($file)
     }
 
-    public function testGetTemplateName()
+    public function testGetTemplateNameDefault()
     {
-        $this->markTestIncomplete('not fully implemented yet');
+        $doc   = Document::new();
+        $title = $doc->addTitleMain();
+        $title->setValue('Test document');
+        $title->setLanguage('eng');
+        $doc->store();
 
-        // NOTE: This test currently requires a test/config.ini setting like this:
-        //            `collection.16031.cover = 'demo-cover.md'`
-        //       The collection ID must equal the ID of the last created collection in the database + 2
-        // TODO alter this test so that it doesn't require a certain collection ID in test/config.ini
+        $overlayProperties = [
+            'pdf' => [
+                'covers' => [
+                    'default'        => 'demo-cover.md',
+                    'generatorClass' => DefaultCoverGenerator::class,
+                ],
+            ],
+        ];
 
+        $this->adjustConfiguration($overlayProperties);
+
+        $generator = CoverGeneratorFactory::getInstance()->create();
+
+        $this->assertNotNull($generator);
+
+        $templateName = $generator->getTemplateName($doc);
+
+        $this->assertEquals('demo-cover.md', $templateName);
+    }
+
+    public function testGetTemplateNameForCollection()
+    {
         /** @var CollectionInterface $subcollection */
         $subcollection = $this->collectionFixture->addFirstChild();
         $subcollection->setName('dummy-subcollection');
@@ -117,10 +138,27 @@ class DefaultCoverGeneratorTest extends SimpleTestCase
 
         $title = $doc->addTitleMain();
         $title->setValue('Test document belonging to a dummy collection');
-        $title->setLanguage('en');
+        $title->setLanguage('eng');
 
         $doc->addCollection($subcollection);
         $doc->store();
+
+        $subcollectionId = $subcollection->getId();
+
+        $overlayProperties = [
+            'collection' => [
+                $subcollectionId => [
+                    'cover' => 'demo-cover.md',
+                ],
+            ],
+            'pdf'        => [
+                'covers' => [
+                    'generatorClass' => DefaultCoverGenerator::class,
+                ],
+            ],
+        ];
+
+        $this->adjustConfiguration($overlayProperties);
 
         $generator = CoverGeneratorFactory::getInstance()->create();
 
