@@ -35,12 +35,14 @@ use Opus\Common\CollectionInterface;
 use Opus\Common\CollectionRole;
 use Opus\Common\CollectionRoleInterface;
 use Opus\Common\Cover\CoverGeneratorFactory;
+use Opus\Common\Cover\CoverGeneratorInterface;
 use Opus\Common\Document;
-use PHPUnit\Framework\TestCase;
+use Opus\Pdf\Cover\DefaultCoverGenerator;
+use OpusTest\Pdf\TestAsset\SimpleTestCase;
 
 use function is_object;
 
-class DefaultCoverGeneratorTest extends TestCase
+class DefaultCoverGeneratorTest extends SimpleTestCase
 {
     /** @var CollectionRoleInterface */
     protected $roleFixture;
@@ -69,6 +71,24 @@ class DefaultCoverGeneratorTest extends TestCase
         }
 
         parent::tearDown();
+    }
+
+    public function testCreate()
+    {
+        $overlayProperties = [
+            'pdf' => [
+                'covers' => [
+                    'generatorClass' => DefaultCoverGenerator::class,
+                ],
+            ],
+        ];
+
+        $this->adjustConfiguration($overlayProperties);
+
+        $generator = CoverGeneratorFactory::getInstance()->create();
+
+        $this->assertNotNull($generator);
+        $this->assertInstanceOf(CoverGeneratorInterface::class, $generator);
     }
 
     public function testGetCachedFilename()
