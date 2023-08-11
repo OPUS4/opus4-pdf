@@ -44,7 +44,7 @@ class CoverGeneratorFactoryTest extends TestCase
         $generatorClass = DefaultCoverGenerator::class;
         Config::setValueInConfig(Config::get(), 'pdf.covers.generatorClass', $generatorClass);
 
-        $generator = CoverGeneratorFactory::create();
+        $generator = CoverGeneratorFactory::getInstance()->create();
 
         $this->assertNotNull($generator);
         $this->assertInstanceOf(CoverGeneratorInterface::class, $generator);

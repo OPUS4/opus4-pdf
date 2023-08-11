@@ -102,7 +102,7 @@ class DefaultCoverGeneratorTest extends TestCase
         $doc->addCollection($subcollection);
         $doc->store();
 
-        $generator = CoverGeneratorFactory::create();
+        $generator = CoverGeneratorFactory::getInstance()->create();
 
         $this->assertNotNull($generator);
 
