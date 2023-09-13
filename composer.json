@@ -12,7 +12,7 @@
     "ext-json": "*",
     "opus4-repo/opus4-common": "dev-master as 4.8.1",
     "iio/libmergepdf": "^4.0",
-    "ryakad/pandoc-php": "^1.0",
+    "ueberdosis/pandoc": "^0.7.0",
     "seboettg/citedata": "@dev"
   },
   "require-dev": {
