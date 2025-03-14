@@ -59,7 +59,8 @@ jobs:
       - name: Install Fonts
         run: |
           sudo mkdir -p /usr/share/fonts/opentype
-          wget https://fonts.bunny.net/download?family=Open%20Sans -O Open_Sans.zip
+          wget https://fonts.google.com/download?family=Open%20Sans -O Open_Sans.zip
+          cat Open_Sans.zip 
           unzip -o Open_Sans.zip -d Open_Sans
           sudo cp -r Open_Sans/static/OpenSans/ /usr/share/fonts/opentype/
           fc-cache -f -v
