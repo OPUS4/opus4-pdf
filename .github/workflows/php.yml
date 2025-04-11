@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['8.1', '8.2']
+        php-versions: ['7.1', '8.1', '8.2']
 
     name: PHP ${{ matrix.php-versions }} Test
 
@@ -59,10 +59,8 @@ jobs:
       - name: Install Fonts
         run: |
           sudo mkdir -p /usr/share/fonts/opentype
-#          wget https://fonts.google.com/download?family=Open%20Sans -O Open_Sans.zip
-#          unzip -o Open_Sans.zip -d Open_Sans
-#          sudo cp -r Open_Sans/static/OpenSans/ /usr/share/fonts/opentype/
-#          fc-cache -f -v
+          sudo cp -r test/_fonts/OpenSans/static/*.ttf /usr/share/fonts/opentype/
+          fc-cache -f -v
 
       - name: Tests
         run: php composer.phar test
