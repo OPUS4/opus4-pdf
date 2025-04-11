@@ -106,10 +106,8 @@ EOT;
 
     /**
      * Executes this command to generate a PDF cover.
-     *
-     * @return int 0 in case of success, otherwise an exit code
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // TODO Support other PDF generator implementations
 

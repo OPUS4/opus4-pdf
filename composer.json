@@ -9,17 +9,18 @@
   ],
   "homepage": "https://www.opus-repository.org",
   "require": {
+    "php": ">=7.1",
     "ext-json": "*",
-    "opus4-repo/opus4-common": "dev-master as 4.8.1",
+    "opus4-repo/opus4-common": "v4.8.0.2-dev as 4.8",
     "iio/libmergepdf": "^4.0",
     "ueberdosis/pandoc": "*",
     "seboettg/citedata": "@dev"
   },
   "require-dev": {
-    "phpunit/phpunit": "<9",
+    "phpunit/phpunit": "*",
     "opus4-repo/codesniffer": "dev-laminas",
-    "phpmetrics/phpmetrics": "2.7.4",
-    "opus4-repo/framework": "dev-master as 4.8.1"
+    "phpmetrics/phpmetrics": "*",
+    "opus4-repo/framework": "^4.8.0.3"
   },
   "config": {
     "allow-plugins": {
