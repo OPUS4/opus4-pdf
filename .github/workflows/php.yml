@@ -59,7 +59,7 @@ jobs:
       - name: Install Fonts
         run: |
           sudo mkdir -p /usr/share/fonts/opentype
-          sudo cp -r test/_fonts/OpenSans/static/*.ttf /usr/share/fonts/opentype/
+          sudo cp -r test/_fonts/Open_Sans/static/*.ttf /usr/share/fonts/opentype/
           fc-cache -f -v
 
       - name: Tests
