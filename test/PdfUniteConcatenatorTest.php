@@ -42,10 +42,12 @@ class PdfUniteConcatenatorTest extends TestCase
 
         $concat = new PdfUniteConcatenator();
 
-        $pdf1   = APPLICATION_PATH . '/test/cover.pdf';
-        $pdf2   = APPLICATION_PATH . '/test/document.pdf';
-        $output = APPLICATION_PATH . '/build/merged.pdf';
+        $coverPath  = APPLICATION_PATH . '/test/cover.pdf';
+        $docPath    = APPLICATION_PATH . '/test/document.pdf';
+        $mergedPath = APPLICATION_PATH . '/build/merged.pdf';
 
-        // $concat->join($pdf1, $pdf2, $output);
+        // $concat->join($coverPath, $docPath, $mergedPath);
+
+        $this->assertFileExists($mergedPath);
     }
 }

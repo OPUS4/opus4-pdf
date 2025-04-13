@@ -34,10 +34,10 @@ namespace Opus\Pdf;
 interface PdfConcatenatorInterface
 {
     /**
-     * @param string $pdfPath1
-     * @param string $pdfPath2
-     * @param string $outputPath
+     * @param string $coverPath
+     * @param string $documentPath
+     * @param string $mergedPath
      * @return string|null
      */
-    public function join($pdfPath1, $pdfPath2, $outputPath);
+    public function join($coverPath, $documentPath, $mergedPath);
 }
