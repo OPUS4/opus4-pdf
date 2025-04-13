@@ -42,7 +42,7 @@ class PdfCommandProvider implements CommandProviderInterface
     public function getCommands()
     {
         return [
-            new CoverGenerateCommand(),
+            new GenerateCoverCommand(),
         ];
     }
 }
