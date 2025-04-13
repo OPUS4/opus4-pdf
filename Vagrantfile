@@ -48,10 +48,10 @@ fi
 SCRIPT
 
 $pandoc = <<SCRIPT
-# Install newer 'pandoc' version
+# Install pandoc 3.1.3
 cd /home/vagrant
-wget https://github.com/jgm/pandoc/releases/download/2.17.1.1/pandoc-2.17.1.1-1-amd64.deb
-dpkg -i pandoc-2.17.1.1-1-amd64.deb
+wget https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-1-amd64.deb
+dpkg -i pandoc-3.1.3-1-amd64.deb
 SCRIPT
 
 $fonts = <<SCRIPT
