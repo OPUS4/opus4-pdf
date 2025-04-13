@@ -551,6 +551,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             } else {
                 $this->getLogger()->err("Configured PDF concatenator class does not exist: {$concatClass}");
             }
+        } else {
+            $this->getLogger()->err("PDF concatenator not configured (pdf.cover.concatClass)");
         }
 
         return $this->pdfConcat;
