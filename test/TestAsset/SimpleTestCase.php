@@ -56,13 +56,6 @@ use const DIRECTORY_SEPARATOR;
  */
 class SimpleTestCase extends TestCase
 {
-    /** @var Config Original configuration cloned for backup purposes. */
-    private $configBackup;
-
-    const CONFIG_VALUE_FALSE = ''; // Zend_Config übersetzt false in den Wert ''
-
-    const CONFIG_VALUE_TRUE = '1'; // Zend_Config übersetzt true in den Wert '1'
-
     /**
      * Overwrites selected properties of current configuration.
      *
@@ -126,27 +119,5 @@ class SimpleTestCase extends TestCase
         if (! file_exists($path)) {
             mkdir($path, 0700, true);
         }
-    }
-
-    /**
-     * Standard setUp method for clearing database.
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $config = Config::get('Zend_Config');
-        if ($config !== null) {
-            $this->configBackup = clone $config;
-        }
-    }
-
-    protected function tearDown(): void
-    {
-        if ($this->configBackup !== null) {
-            Config::set($this->configBackup);
-        }
-
-        parent::tearDown();
     }
 }
