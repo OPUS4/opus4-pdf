@@ -34,6 +34,7 @@ namespace Opus\Pdf\Cover;
 use Exception;
 use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
+use Opus\Common\CollectionInterface;
 use Opus\Common\Config;
 use Opus\Common\ConfigTrait;
 use Opus\Common\Cover\CoverGeneratorInterface;
@@ -270,6 +271,10 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         }
 
         $mergedPdfData = $this->mergePdfFiles($coverPath, $filePath);
+
+        if ($mergedPdfData === null) {
+            return $filePath;
+        }
 
         $savedSuccessfully = $this->saveFileData($mergedPdfData, $cachedFilePath);
         if (! $savedSuccessfully) {
