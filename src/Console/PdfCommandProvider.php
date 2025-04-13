@@ -32,7 +32,7 @@
 namespace Opus\Pdf\Console;
 
 use Opus\Common\Console\CommandProviderInterface;
-use Symfony\Component\Console\Command;
+use Symfony\Component\Console\Command\Command;
 
 class PdfCommandProvider implements CommandProviderInterface
 {
@@ -43,6 +43,7 @@ class PdfCommandProvider implements CommandProviderInterface
     {
         return [
             new GenerateCoverCommand(),
+            new ConcatCommand(),
         ];
     }
 }
