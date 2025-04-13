@@ -37,7 +37,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function count;
 use function file_exists;
 
 /**
@@ -45,7 +44,11 @@ use function file_exists;
  */
 class ConcatCommand extends Command
 {
-    public const ARGUMENT_FILES = 'files';
+    public const ARGUMENT_COVER = 'cover';
+
+    public const ARGUMENT_DOCUMENT = 'document';
+
+    public const ARGUMENT_MERGED = 'merged';
 
     protected function configure()
     {
@@ -56,42 +59,43 @@ Merges two PDF files.
 EOT;
 
         $this->setName('pdf:concat')
-            ->setDescription('Generates a PDF cover for a document')
+            ->setDescription('Joins two PDF files')
             ->setHelp($help)
             ->addArgument(
-                self::ARGUMENT_FILES,
-                InputArgument::IS_ARRAY,
-                '[coverPDF] [docPDF] [outputPDF]'
+                self::ARGUMENT_COVER,
+                InputArgument::REQUIRED,
+                'Cover PDF'
+            )->addArgument(
+                self::ARGUMENT_DOCUMENT,
+                InputArgument::REQUIRED,
+                'Cover PDF'
+            )->addArgument(
+                self::ARGUMENT_MERGED,
+                InputArgument::REQUIRED,
+                'Cover PDF'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $files = $input->getArgument(self::ARGUMENT_FILES);
-
-        if (count($files) !== 3) {
-            $output->writeln('<error>Too few arguments</error>');
-            return Command::FAILURE;
-        }
-
-        $coverPdf = $files[0];
+        $coverPdf = $input->getArgument(self::ARGUMENT_COVER);
         if (! file_exists($coverPdf)) {
             $output->writeln("<error>PDF file not found: {$coverPdf}</error>");
         }
 
-        $documentPdf = $files[1];
+        $documentPdf = $input->getArgument(self::ARGUMENT_DOCUMENT);
         if (! file_exists($documentPdf)) {
             $output->writeln("<error>PDF file not found: {$documentPdf}</error>");
         }
 
-        $outputPdf = $files[2];
+        $outputPdf = $input->getArgument(self::ARGUMENT_MERGED);
 
         $coverGenerator = new DefaultCoverGenerator();
         $concatenator   = $coverGenerator->getPdfConcatenator();
 
         if ($concatenator !== null) {
             if ($concatenator->join($coverPdf, $documentPdf, $outputPdf) === null) {
-                $output->writeln("<error>Failed to merge PDF files</error>");
+                $output->writeln("<error>Failed to join PDF files</error>");
                 return Command::FAILURE;
             }
         } else {
