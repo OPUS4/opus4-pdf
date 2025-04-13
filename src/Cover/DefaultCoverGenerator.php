@@ -31,8 +31,6 @@
 
 namespace Opus\Pdf\Cover;
 
-use Exception;
-use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
 use Opus\Common\CollectionInterface;
 use Opus\Common\Config;
@@ -41,9 +39,10 @@ use Opus\Common\Cover\CoverGeneratorInterface;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
+use Opus\Common\Util\ClassLoaderHelper;
+use Opus\Pdf\PdfConcatenatorInterface;
 
 use function file_exists;
-use function file_put_contents;
 use function filemtime;
 use function pathinfo;
 use function substr;
@@ -73,6 +72,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
     /** @var string Path to a directory that stores licence logo files */
     private $licenceLogosDir = "";
+
+    /** @var PdfConcatenatorInterface */
+    private $pdfConcat;
 
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
@@ -266,23 +268,21 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $coverPath = $pdfGenerator->generateFile($document, $tempFilename);
 
         if ($coverPath === null) {
-            $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
+            $this->getLogger()->err('Failed generating PDF cover');
             return $filePath;
         }
 
-        $mergedPdfData = $this->mergePdfFiles($coverPath, $filePath);
-
-        if ($mergedPdfData === null) {
+        $concatenator = $this->getPdfConcatenator();
+        if ($concatenator === null) {
             return $filePath;
         }
 
-        $savedSuccessfully = $this->saveFileData($mergedPdfData, $cachedFilePath);
-        if (! $savedSuccessfully) {
-            $this->getLogger()->err("Couldn't save merged PDF data to cached file $cachedFilePath");
+        $mergedFilePath = $concatenator->join($coverPath, $filePath, $cachedFilePath);
+        if ($mergedFilePath === null) {
             return $filePath;
         }
 
-        return $cachedFilePath;
+        return $mergedFilePath; // usually same as $cachedFilePath TODO API changes?
     }
 
     /**
@@ -534,40 +534,35 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Saves the given file at the given path. Returns true if storage was successful, otherwise returns false.
-     *
-     * @param string $fileData File data to be stored at the given path.
-     * @param string $filePath Path at which the given file data shall be stored.
-     * @return bool
+     * @return PdfConcatenatorInterface
      */
-    protected function saveFileData($fileData, $filePath)
+    public function getPdfConcatenator()
     {
-        $result = file_put_contents($filePath, $fileData);
+        if ($this->pdfConcat !== null) {
+            return $this->pdfConcat;
+        }
 
-        return ! ($result === false);
+        $config = $this->getConfig();
+
+        if (isset($config->pdf->cover->concatClass)) {
+            $concatClass = $config->pdf->cover->concatClass;
+            if (ClassLoaderHelper::classExists($concatClass)) {
+                $this->pdfConcat = new $concatClass();
+            } else {
+                $this->getLogger()->err("Configured PDF concatenator class does not exist: {$concatClass}");
+            }
+        }
+
+        return $this->pdfConcat;
     }
 
     /**
-     * Merges the PDFs at the given file paths and returns the merged PDF data, or null in case of failure.
-     *
-     * @param string $firstFilePath  Path to PDF file that shall be included first in the merged PDF.
-     * @param string $secondFilePath Path to PDF file that shall be appended to the PDF file at $firstFilePath.
-     * @return string|null Merged PDF data.
+     * @param PdfConcatenatorInterface $concatenator
+     * @return $this
      */
-    protected function mergePdfFiles($firstFilePath, $secondFilePath)
+    public function setPdfConcatenator($concatenator)
     {
-        // TODO check whether another (better maintained, more compatible?) library could be used for PDF merging
-
-        try {
-            $merger = new Merger();
-            $merger->addFile($firstFilePath);
-            $merger->addFile($secondFilePath);
-            $pdfData = $merger->merge();
-        } catch (Exception $e) {
-            $this->getLogger()->err("Couldn't merge PDFs: '$e'");
-            return null;
-        }
-
-        return $pdfData;
+        $this->pdfConcat = $concatenator;
+        return $this;
     }
 }
