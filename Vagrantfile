@@ -57,7 +57,7 @@ SCRIPT
 $fonts = <<SCRIPT
 mkdir -p /usr/share/fonts/opentype
 cd /home/vagrant
-cp -r /home/vagrant/test/_fonts/Open_Sans/static/ /usr/share/fonts/opentype/
+cp -r /vagrant/test/_fonts/Open_Sans/static/*.ttf /usr/share/fonts/opentype/
 apt-get -yq install fontconfig
 fc-cache -f -v
 SCRIPT
