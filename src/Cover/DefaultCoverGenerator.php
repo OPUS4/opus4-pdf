@@ -544,15 +544,15 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         $config = $this->getConfig();
 
-        if (isset($config->pdf->cover->concatClass)) {
-            $concatClass = $config->pdf->cover->concatClass;
+        if (isset($config->pdf->covers->concatClass)) {
+            $concatClass = $config->pdf->covers->concatClass;
             if (ClassLoaderHelper::classExists($concatClass)) {
                 $this->pdfConcat = new $concatClass();
             } else {
                 $this->getLogger()->err("Configured PDF concatenator class does not exist: {$concatClass}");
             }
         } else {
-            $this->getLogger()->err("PDF concatenator not configured (pdf.cover.concatClass)");
+            $this->getLogger()->err("PDF concatenator not configured (pdf.covers.concatClass)");
         }
 
         return $this->pdfConcat;

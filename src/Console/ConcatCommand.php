@@ -94,6 +94,8 @@ EOT;
                 $output->writeln("<error>Failed to merge PDF files</error>");
                 return Command::FAILURE;
             }
+        } else {
+            $output->writeln("<error>PDF concatenator class not configured (pdf.covers.concatClass)</error>");
         }
 
         return Command::SUCCESS;
