@@ -111,6 +111,7 @@ EOT;
 
         $document = Document::get($docId);
         if ($document === null) {
+            $output->writeln("<error>Could not find document {$docId}</error>");
             return Command::FAILURE;
         }
 

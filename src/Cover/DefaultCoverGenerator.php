@@ -244,6 +244,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $tempFilename = $document->getId(); // TODO better temp filename that is not just a number
         $coverPath    = $pdfGenerator->generateFile($document, $tempFilename);
         if ($coverPath === null) {
+            $this->getOutput()->writeln('<error>Could not generate cover</error>');
             $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
             return null;
         }
@@ -409,7 +410,13 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templateName = $config->pdf->covers->default;
         }
 
-        return ! empty($templateName) ? $templateName : null;
+        if (! empty($templateName)) {
+            return $templateName;
+        } else {
+            $this->getOutput()->writeln('No default cover template configured', OutputInterface::VERBOSITY_DEBUG);
+            $this->getLogger()->warn('No default cover template configured');
+            return null;
+        }
     }
 
     /**
@@ -517,6 +524,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templatePath = $this->getTemplatePath($document);
         }
         if ($templatePath === null) {
+            $this->getOutput()->writeln('<error>No cover template found</error>');
             return null;
         }
 
@@ -533,6 +541,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
 
         if ($generator === null) {
+            $this->getOutput()->writeln('<error>Could not create PDF generator</error>');
             $this->getLogger()->err("Couldn't create PDF generator for '$templateFormat' and '$pdfEngine'");
             return null;
         }
