@@ -41,6 +41,8 @@ use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
 use Opus\Common\Util\ClassLoaderHelper;
 use Opus\Pdf\PdfConcatenatorInterface;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function file_exists;
 use function filemtime;
@@ -75,6 +77,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
     /** @var PdfConcatenatorInterface */
     private $pdfConcat;
+
+    /** @var OutputInterface */
+    private $output;
 
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
@@ -231,12 +236,23 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return null;
         }
 
-        $tempFilename = $document->getId();
+        $this->getOutput()->writeln(
+            'Cover template: ' . $pdfGenerator->getTemplatePath(),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        $tempFilename = $document->getId(); // TODO better temp filename that is not just a number
         $coverPath    = $pdfGenerator->generateFile($document, $tempFilename);
         if ($coverPath === null) {
+            $this->getOutput()->writeln('<error>Could not generate cover</error>');
             $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
             return null;
         }
+
+        $this->getOutput()->writeln(
+            'Generated cover file: ' . $coverPath,
+            OutputInterface::VERBOSITY_VERBOSE
+        );
 
         return $coverPath;
     }
@@ -394,7 +410,13 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templateName = $config->pdf->covers->default;
         }
 
-        return ! empty($templateName) ? $templateName : null;
+        if (! empty($templateName)) {
+            return $templateName;
+        } else {
+            $this->getOutput()->writeln('No default cover template configured', OutputInterface::VERBOSITY_DEBUG);
+            $this->getLogger()->warn('No default cover template configured');
+            return null;
+        }
     }
 
     /**
@@ -502,6 +524,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templatePath = $this->getTemplatePath($document);
         }
         if ($templatePath === null) {
+            $this->getOutput()->writeln('<error>No cover template found</error>');
             return null;
         }
 
@@ -518,6 +541,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
 
         if ($generator === null) {
+            $this->getOutput()->writeln('<error>Could not create PDF generator</error>');
             $this->getLogger()->err("Couldn't create PDF generator for '$templateFormat' and '$pdfEngine'");
             return null;
         }
@@ -566,5 +590,27 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     {
         $this->pdfConcat = $concatenator;
         return $this;
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return $this
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
+        return $this;
+    }
+
+    /**
+     * @return OutputInterface
+     */
+    public function getOutput()
+    {
+        if ($this->output === null) {
+            $this->output = new NullOutput();
+        }
+
+        return $this->output;
     }
 }

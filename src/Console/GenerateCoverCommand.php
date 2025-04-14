@@ -111,11 +111,15 @@ EOT;
 
         $document = Document::get($docId);
         if ($document === null) {
+            $output->writeln("<error>Could not find document {$docId}</error>");
             return Command::FAILURE;
         }
 
         $coverGenerator = new DefaultCoverGenerator();
-        $coverPath      = $coverGenerator->processDocument($document, $templatePath);
+        $coverGenerator->setOutput($output);
+
+        $coverPath = $coverGenerator->processDocument($document, $templatePath);
+
         if ($coverPath === null) {
             return Command::FAILURE;
         }
