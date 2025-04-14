@@ -33,6 +33,7 @@ namespace Opus\Pdf;
 
 use Opus\Common\LoggingTrait;
 
+use function escapeshellarg;
 use function exec;
 
 class PdfUniteConcatenator implements PdfConcatenatorInterface
@@ -51,9 +52,13 @@ class PdfUniteConcatenator implements PdfConcatenatorInterface
         $output  = null;
         $retVal  = null;
 
+        $coverPath    = escapeshellarg($coverPath);
+        $documentPath = escapeshellarg($documentPath);
+        $outputPath   = escapeshellarg($outputPath);
+
         $commandLine = "{$command} {$coverPath} {$documentPath} {$outputPath}";
 
-        exec($commandLine, $ouput, $retVal);
+        exec($commandLine, $output, $retVal);
 
         if ($retVal !== 0) {
             $this->getLogger()->err("Error running pdfunite (returened {$retVal})", $output);
