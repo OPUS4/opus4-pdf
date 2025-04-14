@@ -115,7 +115,10 @@ EOT;
         }
 
         $coverGenerator = new DefaultCoverGenerator();
-        $coverPath      = $coverGenerator->processDocument($document, $templatePath);
+        $coverGenerator->setOutput($output);
+
+        $coverPath = $coverGenerator->processDocument($document, $templatePath);
+
         if ($coverPath === null) {
             return Command::FAILURE;
         }
