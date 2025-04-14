@@ -41,6 +41,7 @@ use Opus\Common\Identifier;
 use Opus\Common\Person;
 use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
 use PHPUnit\Framework\TestCase;
+use Zend_Config;
 
 use function dirname;
 use function file_get_contents;
@@ -389,5 +390,40 @@ class CslMetadataGeneratorTest extends TestCase
         $doc->store();
 
         return $doc;
+    }
+
+    public function testGetDateIssues()
+    {
+        $doc = Document::new();
+        $doc->setPublishedYear(2025);
+        $this->assertEquals('2025', $this->metadataGenerator->getDateIssued($doc));
+
+        $publishedDate = new Date('2024-10-17');
+        $doc->setPublishedDate($publishedDate);
+        $this->assertEquals('2024-10-17', $this->metadataGenerator->getDateIssued($doc));
+
+        $doc->setCompletedYear(2023);
+        $this->assertEquals('2024-10-17', $this->metadataGenerator->getDateIssued($doc));
+
+        $doc->setCompletedDate(new Date('2022-05-23'));
+        $this->assertEquals('2024-10-17', $this->metadataGenerator->getDateIssued($doc));
+
+        $this->metadataGenerator->setConfig(new Zend_Config([
+            'search' => ['index' => ['field' => ['year' => ['order' => 'CompletedDate,CompletedYear,PublishedDate,PublishedYear']]]],
+        ]));
+
+        $this->assertEquals('2022-05-23', $this->metadataGenerator->getDateIssued($doc));
+
+        $doc->setCompletedDate(null);
+        $this->assertEquals('2023', $this->metadataGenerator->getDateIssued($doc));
+
+        $doc->setCompletedYear(null);
+        $this->assertEquals('2024-10-17', $this->metadataGenerator->getDateIssued($doc));
+
+        $doc->setPublishedDate(null);
+        $this->assertEquals('2025', $this->metadataGenerator->getDateIssued($doc));
+
+        $doc->setPublishedYear(null);
+        $this->assertNull($this->metadataGenerator->getDateIssued($doc));
     }
 }
