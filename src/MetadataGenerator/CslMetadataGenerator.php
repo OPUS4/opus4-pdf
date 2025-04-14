@@ -32,6 +32,7 @@
 namespace Opus\Pdf\MetadataGenerator;
 
 use Opus\Common\Config;
+use Opus\Common\ConfigTrait;
 use Opus\Common\Date;
 use Opus\Common\DocumentInterface;
 use Opus\Common\LoggingTrait;
@@ -40,17 +41,21 @@ use Seboettg\CiteData\Csl\Date as CslDate;
 use Seboettg\CiteData\Csl\Name as CslName;
 use Seboettg\CiteData\Csl\Record as CslRecord;
 
+use function array_key_exists;
 use function file_put_contents;
 use function implode;
 use function in_array;
 use function is_writable;
 use function json_encode;
 use function preg_replace;
+use function preg_split;
 use function strval;
 use function substr;
+use function trim;
 use function uniqid;
 
 use const DIRECTORY_SEPARATOR;
+use const PREG_SPLIT_NO_EMPTY;
 
 /**
  * Generates metadata for a document in CSL JSON format.
@@ -60,6 +65,7 @@ use const DIRECTORY_SEPARATOR;
  */
 class CslMetadataGenerator
 {
+    use ConfigTrait;
     use LoggingTrait;
 
     /** @var string Path to a directory that stores temporary files */
@@ -135,17 +141,10 @@ class CslMetadataGenerator
         $cslRecord->setEditor($this->cslNames($document->getPersonEditor()));
         //$cslRecord->setContributor($this->cslNames($document->getPersonContributor())); // not supported?
 
-        $publishedDateString = null;
-        $publishedDate       = $document->getPublishedDate();
-        $publishedYear       = $document->getPublishedYear();
-        if ($publishedDate !== null) {
-            $publishedDateString = self::extendedDateString($publishedDate);
-        } elseif (! empty($publishedYear)) {
-            $publishedDateString = strval($publishedYear);
-        }
-        if ($publishedDateString !== null) {
+        $dateIssuedString = $this->getDateIssued($document);
+        if ($dateIssuedString !== null) {
             $issuedDate = new CslDate();
-            $issuedDate->setRaw($publishedDateString);
+            $issuedDate->setRaw($dateIssuedString);
             $cslRecord->setIssued($issuedDate);
         }
 
@@ -211,6 +210,57 @@ class CslMetadataGenerator
         }
 
         return json_encode([$cslRecord]);
+    }
+
+    /**
+     * @param DocumentInterface $document
+     * @return string|null
+     */
+    public function getDateIssued($document)
+    {
+        $dateIssuedString = null;
+
+        $fields                  = [];
+        $fields['PublishedDate'] = $document->getPublishedDate();
+        $fields['PublishedYear'] = $document->getPublishedYear();
+        $fields['CompletedDate'] = $document->getCompletedDate();
+        $fields['CompletedYear'] = $document->getCompletedYear();
+
+        $order = $this->getYearOrder();
+
+        foreach ($order as $fieldName) {
+            if (array_key_exists($fieldName, $fields)) {
+                $value = $fields[$fieldName];
+                if ($value !== null) {
+                    if ($value instanceof Date) {
+                        $dateIssuedString = self::extendedDateString($value);
+                    } else {
+                        $dateIssuedString = strval($value);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return $dateIssuedString;
+    }
+
+    /**
+     * @return string[]
+     *
+     * TODO centralize in Model code
+     */
+    public function getYearOrder()
+    {
+        $config = $this->getConfig();
+
+        if (isset($config->search->index->field->year->order)) {
+            $orderConfig = $config->search->index->field->year->order;
+        } else {
+            $orderConfig = 'PublishedDate,PublishedYear'; // old default
+        }
+
+        return preg_split('/[\s,]+/', trim($orderConfig), 0, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -354,6 +404,8 @@ class CslMetadataGenerator
      *
      * @param  string $type The Document type which shall be mapped to a CSL type.
      * @return string|null CSL type or null in case no matching type was found.
+     *
+     * TODO move mapping to configuration file (does it match any standard?)
      */
     protected function cslType($type)
     {
