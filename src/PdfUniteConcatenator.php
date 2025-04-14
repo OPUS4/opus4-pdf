@@ -33,6 +33,7 @@ namespace Opus\Pdf;
 
 use Opus\Common\LoggingTrait;
 
+use function escapeshellarg;
 use function exec;
 
 class PdfUniteConcatenator implements PdfConcatenatorInterface
