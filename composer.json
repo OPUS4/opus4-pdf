@@ -12,6 +12,8 @@
     "php": ">=7.1",
     "ext-json": "*",
     "opus4-repo/opus4-common": "^4.8.0.2",
+    "symfony/console": "*",
+    "symfony/process": "*",
     "iio/libmergepdf": "^4.0",
     "ueberdosis/pandoc": "*",
     "seboettg/citedata": "@dev"

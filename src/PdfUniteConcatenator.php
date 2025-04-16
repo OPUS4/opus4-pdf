@@ -32,9 +32,9 @@
 namespace Opus\Pdf;
 
 use Opus\Common\LoggingTrait;
+use Symfony\Component\Process\Process;
 
-use function escapeshellarg;
-use function exec;
+use function is_readable;
 
 class PdfUniteConcatenator implements PdfConcatenatorInterface
 {
@@ -49,19 +49,18 @@ class PdfUniteConcatenator implements PdfConcatenatorInterface
     public function join($coverPath, $documentPath, $outputPath)
     {
         $command = 'pdfunite';
-        $output  = null;
-        $retVal  = null;
 
-        $coverPath    = escapeshellarg($coverPath);
-        $documentPath = escapeshellarg($documentPath);
-        $outputPath   = escapeshellarg($outputPath);
+        $process = new Process([$command, $coverPath, $documentPath, $outputPath]);
+        $process->run();
 
-        $commandLine = "{$command} {$coverPath} {$documentPath} {$outputPath}";
+        if (! $process->isSuccessful()) {
+            $exitCode = $process->getExitCode();
+            $this->getLogger()->err("Error running pdfunite (exit code = {$exitCode})");
+            return null;
+        }
 
-        exec($commandLine, $output, $retVal);
-
-        if ($retVal !== 0) {
-            $this->getLogger()->err("Error running pdfunite (returened {$retVal})", $output);
+        if (! is_readable($outputPath)) {
+            $this->getLogger()->err("Merged PDF file is not readable: {$outputPath}");
             return null;
         }
 
