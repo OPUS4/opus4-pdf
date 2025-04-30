@@ -48,22 +48,16 @@ fi
 SCRIPT
 
 $pandoc = <<SCRIPT
-# Install newer 'pandoc' version
+# Install pandoc 3.1.3
 cd /home/vagrant
-wget https://github.com/jgm/pandoc/releases/download/2.17.1.1/pandoc-2.17.1.1-1-amd64.deb
-dpkg -i pandoc-2.17.1.1-1-amd64.deb
+wget https://github.com/jgm/pandoc/releases/download/3.1.3/pandoc-3.1.3-1-amd64.deb
+dpkg -i pandoc-3.1.3-1-amd64.deb
 SCRIPT
 
 $fonts = <<SCRIPT
-# Install "Open Sans" font family (available under the Apache License v.2.0 at
-# https://fonts.google.com/specimen/Open+Sans or under the SIL Open Font License 1.1
-# at https://fonts.bunny.net/family/open-sans) to be used for PDF cover generation by
-# templates in test/_files
 mkdir -p /usr/share/fonts/opentype
 cd /home/vagrant
-wget https://fonts.google.com/download?family=Open%20Sans -O Open_Sans.zip
-unzip -o Open_Sans.zip -d Open_Sans
-cp -r /home/vagrant/Open_Sans/static/OpenSans/ /usr/share/fonts/opentype/
+cp -r /vagrant/test/_fonts/Open_Sans/static/*.ttf /usr/share/fonts/opentype/
 apt-get -yq install fontconfig
 fc-cache -f -v
 SCRIPT

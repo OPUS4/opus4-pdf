@@ -48,21 +48,15 @@ use const DIRECTORY_SEPARATOR;
 /**
  * Console command to generate a PDF cover for a given document ID.
  */
-class CoverGenerateCommand extends Command
+class GenerateCoverCommand extends Command
 {
-    /**
-     * Argument for the name of the output file containing the generated PDF cover
-     */
+    // Argument for the name of the output file containing the generated PDF cover
     public const ARGUMENT_DOC_ID = 'DocID';
 
-    /**
-     * Option for the name of the output file containing the generated PDF cover
-     */
+    // Option for the name of the output file containing the generated PDF cover
     public const OPTION_OUTPUT_FILE = 'out';
 
-    /**
-     * Option for the path to the cover template to be used for PDF cover generation
-     */
+    // Option for the path to the cover template to be used for PDF cover generation
     public const OPTION_TEMPLATE_PATH = 'template';
 
     protected function configure()
@@ -82,7 +76,7 @@ updated if the file's document is changed. This command will instead always forc
 the cover sheet which can be useful when developing a custom cover template.
 EOT;
 
-        $this->setName('cover:generate')
+        $this->setName('pdf:generate-cover')
             ->setDescription('Generates a PDF cover for a document')
             ->setHelp($help)
             ->addArgument(
@@ -117,11 +111,15 @@ EOT;
 
         $document = Document::get($docId);
         if ($document === null) {
+            $output->writeln("<error>Could not find document {$docId}</error>");
             return Command::FAILURE;
         }
 
         $coverGenerator = new DefaultCoverGenerator();
-        $coverPath      = $coverGenerator->processDocument($document, $templatePath);
+        $coverGenerator->setOutput($output);
+
+        $coverPath = $coverGenerator->processDocument($document, $templatePath);
+
         if ($coverPath === null) {
             return Command::FAILURE;
         }

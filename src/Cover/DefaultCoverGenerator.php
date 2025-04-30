@@ -31,18 +31,20 @@
 
 namespace Opus\Pdf\Cover;
 
-use Exception;
-use iio\libmergepdf\Merger;
 use Opus\Common\Collection;
+use Opus\Common\CollectionInterface;
 use Opus\Common\Config;
 use Opus\Common\ConfigTrait;
 use Opus\Common\Cover\CoverGeneratorInterface;
 use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
+use Opus\Common\Util\ClassLoaderHelper;
+use Opus\Pdf\PdfConcatenatorInterface;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 use function file_exists;
-use function file_put_contents;
 use function filemtime;
 use function pathinfo;
 use function substr;
@@ -72,6 +74,12 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
     /** @var string Path to a directory that stores licence logo files */
     private $licenceLogosDir = "";
+
+    /** @var PdfConcatenatorInterface */
+    private $pdfConcat;
+
+    /** @var OutputInterface */
+    private $output;
 
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
@@ -228,12 +236,23 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             return null;
         }
 
-        $tempFilename = $document->getId();
+        $this->getOutput()->writeln(
+            'Cover template: ' . $pdfGenerator->getTemplatePath(),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
+
+        $tempFilename = $document->getId(); // TODO better temp filename that is not just a number
         $coverPath    = $pdfGenerator->generateFile($document, $tempFilename);
         if ($coverPath === null) {
+            $this->getOutput()->writeln('<error>Could not generate cover</error>');
             $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
             return null;
         }
+
+        $this->getOutput()->writeln(
+            'Generated cover file: ' . $coverPath,
+            OutputInterface::VERBOSITY_VERBOSE
+        );
 
         return $coverPath;
     }
@@ -265,19 +284,21 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $coverPath = $pdfGenerator->generateFile($document, $tempFilename);
 
         if ($coverPath === null) {
-            $this->getLogger()->err('Couldn\'t generate cover: expected cover path but got null');
+            $this->getLogger()->err('Failed generating PDF cover');
             return $filePath;
         }
 
-        $mergedPdfData = $this->mergePdfFiles($coverPath, $filePath);
-
-        $savedSuccessfully = $this->saveFileData($mergedPdfData, $cachedFilePath);
-        if (! $savedSuccessfully) {
-            $this->getLogger()->err("Couldn't save merged PDF data to cached file $cachedFilePath");
+        $concatenator = $this->getPdfConcatenator();
+        if ($concatenator === null) {
             return $filePath;
         }
 
-        return $cachedFilePath;
+        $mergedFilePath = $concatenator->join($coverPath, $filePath, $cachedFilePath);
+        if ($mergedFilePath === null) {
+            return $filePath;
+        }
+
+        return $mergedFilePath; // usually same as $cachedFilePath TODO API changes?
     }
 
     /**
@@ -389,7 +410,13 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templateName = $config->pdf->covers->default;
         }
 
-        return ! empty($templateName) ? $templateName : null;
+        if (! empty($templateName)) {
+            return $templateName;
+        } else {
+            $this->getOutput()->writeln('No default cover template configured', OutputInterface::VERBOSITY_DEBUG);
+            $this->getLogger()->warn('No default cover template configured');
+            return null;
+        }
     }
 
     /**
@@ -497,6 +524,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
             $templatePath = $this->getTemplatePath($document);
         }
         if ($templatePath === null) {
+            $this->getOutput()->writeln('<error>No cover template found</error>');
             return null;
         }
 
@@ -513,6 +541,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
         $generator = PdfGeneratorFactory::create($templateFormat, $pdfEngine);
 
         if ($generator === null) {
+            $this->getOutput()->writeln('<error>Could not create PDF generator</error>');
             $this->getLogger()->err("Couldn't create PDF generator for '$templateFormat' and '$pdfEngine'");
             return null;
         }
@@ -529,40 +558,59 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     }
 
     /**
-     * Saves the given file at the given path. Returns true if storage was successful, otherwise returns false.
-     *
-     * @param string $fileData File data to be stored at the given path.
-     * @param string $filePath Path at which the given file data shall be stored.
-     * @return bool
+     * @return PdfConcatenatorInterface
      */
-    protected function saveFileData($fileData, $filePath)
+    public function getPdfConcatenator()
     {
-        $result = file_put_contents($filePath, $fileData);
+        if ($this->pdfConcat !== null) {
+            return $this->pdfConcat;
+        }
 
-        return ! ($result === false);
+        $config = $this->getConfig();
+
+        if (isset($config->pdf->covers->concatClass)) {
+            $concatClass = $config->pdf->covers->concatClass;
+            if (ClassLoaderHelper::classExists($concatClass)) {
+                $this->pdfConcat = new $concatClass();
+            } else {
+                $this->getLogger()->err("Configured PDF concatenator class does not exist: {$concatClass}");
+            }
+        } else {
+            $this->getLogger()->err("PDF concatenator not configured (pdf.covers.concatClass)");
+        }
+
+        return $this->pdfConcat;
     }
 
     /**
-     * Merges the PDFs at the given file paths and returns the merged PDF data, or null in case of failure.
-     *
-     * @param string $firstFilePath  Path to PDF file that shall be included first in the merged PDF.
-     * @param string $secondFilePath Path to PDF file that shall be appended to the PDF file at $firstFilePath.
-     * @return string|null Merged PDF data.
+     * @param PdfConcatenatorInterface $concatenator
+     * @return $this
      */
-    protected function mergePdfFiles($firstFilePath, $secondFilePath)
+    public function setPdfConcatenator($concatenator)
     {
-        // TODO check whether another (better maintained, more compatible?) library could be used for PDF merging
+        $this->pdfConcat = $concatenator;
+        return $this;
+    }
 
-        try {
-            $merger = new Merger();
-            $merger->addFile($firstFilePath);
-            $merger->addFile($secondFilePath);
-            $pdfData = $merger->merge();
-        } catch (Exception $e) {
-            $this->getLogger()->err("Couldn't merge PDFs: '$e'");
-            return null;
+    /**
+     * @param OutputInterface $output
+     * @return $this
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
+        return $this;
+    }
+
+    /**
+     * @return OutputInterface
+     */
+    public function getOutput()
+    {
+        if ($this->output === null) {
+            $this->output = new NullOutput();
         }
 
-        return $pdfData;
+        return $this->output;
     }
 }
