@@ -129,7 +129,30 @@ class CslMetadataGenerator
 
         $mainTitle = $document->getMainTitle();
         if (! empty($mainTitle)) {
-            $cslRecord->setTitle($mainTitle->getValue());
+            $titleValue = trim($mainTitle->getValue());
+            // Append subtitle(s) in the same language as the main title: "Titel: Untertitel"
+            $mainLang   = method_exists($mainTitle, 'getLanguage') ? $mainTitle->getLanguage() : null;
+            $subtitles  = $document->getTitleSub();
+            if (! empty($subtitles) && $titleValue !== '') {
+                $matchingSubtitles = [];
+                foreach ($subtitles as $subtitle) {
+                    $subtitleValue = trim($subtitle->getValue());
+                    if ($subtitleValue === '') {
+                        continue;
+                    }
+                    // Only append subtitles that match the main title's language (if available)
+                    $subtitleLang = method_exists($subtitle, 'getLanguage') ? $subtitle->getLanguage() : null;
+                    if ($mainLang !== null && $subtitleLang === $mainLang) {
+                        $matchingSubtitles[] = $subtitleValue;
+                    }
+                }
+
+                foreach ($matchingSubtitles as $st) {
+                    $titleValue .= ': ' . $st;
+                }
+            }
+
+            $cslRecord->setTitle($titleValue);
         }
 
         $mainAbstract = $document->getMainAbstract();
