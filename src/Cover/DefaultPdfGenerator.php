@@ -46,6 +46,7 @@ use function dirname;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
+use function filter_var;
 use function is_writable;
 use function json_encode;
 use function ltrim;
@@ -55,6 +56,7 @@ use function substr;
 use function uniqid;
 
 use const DIRECTORY_SEPARATOR;
+use const FILTER_VALIDATE_BOOLEAN;
 use const PHP_URL_PATH;
 
 /**
@@ -182,6 +184,9 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * Returns the list of Config option keys whose values will be made available as metadata during PDF generation.
      *
      * @return string[] List of Config option keys
+     *
+     * TODO explain better how this works and why it exists
+     * TODO make this keys configurable
      */
     public function getConfigOptionKeys()
     {
@@ -715,12 +720,22 @@ class DefaultPdfGenerator implements PdfGeneratorInterface
      * Returns a metadata generator instance to create CSL JSON metadata for a document.
      *
      * @return CslMetadataGenerator|null
+     *
+     * TODO function footprint should not be specific to a single generator class
      */
-    protected function getMetadataGenerator()
+    public function getMetadataGenerator()
     {
         if ($this->metadataGenerator === null) {
             $generator = new CslMetadataGenerator();
             $generator->setTempDir($this->getTempDir());
+
+            // TODO should this be moved into CslMetadataGenerator class? Is this a class option or a opus4-pdf option?
+            $config = $this->getConfig();
+            if (isset($config->pdf->covers->includeSubtitles)) {
+                $generator->setIncludeSubtitles(
+                    filter_var($config->pdf->covers->includeSubtitles, FILTER_VALIDATE_BOOLEAN)
+                );
+            }
 
             $this->metadataGenerator = $generator;
         }

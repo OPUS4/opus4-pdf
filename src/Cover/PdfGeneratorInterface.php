@@ -37,6 +37,9 @@ use Opus\Common\DocumentInterface;
  * Interface for generating a PDF for a document based on a template.
  *
  * Different implementations of this interface may use different tool chains to generate the PDF.
+ *
+ * TODO The setTempDir/TemplatePath/LicenceLogoDir functions are part of the configuration of a specific implementation
+ *      and should not be part of the interface.
  */
 interface PdfGeneratorInterface
 {
@@ -55,6 +58,7 @@ interface PdfGeneratorInterface
      * Sets the path to a directory that stores temporary files.
      *
      * @param string|null $tempDir
+     * @return void
      */
     public function setTempDir($tempDir);
 
@@ -69,6 +73,7 @@ interface PdfGeneratorInterface
      * Sets the path to the template file that's used to generate the PDF.
      *
      * @param string|null $templatePath
+     * @return void
      */
     public function setTemplatePath($templatePath);
 
@@ -83,6 +88,7 @@ interface PdfGeneratorInterface
      * Sets the path to a directory containing licence logo files to be used when generating the PDF.
      *
      * @param string|null $licenceLogosDir
+     * @return void
      */
     public function setLicenceLogosDir($licenceLogosDir);
 

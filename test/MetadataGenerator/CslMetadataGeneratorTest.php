@@ -39,8 +39,9 @@ use Opus\Common\Document;
 use Opus\Common\DocumentInterface;
 use Opus\Common\Identifier;
 use Opus\Common\Person;
+use Opus\Common\Title;
 use Opus\Pdf\MetadataGenerator\CslMetadataGenerator;
-use PHPUnit\Framework\TestCase;
+use OpusTest\Pdf\TestAsset\TestCase;
 use Zend_Config;
 
 use function dirname;
@@ -425,5 +426,110 @@ class CslMetadataGeneratorTest extends TestCase
 
         $doc->setPublishedYear(null);
         $this->assertNull($this->metadataGenerator->getDateIssued($doc));
+    }
+
+    public function testGetTitle()
+    {
+        $document = Document::new();
+        $document->setLanguage('en');
+
+        $title = Title::new();
+        $title->setValue('main title');
+        $title->setLanguage('en');
+        $document->addTitleMain($title);
+
+        $subtitle = Title::new();
+        $subtitle->setValue('subtitle test');
+        $subtitle->setLanguage('en');
+        $document->addTitleSub($subtitle);
+
+        $generator = $this->metadataGenerator;
+
+        $generator->setDocument($document);
+        $generator->setIncludeSubtitles(false);
+
+        $title = $generator->getTitle();
+
+        $this->assertEquals('main title', $title);
+    }
+
+    public function testGetTitleWithSubTitle()
+    {
+        $document = Document::new();
+        $document->setLanguage('en');
+
+        $title = Title::new();
+        $title->setValue('main title');
+        $title->setLanguage('en');
+        $document->addTitleMain($title);
+
+        $subtitle = Title::new();
+        $subtitle->setValue('subtitle test');
+        $subtitle->setLanguage('en');
+        $document->addTitleSub($subtitle);
+
+        $generator = $this->metadataGenerator;
+        $generator->setIncludeSubtitles(true);
+
+        $generator->setDocument($document);
+
+        $title = $generator->getTitle();
+
+        $this->assertEquals('main title: subtitle test', $title);
+    }
+
+    public function testGetTitleWithoutSubTitleInMainLanguage()
+    {
+        $document = Document::new();
+        $document->setLanguage('en');
+
+        $title = Title::new();
+        $title->setValue('main title');
+        $title->setLanguage('en');
+        $document->addTitleMain($title);
+
+        $subtitle = Title::new();
+        $subtitle->setValue('subtitle test');
+        $subtitle->setLanguage('de');
+        $document->addTitleSub($subtitle);
+
+        $generator = $this->metadataGenerator;
+        $generator->setIncludeSubtitles(true);
+
+        $generator->setDocument($document);
+
+        $title = $generator->getTitle();
+
+        $this->assertEquals('main title', $title);
+    }
+
+    public function testGetSubtitles()
+    {
+        $document = Document::new();
+
+        $subtitle = Title::new();
+        $subtitle->setValue('subtitle1');
+        $subtitle->setLanguage('en');
+        $document->addTitleSub($subtitle);
+
+        $subtitle = Title::new();
+        $subtitle->setValue('subtitle2');
+        $subtitle->setLanguage('de');
+        $document->addTitleSub($subtitle);
+
+        $generator = $this->metadataGenerator;
+        $generator->setDocument($document);
+
+        $subtitles = $generator->getSubtitles('en');
+        $this->assertCount(1, $subtitles);
+        $this->assertContains('subtitle1', $subtitles);
+
+        $subtitles = $generator->getSubtitles('de');
+        $this->assertCount(1, $subtitles);
+        $this->assertContains('subtitle2', $subtitles);
+
+        $subtitles = $generator->getSubtitles('fr');
+        $this->assertIsArray($subtitles);
+        $this->assertCount(0, $subtitles);
     }
 }
