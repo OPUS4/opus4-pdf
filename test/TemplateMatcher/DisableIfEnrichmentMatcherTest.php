@@ -62,6 +62,10 @@ class DisableIfEnrichmentMatcherTest extends TestCase
 
     public function testGetEnrichmentKey()
     {
+        $this->adjustConfiguration([
+            'pdf' => ['covers' => ['disableIfEnrichment' => '']],
+        ]);
+
         $this->assertEquals(DisableIfEnrichmentMatcher::DEFAULT_ENRICHMENT_KEY, $this->matcher->getEnrichmentKey());
     }
 
