@@ -31,8 +31,6 @@
 
 namespace Opus\Pdf\Cover;
 
-use Opus\Common\Collection;
-use Opus\Common\CollectionInterface;
 use Opus\Common\Config;
 use Opus\Common\ConfigTrait;
 use Opus\Common\Cover\CoverGeneratorInterface;
@@ -40,7 +38,11 @@ use Opus\Common\DocumentInterface;
 use Opus\Common\FileInterface;
 use Opus\Common\LoggingTrait;
 use Opus\Common\Util\ClassLoaderHelper;
+use Opus\Pdf\DoNotUseCoverException;
 use Opus\Pdf\PdfConcatenatorInterface;
+use Opus\Pdf\TemplateMatcher\CollectionMatcher;
+use Opus\Pdf\TemplateMatcher\DefaultMatcher;
+use Opus\Pdf\TemplateMatcher\DisableIfEnrichmentMatcher;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -80,6 +82,9 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
     /** @var OutputInterface */
     private $output;
+
+    /** @var array|null */
+    private $templateMatchers;
 
     /**
      * Returns the path to a workspace subdirectory that stores cached document files.
@@ -377,104 +382,40 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     public function getTemplateName($document)
     {
         // TODO handle documents belonging to two collections for which different cover templates have been specified
+        $matchers = $this->getTemplateMatchers();
 
-        $docCollections = $document->getCollection();
-
-        foreach ($docCollections as $collection) {
-            $templateName = $this->getTemplateNameForCollection($collection);
-            if ($templateName !== null) {
-                return $templateName;
-            }
-        }
-
-        $templateName = $this->getDefaultTemplateName();
-        if ($templateName !== null) {
-            return $templateName;
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the default template name (or path relative to the templates directory) that has been defined
-     * via the `pdf.covers.default` configuration setting. Returns null if no default template was defined.
-     *
-     * @return string|null Template name or path relative to templates directory.
-     */
-    protected function getDefaultTemplateName()
-    {
-        $config       = $this->getConfig();
         $templateName = null;
 
-        if (isset($config->pdf->covers->default)) {
-            $templateName = $config->pdf->covers->default;
-        }
-
-        if (! empty($templateName)) {
-            return $templateName;
-        } else {
-            $this->getOutput()->writeln('No default cover template configured', OutputInterface::VERBOSITY_DEBUG);
-            $this->getLogger()->warn('No default cover template configured');
-            return null;
-        }
-    }
-
-    /**
-     * Returns the first matching template name (or path relative to the templates directory) that has been defined
-     * for the given collection or any of its parent collections. Returns null if no matching template was found.
-     *
-     * @param CollectionInterface $collection Document collection for which a matching template shall be found.
-     * @return string|null Template name or path relative to templates directory.
-     */
-    protected function getTemplateNameForCollection($collection)
-    {
-        $templateId = $this->getTemplateIdForCollectionId($collection->getId());
-
-        // if there's no template for the given collection, check its parent collection
-        if ($templateId === null) {
-            $parentCollectionId = $collection->getParentNodeId();
-            if ($parentCollectionId !== null) {
-                $parentCollection = Collection::get($parentCollectionId);
-                $templateId       = $this->getTemplateNameForCollection($parentCollection);
+        try {
+            foreach ($matchers as $matcher) {
+                $templateName = $matcher->getTemplate($document);
+                if ($templateName !== null) {
+                    break;
+                }
             }
+        } catch (DoNotUseCoverException $ex) {
+            return null;
         }
 
-        // NOTE: currently, the template ID is identical to the template name
-        // TODO in a future implementation, it may be necessary to convert the template ID to a template name
-
-        return $templateId;
+        return $templateName;
     }
 
     /**
-     * Returns the ID of a template that has been defined for the given collection, or null if no template was found.
+     * @return array
      *
-     * @param int $collectionId ID of a document collection for which a matching template shall be found.
-     * @return string|null Template ID.
+     * TODO get list of matchers and their options from configuration
      */
-    protected function getTemplateIdForCollectionId($collectionId)
+    public function getTemplateMatchers()
     {
-        // NOTE: The template name/rel.path <-> collection ID mapping is currently defined via a Config setting such as
-        //       `collection.<COLLECTION_ID>.cover = '<TEMPLATE_NAME>'`; however, note that this is a temporary measure.
-        // NOTE: As a result, the returned template ID is currently identical to the template name and is thus a string
-        //       (instead of an int).
-        // TODO better implementation of the template name/rel.path <-> collection ID mapping
-
-        $collectionConfig = $this->getConfig()->collection;
-        if ($collectionConfig === null) {
-            return null;
+        if ($this->templateMatchers === null) {
+            $this->templateMatchers = [
+                new DisableIfEnrichmentMatcher(),
+                new CollectionMatcher(),
+                new DefaultMatcher(),
+            ];
         }
 
-        $collectionConfigId = $collectionConfig->{$collectionId};
-        if ($collectionConfigId === null) {
-            return null;
-        }
-
-        $templateId = $collectionConfigId->cover;
-        if (empty($templateId)) {
-            return null;
-        }
-
-        return $templateId;
+        return $this->templateMatchers;
     }
 
     /**

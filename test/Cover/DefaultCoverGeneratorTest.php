@@ -37,12 +37,19 @@ use Opus\Common\CollectionRoleInterface;
 use Opus\Common\Cover\CoverGeneratorFactory;
 use Opus\Common\Cover\CoverGeneratorInterface;
 use Opus\Common\Document;
+use Opus\Common\Enrichment;
 use Opus\Pdf\Cover\DefaultCoverGenerator;
-use OpusTest\Pdf\TestAsset\SimpleTestCase;
+use Opus\Pdf\TemplateMatcher\DisableIfEnrichmentMatcher;
+use OpusTest\Pdf\TestAsset\TestCase;
 
 use function is_object;
 
-class DefaultCoverGeneratorTest extends SimpleTestCase
+/**
+ * TODO Tests are using CoverGeneratorFactory to get DefaultCoverGenerator instance. That is integration testing. The
+ *      class, that is being tested here should be instantiated directly. Especially since CoverGeneratorFactory is
+ *      a class from another package.
+ */
+class DefaultCoverGeneratorTest extends TestCase
 {
     /** @var CollectionRoleInterface */
     protected $roleFixture;
@@ -167,5 +174,37 @@ class DefaultCoverGeneratorTest extends SimpleTestCase
         $templateName = $generator->getTemplateName($doc);
 
         $this->assertEquals('demo-cover.md', $templateName);
+    }
+
+    public function testGetTemplateNameCoverDisabled()
+    {
+        $doc = Document::new();
+
+        $enrichment = Enrichment::new();
+        $enrichment->setKeyName(DisableIfEnrichmentMatcher::DEFAULT_ENRICHMENT_KEY);
+        $enrichment->setValue(1);
+        $doc->setEnrichment($enrichment);
+
+        $generator = new DefaultCoverGenerator();
+
+        $this->assertNull($generator->getTemplateName($doc));
+    }
+
+    public function testGetTemplateNameCoverNotDisabled()
+    {
+        $this->adjustConfiguration([
+            'pdf' => ['covers' => ['default' => 'demo-cover.md']],
+        ]);
+
+        $doc = Document::new();
+
+        $enrichment = Enrichment::new();
+        $enrichment->setKeyName(DisableIfEnrichmentMatcher::DEFAULT_ENRICHMENT_KEY);
+        $enrichment->setValue(0);
+        $doc->setEnrichment($enrichment);
+
+        $generator = new DefaultCoverGenerator();
+
+        $this->assertEquals('demo-cover.md', $generator->getTemplateName($doc));
     }
 }
