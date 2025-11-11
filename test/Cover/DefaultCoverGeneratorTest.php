@@ -211,10 +211,12 @@ class DefaultCoverGeneratorTest extends TestCase
     public function testGetTemplateNameUseCustomDisableEnrichment()
     {
         $this->adjustConfiguration([
-            'pdf' => ['covers' => [
-                'default' => 'demo-cover.md',
-                'disableIfEnrichment' => 'OriginalPDF',
-            ]],
+            'pdf' => [
+                'covers' => [
+                    'default'             => 'demo-cover.md',
+                    'disableIfEnrichment' => 'OriginalPDF',
+                ],
+            ],
         ]);
 
         $doc = Document::new();
