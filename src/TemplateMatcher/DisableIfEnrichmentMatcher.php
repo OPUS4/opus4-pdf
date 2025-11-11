@@ -99,7 +99,7 @@ class DisableIfEnrichmentMatcher extends AbstractTemplateMatcher
                 }
             }
 
-            return 'opus_pdf_CoverDisabled';
+            return self::DEFAULT_ENRICHMENT_KEY;
         }
 
         return $this->enrichmentKey;
