@@ -39,7 +39,7 @@ use Opus\Common\Identifier;
 use Opus\Common\Licence;
 use Opus\Common\Person;
 use Opus\Pdf\Cover\DefaultPdfGenerator;
-use PHPUnit\Framework\TestCase;
+use OpusTest\Pdf\TestAsset\TestCase;
 use Zend_Config;
 
 use function dirname;
@@ -77,6 +77,10 @@ class DefaultPdfGeneratorTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * TODO This test fails if PDF generation is not setup on system. The test should give more information why it
+     *      failed.
+     */
     public function testGenerateFile()
     {
         $templatePath = $this->getFixturePath('demo-cover.md');
@@ -300,5 +304,29 @@ class DefaultPdfGeneratorTest extends TestCase
         $doc->store();
 
         return $doc;
+    }
+
+    public function testGetMetadataGenerator()
+    {
+        $generator = $this->xetexPdfGenerator;
+
+        $metadataGenerator = $generator->getMetadataGenerator();
+
+        $this->assertNotNull($metadataGenerator);
+        $this->assertFalse($metadataGenerator->isIncludeSubtitles());
+    }
+
+    public function testSetMetadataGeneratorIncludeSubtitlesEnabled()
+    {
+        $this->adjustConfiguration([
+            'pdf' => ['covers' => ['includeSubtitles' => true]],
+        ]);
+
+        $generator = $this->xetexPdfGenerator;
+
+        $metadataGenerator = $generator->getMetadataGenerator();
+
+        $this->assertNotNull($metadataGenerator);
+        $this->assertTrue($metadataGenerator->isIncludeSubtitles());
     }
 }

@@ -62,6 +62,9 @@ use const PREG_SPLIT_NO_EMPTY;
  *
  * @link https://github.com/citation-style-language/schema#csl-json-schema
  * @link https://citeproc-js.readthedocs.io/en/latest/csl-json/markup.html
+ *
+ * TODO using class variable $document instead of parameters for functions like getTitle is not thread-safe, however
+ *      that should not be an issue with PHP
  */
 class CslMetadataGenerator
 {
@@ -70,6 +73,12 @@ class CslMetadataGenerator
 
     /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
+
+    /** @var DocumentInterface */
+    private $document;
+
+    /** @var bool */
+    private $includeSubtitles = false;
 
     /**
      * Returns the path to a directory that stores temporary files.
@@ -107,17 +116,19 @@ class CslMetadataGenerator
      *
      * @param DocumentInterface $document The document for which metadata shall be generated.
      * @return string|null Generated metadata.
+     *
+     * TODO add support for more CSL properties?
+     *      - general: `id`, `contributor` (both not supported by CslRecord?)
+     *      - chapter in a book: `container-author` (for the book author)
+     *      - chapter in a book in a series: `collection-title` (for the series title)
+     *      - book in a series: `collection-number`, `collection-editor` (series info)
+     *
+     * TODO add support for more OPUS\Document properties?
+     *      - thesis: ThesisGrantor, ThesisDateAccepted
      */
     public function generate($document)
     {
-        // TODO add support for more CSL properties?
-        //     - general: `id`, `contributor` (both not supported by CslRecord?)
-        //     - chapter in a book: `container-author` (for the book author)
-        //     - chapter in a book in a series: `collection-title` (for the series title)
-        //     - book in a series: `collection-number`, `collection-editor` (series info)
-
-        // TODO add support for more OPUS\Document properties?
-        //     - thesis: ThesisGrantor, ThesisDateAccepted
+        $this->setDocument($document); // TODO review design issues (get rid of this) - Used to avoid API change now
 
         // generate metadata in CSL JSON format
         $cslRecord = new CslRecord();
@@ -127,9 +138,9 @@ class CslMetadataGenerator
 
         $cslRecord->setLanguage($document->getLanguage());
 
-        $mainTitle = $document->getMainTitle();
-        if (! empty($mainTitle)) {
-            $cslRecord->setTitle($mainTitle->getValue());
+        $title = $this->getTitle();
+        if ($title !== null) {
+            $cslRecord->setTitle($title);
         }
 
         $mainAbstract = $document->getMainAbstract();
@@ -210,6 +221,62 @@ class CslMetadataGenerator
         }
 
         return json_encode([$cslRecord]);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTitle()
+    {
+        $document = $this->getDocument();
+
+        $mainTitle = $document->getMainTitle();
+        if (empty($mainTitle)) {
+            return null;
+        }
+
+        $titleValue = trim($mainTitle->getValue());
+
+        if ($this->isIncludeSubtitles()) {
+            // Append subtitle(s) in the same language as the main title: "Titel: Untertitel"
+            $lang = $mainTitle->getLanguage();
+
+            $subtitles = $this->getSubTitles($lang);
+
+            if ($subtitles !== null) {
+                foreach ($subtitles as $subtitle) {
+                    $titleValue .= ': ' . $subtitle;
+                }
+            }
+        }
+
+        return $titleValue;
+    }
+
+    /**
+     * @param string $lang
+     * @return string|string[]
+     *
+     * TODO multiple titles with the same language are not really allowed in OPUS 4
+     */
+    public function getSubTitles($lang)
+    {
+        if ($lang === null) {
+            return [];
+        }
+
+        $document  = $this->getDocument();
+        $subtitles = $document->getTitleSub();
+
+        $subtitleValues = [];
+
+        foreach ($subtitles as $subtitle) {
+            if ($subtitle->getLanguage() === $lang) {
+                $subtitleValues[] = trim($subtitle->getValue());
+            }
+        }
+
+        return $subtitleValues;
     }
 
     /**
@@ -473,5 +540,41 @@ class CslMetadataGenerator
         }
 
         return $cslNames;
+    }
+
+    /**
+     * @param DocumentInterface $document
+     * @return $this
+     */
+    public function setDocument($document)
+    {
+        $this->document = $document;
+        return $this;
+    }
+
+    /**
+     * @return DocumentInterface|null
+     */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIncludeSubtitles()
+    {
+        return $this->includeSubtitles;
+    }
+
+    /**
+     * @param bool $enabled
+     * @return $this
+     */
+    public function setIncludeSubtitles($enabled)
+    {
+        $this->includeSubtitles = $enabled;
+        return $this;
     }
 }
