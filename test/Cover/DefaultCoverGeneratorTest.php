@@ -40,7 +40,7 @@ use Opus\Common\Document;
 use Opus\Common\Enrichment;
 use Opus\Pdf\Cover\DefaultCoverGenerator;
 use Opus\Pdf\TemplateMatcher\DisableIfEnrichmentMatcher;
-use OpusTest\Pdf\TestAsset\SimpleTestCase;
+use OpusTest\Pdf\TestAsset\TestCase;
 
 use function is_object;
 
@@ -49,7 +49,7 @@ use function is_object;
  *      class, that is being tested here should be instantiated directly. Especially since CoverGeneratorFactory is
  *      a class from another package.
  */
-class DefaultCoverGeneratorTest extends SimpleTestCase
+class DefaultCoverGeneratorTest extends TestCase
 {
     /** @var CollectionRoleInterface */
     protected $roleFixture;
