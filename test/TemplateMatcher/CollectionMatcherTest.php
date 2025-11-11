@@ -75,6 +75,7 @@ class CollectionMatcherTest extends TestCase
         $doc->store();
 
         // TODO when the root collection is added to the document it gets a new ID - Why?
+        // TODO WARNING This only happens when the full test suite is run!
         // $this->assertEquals($rootId, $root->getId());
 
         $this->adjustConfiguration([
