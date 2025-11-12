@@ -16,6 +16,8 @@ nbproject
 build
 tests/build/
 /database.ini
+.phpunit.result.cache
 
 # Other
 **/.DS_Store
+local
