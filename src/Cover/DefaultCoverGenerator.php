@@ -97,6 +97,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     public function getFilecacheDir()
     {
         if (null === $this->filecacheDir) {
+            // NOTE getWorkspacePath throws exception if not set (so we do not need to check here)
             $path = Path::join(Config::getInstance()->getWorkspacePath(), 'filecache');
             $this->setFilecacheDir($path);
         }
