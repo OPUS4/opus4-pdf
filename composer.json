@@ -14,6 +14,7 @@
     "opus4-repo/opus4-common": "^4.8.0.2",
     "symfony/console": "*",
     "symfony/process": "*",
+    "symfony/filesystem": "*",
     "iio/libmergepdf": "^4.0",
     "ueberdosis/pandoc": "*",
     "seboettg/citedata": "@dev"

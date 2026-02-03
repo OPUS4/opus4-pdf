@@ -45,10 +45,13 @@ use Opus\Pdf\TemplateMatcher\DefaultMatcher;
 use Opus\Pdf\TemplateMatcher\DisableIfEnrichmentMatcher;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 use function file_exists;
 use function filemtime;
 use function pathinfo;
+use function rtrim;
 use function substr;
 
 use const DIRECTORY_SEPARATOR;
@@ -66,7 +69,7 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
     use LoggingTrait;
 
     /** @var string Path to a file cache directory */
-    private $filecacheDir = "";
+    private $filecacheDir;
 
     /** @var string Path to a directory that stores temporary files */
     private $tempDir = "";
@@ -93,17 +96,18 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function getFilecacheDir()
     {
-        $filecacheDir = $this->filecacheDir;
-
-        if (empty($filecacheDir)) {
-            $filecacheDir = Config::getInstance()->getWorkspacePath() . 'filecache';
+        if (null === $this->filecacheDir) {
+            $path = Path::join(Config::getInstance()->getWorkspacePath(), 'filecache');
+            $this->setFilecacheDir($path);
         }
 
-        if (substr($filecacheDir, -1) !== DIRECTORY_SEPARATOR) {
-            $filecacheDir .= DIRECTORY_SEPARATOR;
+        // TODO IMPORTANT move to setup code so this won't be executed every time (SHOULD NOT BE HERE)
+        $filesystem = new Filesystem();
+        if (! $filesystem->exists($path)) {
+            $filesystem->mkdir($path);
         }
 
-        return $filecacheDir;
+        return $this->filecacheDir;
     }
 
     /**
@@ -113,7 +117,11 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
      */
     public function setFilecacheDir($filecacheDir)
     {
-        $this->filecacheDir = $filecacheDir;
+        if ($filecacheDir !== null) {
+            $this->filecacheDir = rtrim($filecacheDir, '/') . DIRECTORY_SEPARATOR;
+        } else {
+            $this->filecacheDir = null;
+        }
     }
 
     /**
