@@ -2,10 +2,10 @@
 # vi: set ft=ruby :
 
 $software = <<SCRIPT
-# Downgrade to PHP 8.1
+# Downgrade to PHP 8.2
 apt-add-repository -y ppa:ondrej/php
 apt-get -yq update
-apt-get -yq install php8.1
+apt-get -yq install php8.2
 
 # Install MYSQL
 debconf-set-selections <<< "mysql-server mysql-server/root_password password root"
@@ -13,10 +13,10 @@ debconf-set-selections <<< "mysql-server mysql-server/root_password_again passwo
 apt-get -yq install mysql-server
 
 # Install required PHP packages
-apt-get -yq install php8.1-curl
-apt-get -yq install php8.1-dom
-apt-get -yq install php8.1-mysql
-apt-get -yq install php8.1-mbstring
+apt-get -yq install php8.2-curl
+apt-get -yq install php8.2-dom
+apt-get -yq install php8.2-mysql
+apt-get -yq install php8.2-mbstring
 
 # Install required tools
 apt-get -yq install texlive-xetex
@@ -41,9 +41,9 @@ ant prepare-workspace
 SCRIPT
 
 $xdebug = <<SCRIPT
-apt-get -yq install php8.1-xdebug
-if ! grep "xdebug.mode=debug" /etc/php/8.1/mods-available/xdebug.ini > /dev/null; then
-  echo -e "xdebug.mode=debug\nxdebug.client_host=10.0.2.15\nxdebug.client_port=9003" >> /etc/php/8.1/mods-available/xdebug.ini
+apt-get -yq install php8.2-xdebug
+if ! grep "xdebug.mode=debug" /etc/php/8.2/mods-available/xdebug.ini > /dev/null; then
+  echo -e "xdebug.mode=debug\nxdebug.client_host=10.0.2.15\nxdebug.client_port=9003" >> /etc/php/8.2/mods-available/xdebug.ini
 fi
 SCRIPT
 
@@ -84,7 +84,7 @@ echo "'composer cs-fix' to automatically fix basic style problems"
 SCRIPT
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-22.04"
+  config.vm.box = "bento/ubuntu-24.04"
 
   config.vm.provision "Install required software...", type: "shell", inline: $software
   config.vm.provision "Install Xdebug...", type: "shell", inline: $xdebug
