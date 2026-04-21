@@ -104,8 +104,8 @@ class DefaultCoverGenerator implements CoverGeneratorInterface
 
         // TODO IMPORTANT move to setup code so this won't be executed every time (SHOULD NOT BE HERE)
         $filesystem = new Filesystem();
-        if (! $filesystem->exists($path)) {
-            $filesystem->mkdir($path);
+        if (! $filesystem->exists($this->filecacheDir)) {
+            $filesystem->mkdir($this->filecacheDir);
         }
 
         return $this->filecacheDir;
