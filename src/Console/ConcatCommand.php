@@ -50,7 +50,7 @@ class ConcatCommand extends Command
 
     public const ARGUMENT_MERGED = 'merged';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 

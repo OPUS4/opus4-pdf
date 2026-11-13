@@ -59,7 +59,7 @@ class GenerateCoverCommand extends Command
     // Option for the path to the cover template to be used for PDF cover generation
     public const OPTION_TEMPLATE_PATH = 'template';
 
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
